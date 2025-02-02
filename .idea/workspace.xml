@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="c4bbd917-8929-44b4-afda-19b441d6e48e" name="Changes" comment="">
+      <change beforePath="$ARCADIA_ROOT$/market/mapi-shared/business-engine/animation/ya.make" beforeDir="false" afterPath="$ARCADIA_ROOT$/market/mapi-shared/business-engine/animation/ya.make" afterDir="false" />
+      <change beforePath="$ARCADIA_ROOT$/market/mapi-shared/feature/discovery/promo-shortcuts/src/main/kotlin/ru/yandex/market/mapi/discovery/promoshortcuts/state/PromoShortcutActionsState.kt" beforeDir="false" afterPath="$ARCADIA_ROOT$/market/mapi-shared/feature/discovery/promo-shortcuts/src/main/kotlin/ru/yandex/market/mapi/discovery/promoshortcuts/state/PromoShortcutActionsState.kt" afterDir="false" />
+      <change beforePath="$ARCADIA_ROOT$/market/mapi/exp3_configs/mapi_configs/mapi_feedbox_config/values.yaml" beforeDir="false" afterPath="$ARCADIA_ROOT$/market/mapi/exp3_configs/mapi_configs/mapi_feedbox_config/values.yaml" afterDir="false" />
+      <change beforePath="$ARCADIA_ROOT$/market/mapi/feature/discovery/promoshortcuts/src/main/kotlin/ru/yandex/market/mapi/feature/discovery/promoshortcuts/assembler/PromoShortcutActionAssembler.kt" beforeDir="false" afterPath="$ARCADIA_ROOT$/market/mapi/feature/discovery/promoshortcuts/src/main/kotlin/ru/yandex/market/mapi/feature/discovery/promoshortcuts/assembler/PromoShortcutActionAssembler.kt" afterDir="false" />
+      <change beforePath="$ARCADIA_ROOT$/market/mapi/screen-api/src/main/kotlin/ru/yandex/market/mapi/controller/screen/main/MainScreenController.kt" beforeDir="false" afterPath="$ARCADIA_ROOT$/market/mapi/screen-api/src/main/kotlin/ru/yandex/market/mapi/controller/screen/main/MainScreenController.kt" afterDir="false" />
+      <change beforePath="$ARCADIA_ROOT$/market/mapi/screen-api/src/main/kotlin/ru/yandex/market/mapi/controller/screen/main/MainScreenPostProcessor.kt" beforeDir="false" afterPath="$ARCADIA_ROOT$/market/mapi/screen-api/src/main/kotlin/ru/yandex/market/mapi/controller/screen/main/MainScreenPostProcessor.kt" afterDir="false" />
+      <change beforePath="$ARCADIA_ROOT$/market/mapi/screen-api/src/main/resources/cms_static/apps_home_screen.json" beforeDir="false" afterPath="$ARCADIA_ROOT$/market/mapi/screen-api/src/main/resources/cms_static/apps_home_screen.json" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ExternalProjectsData">
+    <projectState path="$PROJECT_DIR$">
+      <ProjectState />
+    </projectState>
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Kotlin Class" />
+        <option value="Kotlin Object" />
+      </list>
+    </option>
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 0
+}</component>
+  <component name="ProjectId" id="2roeNNEwzRCHqD3T6CUluPTzWGz" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "/Users/iuturakulov/IdeaProjects/MyBudget-backend/src/main/kotlin/ru/iuturakulov/mybudgetbackend",
+    "settings.editor.selected.configurable": "preferences.pluginManager"
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend" />
+      <recent name="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/routing" />
+      <recent name="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/repository" />
+      <recent name="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/controller/user" />
+      <recent name="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/models" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/entities/user" />
+    </key>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="c4bbd917-8929-44b4-afda-19b441d6e48e" name="Changes" comment="" />
+      <created>1737229814397</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1737229814397</updated>
+    </task>
+    <servers />
+  </component>
+</project>
