@@ -1,37 +1,50 @@
 package ru.iuturakulov.mybudgetbackend.extensions
 
-open class AlreadyExistsException(message: String? = null, base: String = "Already exists") :
-    Exception(message(base, message))
+sealed class AppException(
+    message: String? = null,
+    cause: Throwable? = null
+) : Exception(message, cause) {
 
-class EmailAlreadyExistsException(message: String? = null, base: String = "Email already in use") :
-    AlreadyExistsException(message, base)
+    abstract class BaseException(
+        base: String,
+        details: String? = null,
+        cause: Throwable? = null
+    ) : AppException("$base${details?.let { ": $it" } ?: ""}", cause)
 
-open class InvalidPropertyException(message: String? = null, base: String = "Invalid property") :
-    Exception(message(base, message))
+    sealed class AlreadyExists(
+        base: String = "Already exists",
+        details: String? = null
+    ) : BaseException(base, details) {
+        class Email(details: String? = null) : AlreadyExists("Email already in use", details)
+    }
 
-class EmailInvalidException(message: String? = null, base: String = "Email invalid") :
-    InvalidPropertyException(message, base)
+    sealed class InvalidProperty(
+        base: String = "Invalid property",
+        details: String? = null
+    ) : BaseException(base, details) {
+        class Email(details: String? = null) : InvalidProperty("Email invalid", details)
+        class EmailNotExist(details: String? = null) : InvalidProperty("Email not exist", details)
+        class Password(details: String? = null) : InvalidProperty("Password invalid", details)
+        class PasswordNotMatch(details: String? = null) : InvalidProperty("Password not match", details)
+    }
 
-class EmailNotExistException(message: String? = null, base: String = "Email not exist") :
-    InvalidPropertyException(message, base)
+    sealed class NotFound(
+        base: String = "Not found",
+        details: String? = null
+    ) : BaseException(base, details) {
+        class User(details: String? = null) : NotFound("User not found", details)
+    }
 
-class PasswordInvalidException(message: String? = null, base: String = "Password invalid") :
-    InvalidPropertyException(message, base)
+    class Authorization(
+        details: String? = null
+    ) : BaseException("No authority for this action", details)
 
-class PasswordNotMatchException(message: String? = null, base: String = "Password not match") :
-    InvalidPropertyException(message, base)
+    class Authentication(
+        details: String? = null
+    ) : BaseException("Invalid authentication", details)
 
-class AuthorizationException(message: String? = null, base: String = "No authority for this action") :
-    Exception(message(base, message))
-
-class LoginException(message: String? = null, base: String = "Invalid authentication") :
-    Exception(message(base, message))
-
-class CommonException(message: String? = null, base: String = "Something wrong happened") :
-    Exception(message(base, message))
-
-open class NotFoundException(message: String? = null, base: String = "Not found") : Exception(message(base, message))
-
-class UserNotFoundException(message: String? = null, base: String = "User not found") : NotFoundException(message, base)
-
-private fun message(base: String, message: String?) = base + if (message != null) ": $message" else ""
+    class Common(
+        details: String? = null,
+        cause: Throwable? = null
+    ) : BaseException("Something wrong happened", details, cause)
+}

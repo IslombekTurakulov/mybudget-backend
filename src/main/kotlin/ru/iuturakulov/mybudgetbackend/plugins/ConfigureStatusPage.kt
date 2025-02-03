@@ -8,10 +8,7 @@ import io.ktor.server.response.*
 import org.valiktor.ConstraintViolationException
 import org.valiktor.i18n.mapToMessage
 import ru.iuturakulov.mybudgetbackend.extensions.ApiResponseState.failure
-import ru.iuturakulov.mybudgetbackend.extensions.CommonException
-import ru.iuturakulov.mybudgetbackend.extensions.EmailNotExistException
-import ru.iuturakulov.mybudgetbackend.extensions.PasswordNotMatchException
-import ru.iuturakulov.mybudgetbackend.extensions.UserNotFoundException
+import ru.iuturakulov.mybudgetbackend.extensions.AppException
 import java.util.*
 
 fun Application.configureStatusPage() {
@@ -19,74 +16,92 @@ fun Application.configureStatusPage() {
         exception<Throwable> { call, error ->
             when (error) {
                 is ConstraintViolationException -> {
-                    val errorMessage =
-                        error.constraintViolations.mapToMessage(baseName = "messages", locale = Locale.ENGLISH)
-                            .map { "${it.property}: ${it.message}" }
+                    val errorMessage = error.constraintViolations
+                        .mapToMessage(baseName = "messages", locale = Locale.ENGLISH)
+                        .map { "${it.property}: ${it.message}" }
                     call.respond(
-                        HttpStatusCode.BadRequest, failure(
-                            errorMessage, HttpStatusCode.BadRequest
-                        )
+                        HttpStatusCode.BadRequest,
+                        failure(errorMessage, HttpStatusCode.BadRequest)
                     )
                 }
 
                 is MissingRequestParameterException -> {
                     call.respond(
-                        HttpStatusCode.BadRequest, failure(
-                            "${error.message}", HttpStatusCode.BadRequest
-                        )
+                        HttpStatusCode.BadRequest,
+                        failure("${error.message}", HttpStatusCode.BadRequest)
                     )
                 }
 
-                is EmailNotExistException -> {
+                is AppException.AlreadyExists -> {
                     call.respond(
-                        HttpStatusCode.BadRequest, failure(error.message, HttpStatusCode.BadRequest)
+                        HttpStatusCode.Conflict,
+                        failure(error.message, HttpStatusCode.Conflict)
                     )
                 }
 
-                is NullPointerException -> {
-                    call.respond(
-                        failure(
-                            "Null pointer error : ${error.message}", HttpStatusCode.BadRequest
-                        )
-                    )
-                }
-
-                is UserNotFoundException -> {
-                    call.respond(
-                        HttpStatusCode.BadRequest, failure(error.message, HttpStatusCode.BadRequest)
-                    )
-                }
-
-                is PasswordNotMatchException -> {
+                is AppException.InvalidProperty -> {
                     call.respond(
                         HttpStatusCode.BadRequest,
                         failure(error.message, HttpStatusCode.BadRequest)
                     )
                 }
 
-                is TypeCastException -> {
+                is AppException.NotFound -> {
                     call.respond(
-                        failure("Type cast exception", HttpStatusCode.BadRequest)
+                        HttpStatusCode.NotFound,
+                        failure(error.message, HttpStatusCode.NotFound)
                     )
                 }
 
-                is CommonException -> {
+                is AppException.Authorization -> {
                     call.respond(
-                        HttpStatusCode.BadRequest, failure(error.message, HttpStatusCode.BadRequest)
+                        HttpStatusCode.Forbidden,
+                        failure(error.message, HttpStatusCode.Forbidden)
+                    )
+                }
+
+                is AppException.Authentication -> {
+                    call.respond(
+                        HttpStatusCode.Unauthorized,
+                        failure(error.message, HttpStatusCode.Unauthorized)
+                    )
+                }
+
+                is AppException.Common -> {
+                    call.respond(
+                        HttpStatusCode.BadRequest,
+                        failure(error.message, HttpStatusCode.BadRequest)
+                    )
+                }
+
+                is NullPointerException -> {
+                    call.respond(
+                        HttpStatusCode.BadRequest,
+                        failure("Null pointer error: ${error.message}", HttpStatusCode.BadRequest)
+                    )
+                }
+
+                is TypeCastException -> {
+                    call.respond(
+                        HttpStatusCode.BadRequest,
+                        failure("Type cast exception", HttpStatusCode.BadRequest)
                     )
                 }
 
                 else -> {
                     call.respond(
-                        HttpStatusCode.InternalServerError, failure(
-                            "Internal server error : ${error.message}", HttpStatusCode.InternalServerError
-                        )
+                        HttpStatusCode.InternalServerError,
+                        failure("Internal server error: ${error.message}", HttpStatusCode.InternalServerError)
                     )
                 }
             }
         }
+
         status(HttpStatusCode.Unauthorized) { call, statusCode ->
-            call.respond(HttpStatusCode.Unauthorized, failure("Unauthorized api call", statusCode))
+            call.respond(
+                HttpStatusCode.Unauthorized,
+                failure("Unauthorized api call", statusCode)
+            )
         }
     }
 }

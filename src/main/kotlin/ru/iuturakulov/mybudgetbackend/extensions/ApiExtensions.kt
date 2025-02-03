@@ -61,16 +61,18 @@ object ApiExtensions {
                 }
             }
         } catch (e: EmailException) {
-            throw EmailInvalidException("Sending email failed")
+            throw AppException.InvalidProperty.Email("Failed to send email: ${e.message}")
+        } catch (e: Exception) {
+            throw AppException.Common("Email sending failed", e)
         }
     }
 
     object SmtpServer {
-        const val HOST_NAME = "smtp.googlemail.com"
+        const val HOST_NAME = "smtp.yandex.ru"
         const val PORT = 465
-        const val DEFAULT_AUTHENTICATOR = "smtp@gmail.com" // your smtp email address
-        const val DEFAULT_AUTHENTICATOR_PASSWORD = "smtpcredential" // password for smtp
+        const val DEFAULT_AUTHENTICATOR = "yndx-iuturakulov-khevj0@yandex.ru"
+        const val DEFAULT_AUTHENTICATOR_PASSWORD = "ajiprghaflyfjgnn"
         const val EMAIL_SUBJECT = "Forget Password"
-        const val SENDING_EMAIL = "sendingemail.@gmail.com"
+        const val SENDING_EMAIL = "yndx-iuturakulov-khevj0@yandex.ru"
     }
 }

@@ -48,7 +48,7 @@ fun Route.userRoute(userController: UserController) {
             requestBody.validation()
             call.respond(ApiResponseState.success(userController.addUser(requestBody), HttpStatusCode.OK))
         }
-        get("forget-password", {
+        get("reset-password", {
             tags("User")
             request {
                 queryParameter<String>("email") {

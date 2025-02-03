@@ -8,6 +8,8 @@ import org.jetbrains.exposed.sql.SchemaUtils.create
 import org.jetbrains.exposed.sql.StdOutSqlLogger
 import org.jetbrains.exposed.sql.addLogger
 import org.jetbrains.exposed.sql.transactions.transaction
+import ru.iuturakulov.mybudgetbackend.entities.user.UserProfileTable
+import ru.iuturakulov.mybudgetbackend.entities.user.UserTable
 import javax.sql.DataSource
 
 fun configureDataBase() {
