@@ -17,14 +17,8 @@ import ru.iuturakulov.mybudgetbackend.models.user.body.JwtTokenBody
 
 object ApiExtensions {
 
-    suspend fun <T> query(block: () -> T): T = withContext(Dispatchers.IO) {
-        transaction {
-            block()
-        }
-    }
-
-    fun ApplicationCall.currentUser(): JwtTokenBody {
-        return this.principal<JwtTokenBody>() ?: throw IllegalStateException("No authenticated user found")
+    suspend fun <T> callRequest(block: () -> T): T = withContext(Dispatchers.IO) {
+        block()
     }
 
     suspend fun ApplicationCall.requiredParameters(vararg requiredParams: String): List<String>? {
@@ -36,43 +30,10 @@ object ApiExtensions {
         return requiredParams.map { this.parameters[it]!! }
     }
 
-    fun sendEmail(
-        toEmail: String,
-        verificationCode: String,
-        fromEmail: String = SmtpServer.SENDING_EMAIL,
-        subject: String = SmtpServer.EMAIL_SUBJECT,
-        smtpHost: String = SmtpServer.HOST_NAME,
-        smtpPort: Int = SmtpServer.PORT,
-        smtpUser: String = SmtpServer.DEFAULT_AUTHENTICATOR,
-        smtpPassword: String = SmtpServer.DEFAULT_AUTHENTICATOR_PASSWORD
-    ) {
-        try {
-            CoroutineScope(Dispatchers.IO).launch {
-                SimpleEmail().apply {
-                    hostName = smtpHost
-                    setSmtpPort(smtpPort)
-                    setAuthenticator(DefaultAuthenticator(smtpUser, smtpPassword))
-                    isSSLOnConnect = true
-                    setFrom(fromEmail)
-                    this.subject = subject
-                    setMsg("Your verification code is: $verificationCode")
-                    addTo(toEmail)
-                    send()
-                }
-            }
-        } catch (e: EmailException) {
-            throw AppException.InvalidProperty.Email("Failed to send email: ${e.message}")
-        } catch (e: Exception) {
-            throw AppException.Common("Email sending failed", e)
-        }
-    }
-
-    object SmtpServer {
-        const val HOST_NAME = "smtp.yandex.ru"
-        const val PORT = 465
-        const val DEFAULT_AUTHENTICATOR = "yndx-iuturakulov-khevj0@yandex.ru"
-        const val DEFAULT_AUTHENTICATOR_PASSWORD = "ajiprghaflyfjgnn"
-        const val EMAIL_SUBJECT = "Forget Password"
-        const val SENDING_EMAIL = "yndx-iuturakulov-khevj0@yandex.ru"
+    fun generateVerificationCode(length: Int = 6): String {
+        val chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        return (1..length)
+            .map { chars.random() }
+            .joinToString("")
     }
 }

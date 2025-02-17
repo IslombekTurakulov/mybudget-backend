@@ -1,20 +1,21 @@
 package ru.iuturakulov.mybudgetbackend.models.user.body
 
+import kotlinx.serialization.Serializable
 import org.valiktor.functions.hasSize
 import org.valiktor.functions.isEmail
+import org.valiktor.functions.isNotBlank
 import org.valiktor.functions.isNotNull
 import org.valiktor.validate
 
-data class ConfirmPassword(
+@Serializable
+data class VerifyEmailRequest(
     val email: String,
     val verificationCode: String,
-    val newPassword: String
 ) {
     fun validation() {
         validate(this) {
-            validate(ConfirmPassword::email).isNotNull().isEmail()
-            validate(ConfirmPassword::verificationCode).isNotNull().hasSize(4, 6)
-            validate(ConfirmPassword::newPassword).isNotNull().hasSize(8, 32)
+            validate(VerifyEmailRequest::email).isNotBlank().isEmail().hasSize(5, 128)
+            validate(VerifyEmailRequest::verificationCode).isNotBlank().isNotNull()
         }
     }
 }

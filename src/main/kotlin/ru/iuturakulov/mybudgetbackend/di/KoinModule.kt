@@ -2,9 +2,19 @@ package ru.iuturakulov.mybudgetbackend.di
 
 import org.koin.dsl.module
 import ru.iuturakulov.mybudgetbackend.controller.user.UserController
-import ru.iuturakulov.mybudgetbackend.controller.user.UserProfileController
+
+//val repositoryModule = module {
+//    single { UserRepository() }
+//    single { UserProfileRepository() }
+//}
+//
+//val serviceModule = module {
+//    single { UserService(get()) }
+//    single { UserProfileService(get()) }
+//}
 
 val controllerModule = module {
-    single { UserController() }
-    single { UserProfileController() }
+    single { UserController(get(), get()) }
 }
+
+val appModule = listOf(controllerModule)

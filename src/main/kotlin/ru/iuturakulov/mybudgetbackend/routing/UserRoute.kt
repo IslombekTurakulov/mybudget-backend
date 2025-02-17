@@ -1,6 +1,5 @@
 package ru.iuturakulov.mybudgetbackend.routing
 
-import io.github.smiley4.ktorswaggerui.dsl.routing.get
 import io.github.smiley4.ktorswaggerui.dsl.routing.post
 import io.github.smiley4.ktorswaggerui.dsl.routing.put
 import io.ktor.http.*
@@ -9,137 +8,146 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import ru.iuturakulov.mybudgetbackend.controller.user.UserController
-import ru.iuturakulov.mybudgetbackend.entities.user.ChangePassword
 import ru.iuturakulov.mybudgetbackend.extensions.ApiExtensions.requiredParameters
-import ru.iuturakulov.mybudgetbackend.extensions.ApiExtensions.sendEmail
 import ru.iuturakulov.mybudgetbackend.extensions.ApiResponseState
-import ru.iuturakulov.mybudgetbackend.extensions.DataBaseTransaction
+import ru.iuturakulov.mybudgetbackend.extensions.AppException
 import ru.iuturakulov.mybudgetbackend.extensions.RoutingExtensions.apiResponse
-import ru.iuturakulov.mybudgetbackend.models.user.body.ConfirmPassword
-import ru.iuturakulov.mybudgetbackend.models.user.body.ForgetPasswordEmail
+import ru.iuturakulov.mybudgetbackend.models.user.body.ChangePasswordRequest
+import ru.iuturakulov.mybudgetbackend.models.user.body.ForgetPasswordEmailRequest
 import ru.iuturakulov.mybudgetbackend.models.user.body.JwtTokenBody
-import ru.iuturakulov.mybudgetbackend.models.user.body.LoginBody
-import ru.iuturakulov.mybudgetbackend.models.user.body.RegistrationBody
+import ru.iuturakulov.mybudgetbackend.models.user.body.LoginRequest
+import ru.iuturakulov.mybudgetbackend.models.user.body.RefreshTokenRequest
+import ru.iuturakulov.mybudgetbackend.models.user.body.RegistrationRequest
+import ru.iuturakulov.mybudgetbackend.models.user.body.VerifyEmailRequest
 
 fun Route.userRoute(userController: UserController) {
     route("auth") {
+
         post("login", {
             tags("User")
-            request {
-                body<LoginBody>()
-            }
+            request { body<LoginRequest>() }
             apiResponse()
         }) {
-            val requestBody = call.receive<LoginBody>()
-            call.respond(
-                ApiResponseState.success(
-                    userController.login(requestBody), HttpStatusCode.OK
+            try {
+                val requestBody = call.receive<LoginRequest>()
+                requestBody.validation()
+                val response = userController.login(requestBody)
+
+                call.respond(ApiResponseState.success(response, HttpStatusCode.OK))
+            } catch (e: Exception) {
+                call.respond(
+                    ApiResponseState.failure(
+                        "Ошибка при входе: ${e.localizedMessage}",
+                        HttpStatusCode.BadRequest
+                    )
                 )
-            )
+            }
         }
+
         post("register", {
             tags("User")
-            request {
-                body<RegistrationBody>()
-            }
+            request { body<RegistrationRequest>() }
             apiResponse()
         }) {
-            val requestBody = call.receive<RegistrationBody>()
-            requestBody.validation()
-            call.respond(ApiResponseState.success(userController.addUser(requestBody), HttpStatusCode.OK))
-        }
-        get("reset-password", {
-            tags("User")
-            request {
-                queryParameter<String>("email") {
-                    required = true
-                }
-            }
-            apiResponse()
-        }) {
-            val (email) = call.requiredParameters("email") ?: return@get
-            val requestBody = ForgetPasswordEmail(email)
-            userController.forgetPasswordSendCode(requestBody).let {
-                sendEmail(requestBody.email, it.verificationCode)
+            try {
+                val requestBody = call.receive<RegistrationRequest>()
+                requestBody.validation()
+                val user = userController.register(requestBody)
+                call.respond(ApiResponseState.success(user, HttpStatusCode.Created))
+            } catch (e: AppException.AlreadyExists.Email) {
+                call.respond(ApiResponseState.failure("Email уже используется", HttpStatusCode.Conflict))
+            } catch (e: Exception) {
                 call.respond(
-
-                    ApiResponseState.success(
-                        "Verification code sent to ${requestBody.email}",
-                        HttpStatusCode.OK
+                    ApiResponseState.failure(
+                        "Ошибка при регистрации: ${e.localizedMessage}",
+                        HttpStatusCode.BadRequest
                     )
                 )
             }
         }
-        get("verify-password-change", {
+
+        post("verify-email", {
             tags("User")
             request {
-                queryParameter<String>("email") {
-                    required = true
-                }
-                queryParameter<String>("verificationCode") {
-                    required = true
-                }
-                queryParameter<String>("newPassword") {
-                    required = true
-                }
+                queryParameter<String>("email") { required = true }
+                queryParameter<String>("verificationCode") { required = true }
             }
             apiResponse()
         }) {
-            val (email, verificationCode, newPassword) = call.requiredParameters(
-                "email", "verificationCode", "newPassword"
-            ) ?: return@get
+            try {
+                val (email, verificationCode) = call.requiredParameters("email", "verificationCode") ?: return@post
+                val emailRequest = VerifyEmailRequest(email, verificationCode)
+                emailRequest.validation()
+                val result = userController.verifyEmail(emailRequest)
 
-            UserController().forgetPasswordVerificationCode(
-                ConfirmPassword(
-                    email, verificationCode, newPassword
-                )
-            ).let {
-                when (it) {
-                    DataBaseTransaction.FOUND -> {
-                        call.respond(
-                            ApiResponseState.success(
-                                "Password change successful", HttpStatusCode.OK
-                            )
-                        )
-                    }
-
-                    DataBaseTransaction.NOT_FOUND -> {
-                        call.respond(
-                            ApiResponseState.success(
-                                "Verification code is not valid",
-                                HttpStatusCode.OK
-                            )
-                        )
-                    }
+                if (result.isSuccess) {
+                    call.respond(ApiResponseState.success("Email подтвержден", HttpStatusCode.OK))
+                } else {
+                    call.respond(ApiResponseState.failure("Неверный код", HttpStatusCode.BadRequest))
                 }
+            } catch (e: Exception) {
+                call.respond(ApiResponseState.failure("Ошибка подтверждения email: ${e.localizedMessage}", HttpStatusCode.InternalServerError))
             }
         }
-            put("change-password", {
-                tags("User")
-                protected = true
-                request {
-                    queryParameter<String>("oldPassword") {
-                        required = true
-                    }
-                    queryParameter<String>("newPassword") {
-                        required = true
-                    }
-                }
-                apiResponse()
-            }) {
-                val (oldPassword, newPassword) = call.requiredParameters("oldPassword", "newPassword") ?: return@put
-                val loginUser = call.principal<JwtTokenBody>()
-                userController.changePassword(loginUser?.userId!!, ChangePassword(oldPassword, newPassword)).let {
-                    if (it) call.respond(
-                        ApiResponseState.success(
-                            "Password has been changed", HttpStatusCode.OK
-                        )
-                    ) else call.respond(
-                        ApiResponseState.failure(
-                            "Old password is wrong", HttpStatusCode.OK
-                        )
-                    )
-                }
+
+        post("reset-password", {
+            tags("User")
+            request { body<ForgetPasswordEmailRequest>() }
+            apiResponse()
+        }) {
+            try {
+                val requestBody = call.receive<ForgetPasswordEmailRequest>()
+                requestBody.validation()
+                val verificationCode = userController.requestPasswordReset(requestBody)
+
+                call.respond(verificationCode)
+            } catch (e: AppException.InvalidProperty.EmailNotExist) {
+                call.respond(ApiResponseState.failure("Email не найден", HttpStatusCode.NotFound))
+            } catch (e: Exception) {
+                call.respond(ApiResponseState.failure("Ошибка при сбросе пароля", HttpStatusCode.InternalServerError))
             }
+        }
+
+        put("change-password", {
+            tags("User")
+            protected = true
+            request { body<ChangePasswordRequest>() }
+            apiResponse()
+        }) {
+            try {
+                val requestBody = call.receive<ChangePasswordRequest>()
+                requestBody.validation()
+                val loginUser = call.principal<JwtTokenBody>()?.userId ?: let {
+                    call.respond(ApiResponseState.failure("User with current email is not found", HttpStatusCode.InternalServerError))
+                    return@put
+                }
+                val result = userController.changePassword(loginUser, requestBody)
+
+                if (result.isSuccess) {
+                    call.respond(ApiResponseState.success("Пароль изменен", HttpStatusCode.OK))
+                } else {
+                    call.respond(ApiResponseState.failure("Старый пароль неверен", HttpStatusCode.BadRequest))
+                }
+            } catch (e: Exception) {
+                call.respond(ApiResponseState.failure("Ошибка изменения пароля: ${e.localizedMessage}", HttpStatusCode.InternalServerError))
+            }
+        }
+
+        post("refresh-token", {
+            tags("User")
+            request { body<RefreshTokenRequest>() }
+            apiResponse()
+        }) {
+            try {
+                val requestBody = call.receive<RefreshTokenRequest>()
+                val newAccessToken = userController.refreshToken(requestBody)
+
+                call.respond(ApiResponseState.success(newAccessToken, HttpStatusCode.OK))
+            } catch (e: AppException.Authentication) {
+                call.respond(ApiResponseState.failure("Недействительный refresh-токен", HttpStatusCode.Unauthorized))
+            } catch (e: Exception) {
+                call.respond(ApiResponseState.failure("Ошибка обновления токена: ${e.localizedMessage}", HttpStatusCode.InternalServerError))
+            }
+        }
     }
 }

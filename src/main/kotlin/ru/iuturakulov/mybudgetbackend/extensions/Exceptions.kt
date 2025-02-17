@@ -16,6 +16,7 @@ sealed class AppException(
         details: String? = null
     ) : BaseException(base, details) {
         class Email(details: String? = null) : AlreadyExists("Email already in use", details)
+        class User(details: String? = null) : AlreadyExists("User already exists", details)
     }
 
     sealed class InvalidProperty(
@@ -23,9 +24,9 @@ sealed class AppException(
         details: String? = null
     ) : BaseException(base, details) {
         class Email(details: String? = null) : InvalidProperty("Email invalid", details)
-        class EmailNotExist(details: String? = null) : InvalidProperty("Email not exist", details)
+        class EmailNotExist(details: String? = null) : InvalidProperty("Email does not exist", details)
         class Password(details: String? = null) : InvalidProperty("Password invalid", details)
-        class PasswordNotMatch(details: String? = null) : InvalidProperty("Password not match", details)
+        class PasswordNotMatch(details: String? = null) : InvalidProperty("Password does not match", details)
     }
 
     sealed class NotFound(
@@ -33,6 +34,8 @@ sealed class AppException(
         details: String? = null
     ) : BaseException(base, details) {
         class User(details: String? = null) : NotFound("User not found", details)
+        class Project(details: String? = null) : NotFound("Project not found", details)
+        class Resource(details: String? = null) : NotFound("Resource not found", details)
     }
 
     class Authorization(
@@ -43,8 +46,25 @@ sealed class AppException(
         details: String? = null
     ) : BaseException("Invalid authentication", details)
 
+    class RateLimitExceeded(
+        details: String? = null
+    ) : BaseException("Too many requests", details)
+
+    class InvalidToken(
+        details: String? = null
+    ) : BaseException("Invalid or expired token", details)
+
+    class ActionNotAllowed(
+        details: String? = null
+    ) : BaseException("Action not allowed", details)
+
+    class DatabaseError(
+        details: String? = null,
+        cause: Throwable? = null
+    ) : BaseException("Database error", details, cause)
+
     class Common(
         details: String? = null,
         cause: Throwable? = null
-    ) : BaseException("Something wrong happened", details, cause)
+    ) : BaseException("Something went wrong", details, cause)
 }

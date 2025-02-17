@@ -5,103 +5,71 @@ import io.ktor.server.application.*
 import io.ktor.server.plugins.*
 import io.ktor.server.plugins.statuspages.*
 import io.ktor.server.response.*
+import org.slf4j.LoggerFactory
 import org.valiktor.ConstraintViolationException
 import org.valiktor.i18n.mapToMessage
 import ru.iuturakulov.mybudgetbackend.extensions.ApiResponseState.failure
 import ru.iuturakulov.mybudgetbackend.extensions.AppException
 import java.util.*
 
+private val logger = LoggerFactory.getLogger("StatusPage")
+
 fun Application.configureStatusPage() {
     install(StatusPages) {
-        exception<Throwable> { call, error ->
-            when (error) {
-                is ConstraintViolationException -> {
-                    val errorMessage = error.constraintViolations
-                        .mapToMessage(baseName = "messages", locale = Locale.ENGLISH)
-                        .map { "${it.property}: ${it.message}" }
-                    call.respond(
-                        HttpStatusCode.BadRequest,
-                        failure(errorMessage, HttpStatusCode.BadRequest)
-                    )
-                }
+        exception<Throwable> { call, cause ->
+            when (cause) {
+                is ConstraintViolationException ->
+                    call.respondError(HttpStatusCode.BadRequest, "Ошибка валидации", cause)
 
-                is MissingRequestParameterException -> {
-                    call.respond(
-                        HttpStatusCode.BadRequest,
-                        failure("${error.message}", HttpStatusCode.BadRequest)
-                    )
-                }
+                is MissingRequestParameterException ->
+                    call.respondError(HttpStatusCode.BadRequest, "Пропущен параметр: ${cause.parameterName}", cause)
 
-                is AppException.AlreadyExists -> {
-                    call.respond(
-                        HttpStatusCode.Conflict,
-                        failure(error.message, HttpStatusCode.Conflict)
-                    )
-                }
+                is AppException.NotFound ->
+                    call.respondError(HttpStatusCode.NotFound, cause.message, cause)
 
-                is AppException.InvalidProperty -> {
-                    call.respond(
-                        HttpStatusCode.BadRequest,
-                        failure(error.message, HttpStatusCode.BadRequest)
-                    )
-                }
+                is AppException.Authentication ->
+                    call.respondError(HttpStatusCode.Unauthorized, cause.message, cause)
 
-                is AppException.NotFound -> {
-                    call.respond(
-                        HttpStatusCode.NotFound,
-                        failure(error.message, HttpStatusCode.NotFound)
-                    )
-                }
+                is AppException.Authorization ->
+                    call.respondError(HttpStatusCode.Forbidden, cause.message, cause)
 
-                is AppException.Authorization -> {
-                    call.respond(
-                        HttpStatusCode.Forbidden,
-                        failure(error.message, HttpStatusCode.Forbidden)
-                    )
-                }
+                is AppException.AlreadyExists ->
+                    call.respondError(HttpStatusCode.Conflict, cause.message, cause)
 
-                is AppException.Authentication -> {
-                    call.respond(
-                        HttpStatusCode.Unauthorized,
-                        failure(error.message, HttpStatusCode.Unauthorized)
-                    )
-                }
+                is AppException.InvalidProperty ->
+                    call.respondError(HttpStatusCode.BadRequest, cause.message, cause)
 
-                is AppException.Common -> {
-                    call.respond(
-                        HttpStatusCode.BadRequest,
-                        failure(error.message, HttpStatusCode.BadRequest)
-                    )
-                }
+                is AppException.RateLimitExceeded ->
+                    call.respondError(HttpStatusCode.TooManyRequests, cause.message, cause)
 
-                is NullPointerException -> {
-                    call.respond(
-                        HttpStatusCode.BadRequest,
-                        failure("Null pointer error: ${error.message}", HttpStatusCode.BadRequest)
-                    )
-                }
+                is AppException.DatabaseError ->
+                    call.respondError(HttpStatusCode.InternalServerError, "Ошибка базы данных", cause)
 
-                is TypeCastException -> {
-                    call.respond(
-                        HttpStatusCode.BadRequest,
-                        failure("Type cast exception", HttpStatusCode.BadRequest)
-                    )
-                }
+                is AppException.InvalidToken ->
+                    call.respondError(HttpStatusCode.Unauthorized, "Неверный или устаревший токен", cause)
+
+                is AppException.ActionNotAllowed ->
+                    call.respondError(HttpStatusCode.Forbidden, "Запрещенное действие", cause)
 
                 else -> {
-                    call.respond(
-                        HttpStatusCode.InternalServerError,
-                        failure("Internal server error: ${error.message}", HttpStatusCode.InternalServerError)
-                    )
+                    logger.error("Неизвестная ошибка", cause)
+                    call.respondError(HttpStatusCode.InternalServerError, "Внутренняя ошибка сервера", cause)
                 }
             }
         }
-
-        status(HttpStatusCode.Unauthorized) { call, statusCode ->
-            call.respond(
-                HttpStatusCode.Unauthorized,
-                failure("Unauthorized api call", statusCode)
-            )
-        }
     }
+}
+
+private suspend fun ApplicationCall.respondError(status: HttpStatusCode, message: String?, cause: Throwable? = null) {
+    val response = mutableMapOf(
+        "status" to status.value,
+        "error" to message
+    )
+
+    // Включаем трассировку ошибок только в режиме DEBUG
+    if (System.getenv("DEBUG") == "true" && cause != null) {
+        response["trace"] = cause.stackTraceToString()
+    }
+
+    respond(status, response)
 }

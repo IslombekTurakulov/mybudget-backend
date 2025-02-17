@@ -1,86 +1,122 @@
 package ru.iuturakulov.mybudgetbackend.controller.user
 
-import at.favre.lib.crypto.bcrypt.BCrypt
-import ru.iuturakulov.mybudgetbackend.models.user.response.RegistrationResponse
-import ru.iuturakulov.mybudgetbackend.entities.user.ChangePassword
-import ru.iuturakulov.mybudgetbackend.entities.user.LoginResponse
-import ru.iuturakulov.mybudgetbackend.entities.user.UserTable
-import ru.iuturakulov.mybudgetbackend.entities.user.UsersEntity
-import ru.iuturakulov.mybudgetbackend.entities.user.UsersProfileEntity
-import ru.iuturakulov.mybudgetbackend.entities.user.VerificationCode
-import ru.iuturakulov.mybudgetbackend.extensions.ApiExtensions.query
+import io.ktor.http.*
+import ru.iuturakulov.mybudgetbackend.config.JwtConfig
+import ru.iuturakulov.mybudgetbackend.database.DataBaseTransaction
+import ru.iuturakulov.mybudgetbackend.extensions.ApiExtensions.callRequest
+import ru.iuturakulov.mybudgetbackend.extensions.ApiExtensions.generateVerificationCode
+import ru.iuturakulov.mybudgetbackend.extensions.ApiResponse
+import ru.iuturakulov.mybudgetbackend.extensions.ApiResponseState
 import ru.iuturakulov.mybudgetbackend.extensions.AppException
-import ru.iuturakulov.mybudgetbackend.extensions.DataBaseTransaction
-import ru.iuturakulov.mybudgetbackend.models.user.body.ConfirmPassword
-import ru.iuturakulov.mybudgetbackend.models.user.body.ForgetPasswordEmail
-import ru.iuturakulov.mybudgetbackend.models.user.body.LoginBody
-import ru.iuturakulov.mybudgetbackend.models.user.body.RegistrationBody
-import ru.iuturakulov.mybudgetbackend.services.IUserServices
-import kotlin.random.Random
+import ru.iuturakulov.mybudgetbackend.extensions.PasswordHasher
+import ru.iuturakulov.mybudgetbackend.models.user.body.ChangePasswordRequest
+import ru.iuturakulov.mybudgetbackend.models.user.body.ForgetPasswordEmailRequest
+import ru.iuturakulov.mybudgetbackend.models.user.body.LoginRequest
+import ru.iuturakulov.mybudgetbackend.models.user.body.RefreshTokenRequest
+import ru.iuturakulov.mybudgetbackend.models.user.body.RegistrationRequest
+import ru.iuturakulov.mybudgetbackend.models.user.body.VerifyEmailRequest
+import ru.iuturakulov.mybudgetbackend.repositories.UserRepository
+import services.EmailService
+import java.time.Instant
+import java.util.concurrent.ConcurrentHashMap
 
-class UserController : IUserServices {
-    override suspend fun addUser(registrationBody: RegistrationBody): RegistrationResponse = query {
-        val userEntity = UsersEntity.find { UserTable.email eq registrationBody.email }
-            .singleOrNull()
+private const val DURATION_BRUTE_FORCE_SPAM = 60
 
-        if (userEntity != null) {
-            throw AppException.AlreadyExists.Email()
-        }
+class UserController(private val userRepository: UserRepository, private val emailService: EmailService) {
 
-        val inserted = UsersEntity.new {
-            email = registrationBody.email
-            password = BCrypt.withDefaults().hashToString(12, registrationBody.password.toCharArray())
-        }
+    private val passwordResetCooldown = ConcurrentHashMap<String, Long>()
 
-        UsersProfileEntity.new {
-            userId = inserted.id
-        }
+    /**
+     * Регистрация нового пользователя
+     */
+    suspend fun register(request: RegistrationRequest): ApiResponse = callRequest {
+        val existingUser = userRepository.getUserByEmail(request.email)
+        if (existingUser != null) throw AppException.AlreadyExists.Email("Почта уже используется")
+        val savedUser = userRepository.createUser(request)
 
-        RegistrationResponse(inserted.id.value, registrationBody.email)
+        // Генерируем код верификации email и отправляем пользователю
+        val verificationCode = generateVerificationCode()
+        userRepository.saveEmailVerificationCode(savedUser.email, verificationCode)
+        emailService.sendEmail(savedUser.email, "Подтвердите регистрацию", "Ваш код: $verificationCode")
+
+        return@callRequest ApiResponseState.success("Регистрация успешна. Проверьте почту для подтверждения.", HttpStatusCode.Created)
     }
 
-    override suspend fun login(loginBody: LoginBody): LoginResponse = query {
-        val userEntity = UsersEntity.find { UserTable.email eq loginBody.email }
-            .singleOrNull() ?: throw AppException.NotFound.User()
+    /**
+     * Вход пользователя
+     */
+    suspend fun login(request: LoginRequest): ApiResponse = callRequest {
+        val token = userRepository.loginUser(request)
+        return@callRequest ApiResponseState.success(token, HttpStatusCode.OK)
+    }
 
-        if (!BCrypt.verifyer().verify(loginBody.password.toCharArray(), userEntity.password).verified) {
-            throw AppException.InvalidProperty.PasswordNotMatch()
+    /**
+     * Подтверждение email
+     */
+    suspend fun verifyEmail(request: VerifyEmailRequest): ApiResponse = callRequest {
+        val verificationStatus = userRepository.verifyEmailCode(request.email, request.verificationCode)
+        if (verificationStatus == DataBaseTransaction.NOT_FOUND) {
+            throw AppException.InvalidProperty.EmailNotExist("Неверный код подтверждения")
+        }
+        return@callRequest ApiResponseState.success("Email подтвержден", HttpStatusCode.OK)
+    }
+
+    /**
+     * Запрос на восстановление пароля
+     */
+    suspend fun requestPasswordReset(request: ForgetPasswordEmailRequest): ApiResponse = callRequest {
+        val user = userRepository.getUserByEmail(request.email)
+            ?: throw AppException.NotFound.User("Пользователь с таким email не найден")
+
+        // Проверяем частоту запросов сброса пароля (5 минут)
+        val lastRequestTime = passwordResetCooldown[request.email] ?: 0L
+        if (Instant.now().epochSecond - lastRequestTime < DURATION_BRUTE_FORCE_SPAM) {
+            throw AppException.Common("Слишком частые запросы сброса пароля. Подождите минуту.")
         }
 
-        userEntity.loggedInWithToken()
+        val resetCode = generateVerificationCode()
+        userRepository.savePasswordResetCode(user.email, resetCode)
+        emailService.sendEmail(user.email, "Восстановление пароля", "Ваш код: $resetCode")
+
+        passwordResetCooldown[request.email] = Instant.now().epochSecond
+
+        return@callRequest ApiResponseState.success("Код для сброса пароля отправлен на email", HttpStatusCode.OK)
     }
 
-    override suspend fun changePassword(userId: String, changePassword: ChangePassword): Boolean = query {
-        val userEntity = UsersEntity.find { UserTable.id eq userId }
-            .singleOrNull() ?: throw AppException.NotFound.User()
 
-        if (!BCrypt.verifyer().verify(changePassword.oldPassword.toCharArray(), userEntity.password).verified) {
-            throw AppException.InvalidProperty.PasswordNotMatch()
+    /**
+     * Смена пароля
+     */
+    suspend fun changePassword(userId: String, request: ChangePasswordRequest): ApiResponse = callRequest {
+        val user = userRepository.getUserById(userId)
+            ?: throw AppException.NotFound.User("Пользователь не найден")
+
+        if (!PasswordHasher.verify(request.oldPassword, user.password)) {
+            throw AppException.InvalidProperty.PasswordNotMatch("Старый пароль неверен")
         }
 
-        userEntity.password = BCrypt.withDefaults().hashToString(12, changePassword.newPassword.toCharArray())
-        true
+        val hashedNewPassword = PasswordHasher.hash(request.newPassword)
+        userRepository.updateUserPassword(userId, hashedNewPassword)
+
+        return@callRequest ApiResponseState.success("Пароль изменен", HttpStatusCode.OK)
     }
 
-    override suspend fun forgetPasswordSendCode(forgetPasswordBody: ForgetPasswordEmail): VerificationCode = query {
-        val userEntity = UsersEntity.find { UserTable.email eq forgetPasswordBody.email }
-            .singleOrNull() ?: throw AppException.NotFound.User()
-
-        val verificationCode = Random.nextInt(1000, 9999).toString()
-        userEntity.verificationCode = verificationCode
-        VerificationCode(verificationCode)
-    }
-
-    override suspend fun forgetPasswordVerificationCode(confirmPasswordBody: ConfirmPassword): Int = query {
-        val userEntity = UsersEntity.find { UserTable.email eq confirmPasswordBody.email }
-            .singleOrNull() ?: throw AppException.NotFound.User()
-
-        if (confirmPasswordBody.verificationCode != userEntity.verificationCode) {
-            throw AppException.InvalidProperty.Password("Invalid verification code")
+    suspend fun refreshToken(request: RefreshTokenRequest): ApiResponse = callRequest {
+        val decodedJWT = try {
+            JwtConfig.verify(request.refreshToken)
+        } catch (e: Exception) {
+            throw AppException.Authentication("Недействительный refresh-токен")
         }
 
-        userEntity.password = BCrypt.withDefaults().hashToString(12, confirmPasswordBody.newPassword.toCharArray())
-        userEntity.verificationCode = null
-        DataBaseTransaction.FOUND
+        val userId = decodedJWT?.getClaim("userId")?.asString()
+            ?: throw AppException.Authentication("Ошибка верификации токена")
+
+        val user = userRepository.getUserById(userId)
+            ?: throw AppException.NotFound.User("Пользователь не найден")
+
+        // Генерируем новый access-token
+        val newAccessToken = JwtConfig.generateToken(user.id)
+        return@callRequest ApiResponseState.success(newAccessToken, HttpStatusCode.OK)
     }
+
 }
