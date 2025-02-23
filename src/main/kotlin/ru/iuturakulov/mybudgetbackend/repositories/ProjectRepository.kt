@@ -1,53 +1,118 @@
 package ru.iuturakulov.mybudgetbackend.repositories
 
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert
-import org.jetbrains.exposed.sql.insertAndGetId
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.update
+import ru.iuturakulov.mybudgetbackend.entities.participants.ParticipantTable
 import ru.iuturakulov.mybudgetbackend.entities.projects.ProjectEntity
+import ru.iuturakulov.mybudgetbackend.entities.projects.ProjectStatus
 import ru.iuturakulov.mybudgetbackend.entities.projects.ProjectsTable
+import ru.iuturakulov.mybudgetbackend.extensions.AppException
+import ru.iuturakulov.mybudgetbackend.models.UserRole
+import ru.iuturakulov.mybudgetbackend.models.project.CreateProjectRequest
+import ru.iuturakulov.mybudgetbackend.models.project.UpdateProjectRequest
 import java.util.*
 
 class ProjectRepository {
 
-    fun createProject(project: ProjectEntity): ProjectEntity = transaction {
-        val projectId = UUID.randomUUID().toString()
-        ProjectsTable.insert {
-            it[id] = projectId
-            it[name] = project.name
-            it[description] = project.description
-            it[budgetLimit] = project.budgetLimit.toBigDecimal()
-            it[amountSpent] = project.amountSpent.toBigDecimal()
-            it[status] = project.status
-            it[createdAt] = project.createdAt
-            it[lastModified] = project.lastModified
-            it[ownerId] = project.ownerId
+    /**
+     * Создать новый проект
+     */
+    fun createProject(ownerId: String, request: CreateProjectRequest): ProjectEntity = transaction {
+        val generatedProjectId = UUID.randomUUID().toString()
+
+        ProjectsTable.insert { statement ->
+            statement[id] = generatedProjectId
+            statement[name] = request.name
+            statement[description] = request.description
+            statement[budgetLimit] = request.budgetLimit.toBigDecimal()
+            statement[amountSpent] = 0.toBigDecimal()
+            statement[status] = ProjectStatus.ACTIVE
+            statement[createdAt] = System.currentTimeMillis()
+            statement[lastModified] = System.currentTimeMillis()
+            statement[ProjectsTable.ownerId] = ownerId
         }
 
-        project.copy(id = projectId)
+        // Добавляем владельца в участники проекта
+        ParticipantTable.insert {
+            it[id] = UUID.randomUUID().toString()
+            it[projectId] = generatedProjectId
+            it[userId] = ownerId
+            it[role] = UserRole.OWNER
+            it[createdAt] = System.currentTimeMillis()
+        }
+
+        getProjectById(generatedProjectId) ?: throw AppException.NotFound.Project()
     }
 
+    /**
+     * Получить проект по ID
+     */
     fun getProjectById(id: String): ProjectEntity? = transaction {
         ProjectsTable.selectAll().where { ProjectsTable.id eq id }
-            .mapNotNull { ProjectEntity.fromRow(it) }
+            .mapNotNull { ProjectsTable.fromRow(it) }
             .singleOrNull()
     }
 
-    fun updateProject(project: ProjectEntity): Boolean = transaction {
-        ProjectsTable.update({ ProjectsTable.id eq project.id!! }) {
-            it[name] = project.name
-            it[description] = project.description
-            it[budgetLimit] = project.budgetLimit.toBigDecimal()
-            it[amountSpent] = project.amountSpent.toBigDecimal()
-            it[status] = project.status
-            it[lastModified] = project.lastModified
-        } > 0
+    /**
+     * Получить проекты, в которых участвует пользователь
+     */
+    fun getProjectsByUser(userId: String): List<ProjectEntity> = transaction {
+        (ProjectsTable innerJoin ParticipantTable)
+            .selectAll().where { ParticipantTable.userId eq userId }
+            .map { ProjectsTable.fromRow(it) }
     }
 
-    fun deleteProject(id: String): Boolean = transaction {
-        ProjectsTable.deleteWhere { ProjectsTable.id eq id } > 0
+    /**
+     * Проверить, является ли пользователь владельцем проекта
+     */
+    fun isUserOwner(projectId: String, userId: String): Boolean = transaction {
+        ParticipantTable.selectAll().where {
+            (ParticipantTable.projectId eq projectId) and
+                    (ParticipantTable.userId eq userId) and
+                    (ParticipantTable.role eq UserRole.OWNER)
+        }.count() > 0
     }
+
+    /**
+     * Обновить данные проекта (разрешено только владельцу и редакторам)
+     */
+    fun updateProject(projectId: String, request: UpdateProjectRequest): ProjectEntity = transaction {
+        ProjectsTable.update({ ProjectsTable.id eq projectId }) {
+            request.name?.let { requestName ->
+                it[name] = requestName
+            }
+            request.description?.let { requestDescription ->
+                it[description] = requestDescription
+            }
+            request.budgetLimit?.let { requestBudgetLimit ->
+                it[budgetLimit] = requestBudgetLimit.toBigDecimal()
+            }
+            it[lastModified] = System.currentTimeMillis()
+        }
+
+        getProjectById(projectId) ?: throw AppException.NotFound.Project()
+    }
+
+    /**
+     * Удалить проект (только владелец)
+     */
+    fun deleteProject(projectId: String) = transaction {
+        // Удаляем участников проекта
+        ParticipantTable.deleteWhere { ParticipantTable.projectId eq projectId }
+
+        // Удаляем сам проект
+        ProjectsTable.deleteWhere { id eq projectId }
+    }
+
+    fun isUserParticipant(userId: String, projectId: String): Boolean = transaction {
+        ParticipantTable.selectAll().where {
+            (ParticipantTable.userId eq userId) and (ParticipantTable.projectId eq projectId)
+        }.count() > 0
+    }
+
 }

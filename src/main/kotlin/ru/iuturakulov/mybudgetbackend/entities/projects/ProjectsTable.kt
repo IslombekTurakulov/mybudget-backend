@@ -1,11 +1,10 @@
 package ru.iuturakulov.mybudgetbackend.entities.projects
 
-import org.jetbrains.exposed.dao.id.IntIdTable
+import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.Table
-import ru.iuturakulov.mybudgetbackend.entities.participants.ParticipantTable
 
 object ProjectsTable : Table("projects") {
-    val id = varchar("id", 36)
+    val id = varchar("id", 36) // UUID проекта
     val name = varchar("name", 255)
     val description = text("description").nullable()
     val budgetLimit = decimal("budget_limit", 12, 2)
@@ -15,5 +14,18 @@ object ProjectsTable : Table("projects") {
     val lastModified = long("last_modified").default(System.currentTimeMillis())
     val ownerId = varchar("owner_id", 50) // ID владельца проекта
 
-    override val primaryKey = PrimaryKey(ParticipantTable.id)
+    override val primaryKey = PrimaryKey(id)
+
+    // Метод для преобразования строки из БД в `ProjectEntity`
+    fun fromRow(row: ResultRow) = ProjectEntity(
+        id = row[id],
+        name = row[name],
+        description = row[description],
+        budgetLimit = row[budgetLimit].toDouble(),
+        amountSpent = row[amountSpent].toDouble(),
+        status = row[status],
+        createdAt = row[createdAt],
+        lastModified = row[lastModified],
+        ownerId = row[ownerId]
+    )
 }

@@ -1,17 +1,20 @@
 package ru.iuturakulov.mybudgetbackend.extensions
 
 import io.ktor.http.*
+import kotlinx.serialization.Contextual
+import kotlinx.serialization.Serializable
 
-data class ApiResponse(
+@Serializable
+data class ApiResponse<T>(
     val isSuccess: Boolean,
-    val statusCode: HttpStatusCode? = null,
-    val data: Any? = null,
-    val error: Any? = null
+    val statusCode: @Contextual HttpStatusCode? = null,
+    val data: T? = null,
+    val error: T? = null
 )
 
 
 object ApiResponseState {
-    fun <T> success(data: T, statsCode: HttpStatusCode?): ApiResponse {
+    fun <T> success(data: T, statsCode: HttpStatusCode?): ApiResponse<T> {
         return ApiResponse(
             isSuccess = true,
             data = data,
@@ -19,7 +22,7 @@ object ApiResponseState {
         )
     }
 
-    fun <T> failure(error: T, statsCode: HttpStatusCode?): ApiResponse {
+    fun <T> failure(error: T, statsCode: HttpStatusCode?): ApiResponse<T> {
         return ApiResponse(
             isSuccess = false,
             error = error,

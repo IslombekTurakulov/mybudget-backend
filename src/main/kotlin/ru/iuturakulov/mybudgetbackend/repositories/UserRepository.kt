@@ -1,9 +1,6 @@
 package ru.iuturakulov.mybudgetbackend.repositories
 
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.insert
-import org.jetbrains.exposed.sql.insertAndGetId
-import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.update
@@ -150,7 +147,7 @@ class UserRepository {
     /**
      * **Проверка неудачных попыток сброса пароля**
      */
-    fun getFailedResetAttempts(email: String): Int = failedResetAttempts.getOrDefault(email, 0)
+    private fun getFailedResetAttempts(email: String): Int = failedResetAttempts.getOrDefault(email, 0)
 
     fun incrementFailedResetAttempts(email: String) {
         failedResetAttempts[email] = getFailedResetAttempts(email) + 1

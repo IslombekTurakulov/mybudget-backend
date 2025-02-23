@@ -29,7 +29,7 @@ class UserController(private val userRepository: UserRepository, private val ema
     /**
      * Регистрация нового пользователя
      */
-    suspend fun register(request: RegistrationRequest): ApiResponse = callRequest {
+    suspend fun register(request: RegistrationRequest): ApiResponse<String> = callRequest {
         val existingUser = userRepository.getUserByEmail(request.email)
         if (existingUser != null) throw AppException.AlreadyExists.Email("Почта уже используется")
         val savedUser = userRepository.createUser(request)
@@ -39,13 +39,16 @@ class UserController(private val userRepository: UserRepository, private val ema
         userRepository.saveEmailVerificationCode(savedUser.email, verificationCode)
         emailService.sendEmail(savedUser.email, "Подтвердите регистрацию", "Ваш код: $verificationCode")
 
-        return@callRequest ApiResponseState.success("Регистрация успешна. Проверьте почту для подтверждения.", HttpStatusCode.Created)
+        return@callRequest ApiResponseState.success(
+            "Регистрация успешна. Проверьте почту для подтверждения.",
+            HttpStatusCode.Created
+        )
     }
 
     /**
      * Вход пользователя
      */
-    suspend fun login(request: LoginRequest): ApiResponse = callRequest {
+    suspend fun login(request: LoginRequest): ApiResponse<String> = callRequest {
         val token = userRepository.loginUser(request)
         return@callRequest ApiResponseState.success(token, HttpStatusCode.OK)
     }
@@ -53,7 +56,7 @@ class UserController(private val userRepository: UserRepository, private val ema
     /**
      * Подтверждение email
      */
-    suspend fun verifyEmail(request: VerifyEmailRequest): ApiResponse = callRequest {
+    suspend fun verifyEmail(request: VerifyEmailRequest): ApiResponse<String> = callRequest {
         val verificationStatus = userRepository.verifyEmailCode(request.email, request.verificationCode)
         if (verificationStatus == DataBaseTransaction.NOT_FOUND) {
             throw AppException.InvalidProperty.EmailNotExist("Неверный код подтверждения")
@@ -64,7 +67,7 @@ class UserController(private val userRepository: UserRepository, private val ema
     /**
      * Запрос на восстановление пароля
      */
-    suspend fun requestPasswordReset(request: ForgetPasswordEmailRequest): ApiResponse = callRequest {
+    suspend fun requestPasswordReset(request: ForgetPasswordEmailRequest): ApiResponse<String> = callRequest {
         val user = userRepository.getUserByEmail(request.email)
             ?: throw AppException.NotFound.User("Пользователь с таким email не найден")
 
@@ -87,7 +90,7 @@ class UserController(private val userRepository: UserRepository, private val ema
     /**
      * Смена пароля
      */
-    suspend fun changePassword(userId: String, request: ChangePasswordRequest): ApiResponse = callRequest {
+    suspend fun changePassword(userId: String, request: ChangePasswordRequest): ApiResponse<String> = callRequest {
         val user = userRepository.getUserById(userId)
             ?: throw AppException.NotFound.User("Пользователь не найден")
 
@@ -101,7 +104,7 @@ class UserController(private val userRepository: UserRepository, private val ema
         return@callRequest ApiResponseState.success("Пароль изменен", HttpStatusCode.OK)
     }
 
-    suspend fun refreshToken(request: RefreshTokenRequest): ApiResponse = callRequest {
+    suspend fun refreshToken(request: RefreshTokenRequest): ApiResponse<String> = callRequest {
         val decodedJWT = try {
             JwtConfig.verify(request.refreshToken)
         } catch (e: Exception) {

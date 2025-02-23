@@ -12,6 +12,7 @@ import ru.iuturakulov.mybudgetbackend.extensions.ApiExtensions.requiredParameter
 import ru.iuturakulov.mybudgetbackend.extensions.ApiResponseState
 import ru.iuturakulov.mybudgetbackend.extensions.AppException
 import ru.iuturakulov.mybudgetbackend.extensions.RoutingExtensions.apiResponse
+import ru.iuturakulov.mybudgetbackend.extensions.RoutingExtensions.respondBadRequest
 import ru.iuturakulov.mybudgetbackend.models.user.body.ChangePasswordRequest
 import ru.iuturakulov.mybudgetbackend.models.user.body.ForgetPasswordEmailRequest
 import ru.iuturakulov.mybudgetbackend.models.user.body.JwtTokenBody
@@ -75,7 +76,8 @@ fun Route.userRoute(userController: UserController) {
             apiResponse()
         }) {
             try {
-                val (email, verificationCode) = call.requiredParameters("email", "verificationCode") ?: return@post
+                val (email, verificationCode) = call.requiredParameters("email", "verificationCode")
+                    ?: return@post call.respondBadRequest("Required params are invalid")
                 val emailRequest = VerifyEmailRequest(email, verificationCode)
                 emailRequest.validation()
                 val result = userController.verifyEmail(emailRequest)
@@ -86,7 +88,12 @@ fun Route.userRoute(userController: UserController) {
                     call.respond(ApiResponseState.failure("Неверный код", HttpStatusCode.BadRequest))
                 }
             } catch (e: Exception) {
-                call.respond(ApiResponseState.failure("Ошибка подтверждения email: ${e.localizedMessage}", HttpStatusCode.InternalServerError))
+                call.respond(
+                    ApiResponseState.failure(
+                        "Ошибка подтверждения email: ${e.localizedMessage}",
+                        HttpStatusCode.InternalServerError
+                    )
+                )
             }
         }
 
@@ -118,7 +125,12 @@ fun Route.userRoute(userController: UserController) {
                 val requestBody = call.receive<ChangePasswordRequest>()
                 requestBody.validation()
                 val loginUser = call.principal<JwtTokenBody>()?.userId ?: let {
-                    call.respond(ApiResponseState.failure("User with current email is not found", HttpStatusCode.InternalServerError))
+                    call.respond(
+                        ApiResponseState.failure(
+                            error = "User with current email is not found",
+                            statsCode = HttpStatusCode.InternalServerError
+                        )
+                    )
                     return@put
                 }
                 val result = userController.changePassword(loginUser, requestBody)
@@ -129,7 +141,12 @@ fun Route.userRoute(userController: UserController) {
                     call.respond(ApiResponseState.failure("Старый пароль неверен", HttpStatusCode.BadRequest))
                 }
             } catch (e: Exception) {
-                call.respond(ApiResponseState.failure("Ошибка изменения пароля: ${e.localizedMessage}", HttpStatusCode.InternalServerError))
+                call.respond(
+                    ApiResponseState.failure(
+                        "Ошибка изменения пароля: ${e.localizedMessage}",
+                        HttpStatusCode.InternalServerError
+                    )
+                )
             }
         }
 
@@ -146,7 +163,12 @@ fun Route.userRoute(userController: UserController) {
             } catch (e: AppException.Authentication) {
                 call.respond(ApiResponseState.failure("Недействительный refresh-токен", HttpStatusCode.Unauthorized))
             } catch (e: Exception) {
-                call.respond(ApiResponseState.failure("Ошибка обновления токена: ${e.localizedMessage}", HttpStatusCode.InternalServerError))
+                call.respond(
+                    ApiResponseState.failure(
+                        "Ошибка обновления токена: ${e.localizedMessage}",
+                        HttpStatusCode.InternalServerError
+                    )
+                )
             }
         }
     }

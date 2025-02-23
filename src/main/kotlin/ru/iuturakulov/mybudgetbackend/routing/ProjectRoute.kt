@@ -1,128 +1,203 @@
 package ru.iuturakulov.mybudgetbackend.routing
 
+import io.github.smiley4.ktorswaggerui.dsl.routing.delete
+import io.github.smiley4.ktorswaggerui.dsl.routing.get
 import io.github.smiley4.ktorswaggerui.dsl.routing.post
 import io.github.smiley4.ktorswaggerui.dsl.routing.put
-import io.github.smiley4.ktorswaggerui.dsl.routing.get
 import io.ktor.http.*
 import io.ktor.server.auth.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import ru.iuturakulov.mybudgetbackend.controller.project.ProjectController
-import ru.iuturakulov.mybudgetbackend.entities.projects.ProjectEntity
-import ru.iuturakulov.mybudgetbackend.extensions.AccessControl
 import ru.iuturakulov.mybudgetbackend.extensions.ApiResponseState
+import ru.iuturakulov.mybudgetbackend.extensions.AppException
+import ru.iuturakulov.mybudgetbackend.extensions.AuditLogService
 import ru.iuturakulov.mybudgetbackend.extensions.RoutingExtensions.apiResponse
+import ru.iuturakulov.mybudgetbackend.extensions.RoutingExtensions.respondBadRequest
+import ru.iuturakulov.mybudgetbackend.extensions.RoutingExtensions.respondUnauthorized
+import ru.iuturakulov.mybudgetbackend.models.project.AcceptInviteRequest
+import ru.iuturakulov.mybudgetbackend.models.project.ChangeRoleRequest
+import ru.iuturakulov.mybudgetbackend.models.project.CreateProjectRequest
+import ru.iuturakulov.mybudgetbackend.models.project.InviteParticipantRequest
+import ru.iuturakulov.mybudgetbackend.models.project.UpdateProjectRequest
 import ru.iuturakulov.mybudgetbackend.models.user.body.JwtTokenBody
-import kotlin.text.get
 
-fun Route.projectRoute(projectController: ProjectController, accessControl: AccessControl) {
+fun Route.projectRoute(projectController: ProjectController, auditLogService: AuditLogService) {
     route("projects") {
 
-        /**
-         * Получение всех проектов, в которых участвует пользователь (OWNER, EDITOR, VIEWER)
-         */
         get({
             tags("Projects")
             protected = true
-            summary = "Получить список проектов, в которых участвует текущий пользователь"
-            apiResponse<List<ProjectEntity>>()
+            summary = "Получить список проектов, в которых участвует пользователь"
+            apiResponse()
         }) {
             val userId = call.principal<JwtTokenBody>()?.userId ?: return@get call.respondUnauthorized()
-            val projects = projectController.getProject(userId)
+            val projects = projectController.getUserProjects(userId)
             call.respond(ApiResponseState.success(projects, HttpStatusCode.OK))
         }
 
-        /**
-         * Получение конкретного проекта (только для участников)
-         */
+        post("accept-invite", {
+            tags("Projects")
+            protected = true
+            summary = "Принять приглашение в проект"
+            request { body<AcceptInviteRequest>() }
+            apiResponse()
+        }) {
+            val userId = call.principal<JwtTokenBody>()?.userId ?: return@post call.respondUnauthorized()
+            val requestBody = call.receive<AcceptInviteRequest>()
+
+            projectController.acceptInvitation(userId, requestBody).let { result ->
+                if (result) {
+                    auditLogService.logAction(userId, "Accepted invite to project: ${requestBody.projectId}")
+                    call.respond(ApiResponseState.success("Приглашение принято", HttpStatusCode.OK))
+                } else {
+                    call.respond(ApiResponseState.failure("Ошибка принятия приглашения", HttpStatusCode.BadRequest))
+                }
+            }
+        }
+
+        post("{projectId}/invite", {
+            tags("Projects")
+            protected = true
+            summary = "Пригласить участника в проект"
+            request {
+                pathParameter<String>("projectId") { description = "ID проекта" }
+                body<InviteParticipantRequest>()
+            }
+            apiResponse()
+        }) {
+            val userId = call.principal<JwtTokenBody>()?.userId ?: return@post call.respondUnauthorized()
+            val projectId = call.parameters["projectId"] ?: return@post call.respondBadRequest("Project ID is required")
+            val requestBody = call.receive<InviteParticipantRequest>()
+
+            projectController.inviteParticipant(userId, projectId, requestBody).let { result ->
+                if (result.success) {
+                    auditLogService.logAction(userId, "Invited ${requestBody.email} to project: $projectId")
+                    call.respond(ApiResponseState.success("Приглашение отправлено", HttpStatusCode.OK))
+                } else {
+                    call.respond(ApiResponseState.failure(result.message, HttpStatusCode.TooManyRequests))
+                }
+            }
+        }
+
+
         get("{projectId}", {
             tags("Projects")
             protected = true
-            summary = "Получить проект по ID (только для участников)"
-            request { pathParameter<String>("projectId") { required = true } }
-            apiResponse<ProjectEntity>()
+            summary = "Получить информацию о проекте"
+            request {
+                pathParameter<String>("projectId") { description = "ID проекта" }
+            }
+            apiResponse()
         }) {
             val userId = call.principal<JwtTokenBody>()?.userId ?: return@get call.respondUnauthorized()
             val projectId = call.parameters["projectId"] ?: return@get call.respondBadRequest("Project ID is required")
 
-            val project = projectController.getProjectById(projectId) ?: return@get call.respondNotFound("Проект не найден")
-            val participant = projectController.getParticipant(userId, projectId)
-
-            if (!accessControl.canViewProject(userId, project, participant)) {
-                return@get call.respondForbidden("У вас нет доступа к этому проекту")
-            }
-
+            val project = projectController.getProjectById(userId, projectId)
             call.respond(ApiResponseState.success(project, HttpStatusCode.OK))
         }
 
-        /**
-         * Создание проекта (владелец становится OWNER)
-         */
         post({
             tags("Projects")
             protected = true
             summary = "Создать новый проект"
             request { body<CreateProjectRequest>() }
-            apiResponse<ProjectEntity>()
+            apiResponse()
         }) {
             val userId = call.principal<JwtTokenBody>()?.userId ?: return@post call.respondUnauthorized()
             val requestBody = call.receive<CreateProjectRequest>()
-            requestBody.validation()
-
             val project = projectController.createProject(userId, requestBody)
             call.respond(ApiResponseState.success(project, HttpStatusCode.Created))
         }
 
-        /**
-         * Обновление проекта (только для владельца и редактора)
-         */
         put("{projectId}", {
             tags("Projects")
             protected = true
-            summary = "Обновить проект (доступно только владельцу и редакторам)"
+            summary = "Обновить проект"
             request {
-                pathParameter<String>("projectId") { required = true }
+                pathParameter<String>("projectId") { description = "ID проекта" }
                 body<UpdateProjectRequest>()
             }
-            apiResponse<ProjectEntity>()
+            apiResponse()
         }) {
             val userId = call.principal<JwtTokenBody>()?.userId ?: return@put call.respondUnauthorized()
             val projectId = call.parameters["projectId"] ?: return@put call.respondBadRequest("Project ID is required")
             val requestBody = call.receive<UpdateProjectRequest>()
 
-            val project = projectController.getProjectById(projectId) ?: return@put call.respondNotFound("Проект не найден")
-            val participant = projectController.getParticipant(userId, projectId)
-
-            if (!accessControl.canEditProject(userId, project, participant)) {
-                return@put call.respondForbidden("У вас нет прав на редактирование этого проекта")
-            }
-
-            val updatedProject = projectController.updateProject(projectId, requestBody)
+            val updatedProject = projectController.updateProject(userId, projectId, requestBody)
             call.respond(ApiResponseState.success(updatedProject, HttpStatusCode.OK))
         }
 
-        /**
-         * Удаление проекта (только для владельца)
-         */
         delete("{projectId}", {
             tags("Projects")
             protected = true
-            summary = "Удалить проект (доступно только владельцу)"
-            request { pathParameter<String>("projectId") { required = true } }
-            apiResponse<Unit>()
+            summary = "Удалить проект (только для владельца)"
+            request {
+                pathParameter<String>("projectId") { description = "ID проекта" }
+            }
+            apiResponse()
         }) {
             val userId = call.principal<JwtTokenBody>()?.userId ?: return@delete call.respondUnauthorized()
-            val projectId = call.parameters["projectId"] ?: return@delete call.respondBadRequest("Project ID is required")
+            val projectId =
+                call.parameters["projectId"] ?: return@delete call.respondBadRequest("Project ID is required")
 
-            val project = projectController.getProjectById(projectId) ?: return@delete call.respondNotFound("Проект не найден")
-
-            if (!accessControl.canDeleteProject(userId, project)) {
-                return@delete call.respondForbidden("Только владелец может удалить этот проект")
+            try {
+                projectController.deleteProject(userId, projectId)
+                auditLogService.logAction(userId, "Удалил проект: $projectId")
+                call.respond(ApiResponseState.success("Проект успешно удален", HttpStatusCode.OK))
+            } catch (e: AppException.Authorization) {
+                call.respond(
+                    HttpStatusCode.Forbidden,
+                    ApiResponseState.failure("Вы не можете удалить этот проект", HttpStatusCode.Forbidden)
+                )
+            } catch (e: AppException.NotFound.Project) {
+                call.respond(
+                    HttpStatusCode.NotFound,
+                    ApiResponseState.failure("Проект не найден", HttpStatusCode.NotFound)
+                )
+            } catch (e: Exception) {
+                call.respond(
+                    HttpStatusCode.InternalServerError,
+                    ApiResponseState.failure("Ошибка сервера: ${e.message}", HttpStatusCode.InternalServerError)
+                )
             }
+        }
 
-            projectController.deleteProject(projectId)
-            call.respond(ApiResponseState.success("Проект успешно удален", HttpStatusCode.OK))
+        post("{projectId}/invite", {
+            tags("Projects")
+            protected = true
+            summary = "Пригласить участника в проект"
+            request {
+                pathParameter<String>("projectId") { description = "ID проекта" }
+                body<InviteParticipantRequest>()
+            }
+            apiResponse()
+        }) {
+            val userId = call.principal<JwtTokenBody>()?.userId ?: return@post call.respondUnauthorized()
+            val projectId = call.parameters["projectId"] ?: return@post call.respondBadRequest("Project ID is required")
+            val requestBody = call.receive<InviteParticipantRequest>()
+
+            projectController.inviteParticipant(userId, projectId, requestBody)
+            call.respond(ApiResponseState.success("Приглашение отправлено", HttpStatusCode.OK))
+        }
+
+        put("{projectId}/role", {
+            tags("Projects")
+            protected = true
+            summary = "Изменить роль участника в проекте"
+            request {
+                pathParameter<String>("projectId") { description = "ID проекта" }
+                body<ChangeRoleRequest>()
+            }
+            apiResponse()
+        }) {
+            val userId = call.principal<JwtTokenBody>()?.userId ?: return@put call.respondUnauthorized()
+            val projectId = call.parameters["projectId"] ?: return@put call.respondBadRequest("Project ID is required")
+            val requestBody = call.receive<ChangeRoleRequest>()
+
+            projectController.changeParticipantRole(userId, projectId, requestBody)
+            call.respond(ApiResponseState.success("Роль участника изменена", HttpStatusCode.OK))
         }
     }
 }

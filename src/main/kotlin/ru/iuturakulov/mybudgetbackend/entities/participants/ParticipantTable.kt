@@ -10,8 +10,6 @@ object ParticipantTable : Table("participant") {
     val id = varchar("id", 36) // UUID участника
     val projectId = reference("project_id", ProjectsTable.id) // Связь с проектом
     val userId = reference("user_id", UserTable.id) // Связь с пользователем
-    val name = varchar("name", 64)
-    val email = varchar("email", 128)
     val role = enumerationByName("role", 10, UserRole::class)
     val createdAt = long("created_at").default(System.currentTimeMillis())
 
@@ -19,8 +17,8 @@ object ParticipantTable : Table("participant") {
         id = row[id],
         projectId = row[projectId],
         userId = row[userId],
-        name = row[name],
-        email = row[email],
+        name = row[UserTable.name], // Достаём имя из UserTable
+        email = row[UserTable.email], // Достаём email из UserTable
         role = row[role],
         createdAt = row[createdAt]
     )

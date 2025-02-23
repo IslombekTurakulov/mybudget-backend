@@ -26,6 +26,7 @@ sealed class AppException(
         class Email(details: String? = null) : InvalidProperty("Email invalid", details)
         class EmailNotExist(details: String? = null) : InvalidProperty("Email does not exist", details)
         class Password(details: String? = null) : InvalidProperty("Password invalid", details)
+        class Transaction(details: String? = null) : InvalidProperty("Transaction invalid", details)
         class PasswordNotMatch(details: String? = null) : InvalidProperty("Password does not match", details)
     }
 
@@ -35,6 +36,7 @@ sealed class AppException(
     ) : BaseException(base, details) {
         class User(details: String? = null) : NotFound("User not found", details)
         class Project(details: String? = null) : NotFound("Project not found", details)
+        class Transaction(details: String? = null) : NotFound("Transaction not found", details)
         class Resource(details: String? = null) : NotFound("Resource not found", details)
     }
 
