@@ -15,5 +15,7 @@ enum class NotificationType {
     ROLE_CHANGE,
     TRANSACTION_ADDED,
     TRANSACTION_REMOVED,
+    PROJECT_EDITED,
+    PROJECT_REMOVED,
     SYSTEM_ALERT
 }

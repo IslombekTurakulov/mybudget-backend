@@ -4,66 +4,29 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4bbd917-8929-44b4-afda-19b441d6e48e" name="Changes" comment="MYBUDGETBACKEND-2: Fix SMTP mail sending and exceptions handling">
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/controller/participant/ParticipantController.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/controller/project/ProjectController.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/database/DataBaseTransaction.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/entities/participants/ParticipantEntity.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/entities/participants/ParticipantTable.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/entities/projects/ProjectEntity.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/entities/projects/ProjectStatus.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/entities/projects/ProjectsTable.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/entities/user/UserEntity.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/entities/user/UserTable.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/extensions/AccessControl.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/extensions/PasswordHasher.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/models/UserRole.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/models/project/ProjectCreateRequest.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/models/project/ProjectUpdateRequest.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/models/user/body/ChangePasswordRequest.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/models/user/body/RefreshTokenRequest.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/models/user/body/RegistrationRequest.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/models/user/body/VerifyEmailRequest.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/plugins/LoggingPlugin.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/repositories/ParticipantRepository.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/repositories/ProjectRepository.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/repositories/UserRepository.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/routing/ParticipantRoute.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/routing/ProjectRoute.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/kotlin/services/EmailService.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/kotlin/services/TokenService.kt" afterDir="false" />
+    <list default="true" id="c4bbd917-8929-44b4-afda-19b441d6e48e" name="Changes" comment="MYBUDGETBACKEND-4: Project, Transaction, Email and audit logging logic implemented">
+      <change afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/controller/analytics/AnalyticsController.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/models/analytics/AnalyticsFilter.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/models/analytics/CategoryStats.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/models/analytics/OverviewAnalyticsDto.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/models/analytics/PeriodStats.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/models/analytics/ProjectAnalyticsDto.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/models/analytics/ProjectComparison.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/models/analytics/TaskStats.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/plugins/ConfigureMetrics.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/repositories/AnalyticsRepository.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/routing/AnalyticsRoute.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/Application.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/Application.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/controller/JwtController.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/config/JwtConfig.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/controller/transaction/TransactionController.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/controller/transaction/TransactionController.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/controller/user/UserController.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/controller/user/UserController.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/controller/user/UserProfileController.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/database/ConfigureDataBase.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/database/ConfigureDataBase.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/di/KoinModule.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/di/KoinModule.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/entities/BaseIntIdTable.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/entities/user/User.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/entities/user/UserProfile.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/extensions/ApiExtensions.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/extensions/ApiExtensions.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/extensions/DataBaseTransaction.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/extensions/Exceptions.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/extensions/Exceptions.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/models/user/body/ConfirmPassword.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/models/user/body/ConfirmPassword.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/models/user/body/ForgetPasswordEmail.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/models/user/body/ForgetPasswordEmailRequest.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/models/user/body/JwtTokenBody.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/models/user/body/JwtTokenBody.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/models/user/body/LoginBody.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/models/user/body/LoginRequest.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/models/user/body/RegistrationBody.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/models/user/body/UserProfileBody.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/models/user/response/RegistrationResponse.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/plugins/ConfigureAuth.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/plugins/ConfigureAuth.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/entities/notification/NotificationEntity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/entities/notification/NotificationEntity.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/entities/notification/NotificationTable.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/entities/notification/NotificationTable.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/extensions/AccessControl.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/extensions/AccessControl.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/plugins/ConfigureBasic.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/plugins/ConfigureBasic.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/plugins/ConfigureKoin.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/plugins/ConfigureKoin.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/plugins/ConfigureRequestValidation.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/plugins/ConfigureRequestValidation.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/plugins/ConfigureRouting.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/plugins/ConfigureRouting.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/plugins/ConfigureStatusPage.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/plugins/ConfigureStatusPage.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/repositories/interfaces/IEntityRepository.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/routing/UserProfileRoute.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/routing/UserRoute.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/routing/UserRoute.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/services/IUserProfileServices.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/services/IUserServices.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/repositories/TransactionRepository.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/repositories/TransactionRepository.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -128,7 +91,7 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "Gradle.Build MyBudget-backend.executor": "Run",
-    "Kotlin.ApplicationKt.executor": "Run",
+    "Kotlin.ApplicationKt.executor": "Debug",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "git-widget-placeholder": "main",
     "kotlin-language-version-configured": "true",
@@ -186,23 +149,66 @@
       <option name="project" value="LOCAL" />
       <updated>1738580119117</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="MYBUDGETBACKEND-3: Auth system, project and participant logic">
+      <option name="closed" value="true" />
+      <created>1739756833729</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1739756833729</updated>
+    </task>
+    <task id="LOCAL-00003" summary="MYBUDGETBACKEND-4: Project, Transaction, Email and audit logging logic implemented">
+      <option name="closed" value="true" />
+      <created>1740280943309</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1740280943309</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="MYBUDGETBACKEND-2: Fix SMTP mail sending and exceptions handling" />
-    <option name="LAST_COMMIT_MESSAGE" value="MYBUDGETBACKEND-2: Fix SMTP mail sending and exceptions handling" />
+    <MESSAGE value="MYBUDGETBACKEND-3: Auth system, project and participant logic" />
+    <MESSAGE value="MYBUDGETBACKEND-4: Project, Transaction, Email and audit logging logic implemented" />
+    <option name="LAST_COMMIT_MESSAGE" value="MYBUDGETBACKEND-4: Project, Transaction, Email and audit logging logic implemented" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="kotlin-line">
           <url>file://$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/routing/UserRoute.kt</url>
-          <line>81</line>
+          <line>83</line>
           <properties>
             <option name="lambda-ordinal" value="-1" />
           </properties>
           <option name="timeStamp" value="2" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="kotlin-line">
+          <url>file://$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/routing/UserRoute.kt</url>
+          <line>107</line>
+          <option name="timeStamp" value="3" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="kotlin-line">
+          <url>file://$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/routing/UserRoute.kt</url>
+          <line>105</line>
+          <option name="timeStamp" value="4" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="kotlin-line">
+          <url>file://$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/controller/user/UserController.kt</url>
+          <line>80</line>
+          <option name="timeStamp" value="5" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="kotlin-line">
+          <url>file://$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/controller/user/UserController.kt</url>
+          <line>71</line>
+          <option name="timeStamp" value="6" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="kotlin-line">
+          <url>file://$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/controller/user/UserController.kt</url>
+          <line>75</line>
+          <option name="timeStamp" value="7" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

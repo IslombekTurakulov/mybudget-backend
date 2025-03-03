@@ -22,6 +22,7 @@ import java.util.concurrent.ConcurrentHashMap
 
 private const val DURATION_BRUTE_FORCE_SPAM = 60
 
+// TODO: Implement audit service
 class UserController(private val userRepository: UserRepository, private val emailService: EmailService) {
 
     private val passwordResetCooldown = ConcurrentHashMap<String, Long>()
@@ -71,7 +72,7 @@ class UserController(private val userRepository: UserRepository, private val ema
         val user = userRepository.getUserByEmail(request.email)
             ?: throw AppException.NotFound.User("Пользователь с таким email не найден")
 
-        // Проверяем частоту запросов сброса пароля (5 минут)
+        // Проверяем частоту запросов сброса пароля (1 минута)
         val lastRequestTime = passwordResetCooldown[request.email] ?: 0L
         if (Instant.now().epochSecond - lastRequestTime < DURATION_BRUTE_FORCE_SPAM) {
             throw AppException.Common("Слишком частые запросы сброса пароля. Подождите минуту.")

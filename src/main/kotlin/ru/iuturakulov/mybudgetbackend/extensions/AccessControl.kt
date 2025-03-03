@@ -4,7 +4,7 @@ import ru.iuturakulov.mybudgetbackend.entities.participants.ParticipantEntity
 import ru.iuturakulov.mybudgetbackend.entities.projects.ProjectEntity
 import ru.iuturakulov.mybudgetbackend.models.UserRole
 
-object AccessControl {
+class AccessControl {
 
     fun canEditProject(userId: String, project: ProjectEntity, participant: ParticipantEntity?): Boolean {
         return project.ownerId == userId || participant?.role == UserRole.EDITOR
