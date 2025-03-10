@@ -22,6 +22,7 @@ fun Application.configureRoutes() {
     val transactionController: TransactionController by inject()
     val analyticsController: AnalyticsController by inject()
     val auditLogService: AuditLogService by inject()
+
     routing {
         userRoute(userController = userController)
         projectRoute(projectController = projectController, auditLogService = auditLogService)

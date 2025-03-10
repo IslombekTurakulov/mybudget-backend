@@ -31,6 +31,8 @@ class ParticipantRepository {
             statement[id] = participant.id ?: UUID.randomUUID().toString() // Генерация ID
             statement[projectId] = participant.projectId
             statement[userId] = participant.userId
+            statement[name] = participant.name
+            statement[email] = participant.email
             statement[role] = participant.role
             statement[createdAt] = participant.createdAt
         }

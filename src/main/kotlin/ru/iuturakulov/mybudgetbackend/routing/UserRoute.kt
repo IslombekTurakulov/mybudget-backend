@@ -34,13 +34,11 @@ fun Route.userRoute(userController: UserController) {
                 requestBody.validation()
                 val response = userController.login(requestBody)
 
-                call.respond(ApiResponseState.success(response, HttpStatusCode.OK))
+                call.respond(HttpStatusCode.OK, response)
             } catch (e: Exception) {
                 call.respond(
-                    ApiResponseState.failure(
-                        "Ошибка при входе: ${e.localizedMessage}",
-                        HttpStatusCode.BadRequest
-                    )
+                    HttpStatusCode.BadRequest,
+                    "Ошибка при входе: ${e.localizedMessage}"
                 )
             }
         }
@@ -54,15 +52,16 @@ fun Route.userRoute(userController: UserController) {
                 val requestBody = call.receive<RegistrationRequest>()
                 requestBody.validation()
                 val user = userController.register(requestBody)
-                call.respond(ApiResponseState.success(user, HttpStatusCode.Created))
+                call.respond(HttpStatusCode.Created, user)
             } catch (e: AppException.AlreadyExists.Email) {
-                call.respond(ApiResponseState.failure("Email уже используется", HttpStatusCode.Conflict))
+                call.respond(
+                    HttpStatusCode.Conflict,
+                    "Email уже используется"
+                )
             } catch (e: Exception) {
                 call.respond(
-                    ApiResponseState.failure(
-                        "Ошибка при регистрации: ${e.localizedMessage}",
-                        HttpStatusCode.BadRequest
-                    )
+                    HttpStatusCode.BadRequest,
+                    "Ошибка при регистрации: ${e.localizedMessage}",
                 )
             }
         }
@@ -83,16 +82,14 @@ fun Route.userRoute(userController: UserController) {
                 val result = userController.verifyEmail(emailRequest)
 
                 if (result.isSuccess) {
-                    call.respond(ApiResponseState.success("Email подтвержден", HttpStatusCode.OK))
+                    call.respond(HttpStatusCode.OK, "Email подтвержден")
                 } else {
                     call.respond(ApiResponseState.failure("Неверный код", HttpStatusCode.BadRequest))
                 }
             } catch (e: Exception) {
                 call.respond(
-                    ApiResponseState.failure(
-                        "Ошибка подтверждения email: ${e.localizedMessage}",
-                        HttpStatusCode.InternalServerError
-                    )
+                    HttpStatusCode.InternalServerError,
+                    "Ошибка подтверждения email: ${e.localizedMessage}",
                 )
             }
         }
@@ -109,9 +106,9 @@ fun Route.userRoute(userController: UserController) {
 
                 call.respond(verificationCode)
             } catch (e: AppException.InvalidProperty.EmailNotExist) {
-                call.respond(ApiResponseState.failure("Email не найден", HttpStatusCode.NotFound))
+                call.respond(HttpStatusCode.NotFound, "Email не найден")
             } catch (e: Exception) {
-                call.respond(ApiResponseState.failure("Ошибка при сбросе пароля", HttpStatusCode.InternalServerError))
+                call.respond(HttpStatusCode.InternalServerError, "Ошибка при сбросе пароля")
             }
         }
 
@@ -126,26 +123,22 @@ fun Route.userRoute(userController: UserController) {
                 requestBody.validation()
                 val loginUser = call.principal<JwtTokenBody>()?.userId ?: let {
                     call.respond(
-                        ApiResponseState.failure(
-                            error = "User with current email is not found",
-                            statsCode = HttpStatusCode.InternalServerError
-                        )
+                        HttpStatusCode.InternalServerError,
+                        "User with current email is not found"
                     )
                     return@put
                 }
                 val result = userController.changePassword(loginUser, requestBody)
 
                 if (result.isSuccess) {
-                    call.respond(ApiResponseState.success("Пароль изменен", HttpStatusCode.OK))
+                    call.respond(HttpStatusCode.OK, "Пароль изменен")
                 } else {
-                    call.respond(ApiResponseState.failure("Старый пароль неверен", HttpStatusCode.BadRequest))
+                    call.respond(HttpStatusCode.BadRequest, "Старый пароль неверен")
                 }
             } catch (e: Exception) {
                 call.respond(
-                    ApiResponseState.failure(
-                        "Ошибка изменения пароля: ${e.localizedMessage}",
-                        HttpStatusCode.InternalServerError
-                    )
+                    HttpStatusCode.InternalServerError,
+                    "Ошибка изменения пароля: ${e.localizedMessage}"
                 )
             }
         }
@@ -159,15 +152,13 @@ fun Route.userRoute(userController: UserController) {
                 val requestBody = call.receive<RefreshTokenRequest>()
                 val newAccessToken = userController.refreshToken(requestBody)
 
-                call.respond(ApiResponseState.success(newAccessToken, HttpStatusCode.OK))
+                call.respond(HttpStatusCode.OK, newAccessToken)
             } catch (e: AppException.Authentication) {
-                call.respond(ApiResponseState.failure("Недействительный refresh-токен", HttpStatusCode.Unauthorized))
+                call.respond(HttpStatusCode.Unauthorized, "Недействительный refresh-токен")
             } catch (e: Exception) {
                 call.respond(
-                    ApiResponseState.failure(
-                        "Ошибка обновления токена: ${e.localizedMessage}",
-                        HttpStatusCode.InternalServerError
-                    )
+                    HttpStatusCode.InternalServerError,
+                    "Ошибка обновления токена: ${e.localizedMessage}"
                 )
             }
         }

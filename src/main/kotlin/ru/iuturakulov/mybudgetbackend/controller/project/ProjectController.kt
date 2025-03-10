@@ -1,10 +1,14 @@
 package ru.iuturakulov.mybudgetbackend.controller.project
 
+import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import ru.iuturakulov.mybudgetbackend.entities.notification.NotificationType
 import ru.iuturakulov.mybudgetbackend.entities.participants.ParticipantEntity
+import ru.iuturakulov.mybudgetbackend.entities.participants.ParticipantTable
 import ru.iuturakulov.mybudgetbackend.entities.projects.ProjectEntity
+import ru.iuturakulov.mybudgetbackend.entities.projects.ProjectStatus
+import ru.iuturakulov.mybudgetbackend.entities.projects.ProjectsTable
 import ru.iuturakulov.mybudgetbackend.entities.user.UserEntity
 import ru.iuturakulov.mybudgetbackend.entities.user.UserTable
 import ru.iuturakulov.mybudgetbackend.extensions.AccessControl
@@ -19,6 +23,7 @@ import ru.iuturakulov.mybudgetbackend.models.project.InviteParticipantRequest
 import ru.iuturakulov.mybudgetbackend.models.project.UpdateProjectRequest
 import ru.iuturakulov.mybudgetbackend.repositories.ParticipantRepository
 import ru.iuturakulov.mybudgetbackend.repositories.ProjectRepository
+import ru.iuturakulov.mybudgetbackend.repositories.UserRepository
 import services.InvitationService
 import services.NotificationService
 import java.util.*
@@ -58,32 +63,49 @@ class ProjectController(
      * Создать проект (создатель становится владельцем)
      */
     fun createProject(ownerId: String, request: CreateProjectRequest): ProjectEntity {
-        request.validation()
+        return transaction {
+            request.validation()
 
-        return projectRepository.createProject(ownerId, request).also { project ->
-            val projectId = project.id ?: throw AppException.NotFound.Project("Проект не создан")
+            val user = UserRepository().getUserById(ownerId)
+                ?: throw AppException.NotFound.User("Пользователь не найден")
 
-            // Загружаем информацию о пользователе
-            val user = transaction {
-                UserTable.selectAll().where { UserTable.id eq ownerId }
-                    .map { row -> UserEntity.fromRow(row) }
-                    .singleOrNull()
-            } ?: throw AppException.NotFound.User("Пользователь не найден")
+            val generatedProjectId = UUID.randomUUID().toString()
 
-            // Добавляем владельца как участника проекта
-            participantRepository.addParticipant(
-                ParticipantEntity(
-                    id = UUID.randomUUID().toString(),
-                    projectId = projectId,
-                    userId = ownerId,
-                    name = user.name,
-                    email = user.email,
-                    role = UserRole.OWNER,
-                    createdAt = System.currentTimeMillis()
-                )
+            ProjectsTable.insert { statement ->
+                statement[id] = generatedProjectId
+                statement[name] = request.name
+                statement[description] = request.description
+                statement[budgetLimit] = request.budgetLimit.toBigDecimal()
+                statement[amountSpent] = 0.toBigDecimal()
+                statement[status] = ProjectStatus.ACTIVE
+                statement[createdAt] = System.currentTimeMillis()
+                statement[lastModified] = System.currentTimeMillis()
+                statement[ProjectsTable.ownerId] = ownerId
+            }
+
+            ParticipantTable.insert {
+                it[id] = UUID.randomUUID().toString()
+                it[projectId] = generatedProjectId
+                it[userId] = ownerId
+                it[name] = user.name
+                it[email] = user.email
+                it[role] = UserRole.OWNER
+                it[createdAt] = System.currentTimeMillis()
+            }
+
+            auditLogService.logAction(ownerId, "Создан проект: $generatedProjectId")
+
+            ProjectEntity(
+                id = generatedProjectId,
+                name = request.name,
+                description = request.description,
+                budgetLimit = request.budgetLimit,
+                amountSpent = 0.0,
+                status = ProjectStatus.ACTIVE,
+                createdAt = System.currentTimeMillis(),
+                lastModified = System.currentTimeMillis(),
+                ownerId = ownerId
             )
-
-            auditLogService.logAction(ownerId, "Создан проект: ${project.id}")
         }
     }
 
@@ -91,15 +113,17 @@ class ProjectController(
      * Обновить проект (разрешено владельцу и редакторам)
      */
     fun updateProject(userId: String, projectId: String, request: UpdateProjectRequest): ProjectEntity {
-        val project = projectRepository.getProjectById(projectId) ?: throw AppException.NotFound.Project()
-        val participant = participantRepository.getParticipantByUserAndProjectId(userId, projectId)
+        return transaction {
+            val project = projectRepository.getProjectById(projectId) ?: throw AppException.NotFound.Project()
+            val participant = participantRepository.getParticipantByUserAndProjectId(userId, projectId)
 
-        if (!accessControl.canEditProject(userId, project, participant)) {
-            throw AppException.Authorization("Вы не можете редактировать этот проект")
-        }
+            if (!accessControl.canEditProject(userId, project, participant)) {
+                throw AppException.Authorization("Вы не можете редактировать этот проект")
+            }
 
-        return projectRepository.updateProject(projectId, request).also {
-            auditLogService.logAction(userId, "Обновлен проект: $projectId")
+            projectRepository.updateProject(projectId, request).also {
+                auditLogService.logAction(userId, "Обновлен проект: $projectId")
+            }
         }
     }
 

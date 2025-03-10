@@ -1,6 +1,5 @@
 package ru.iuturakulov.mybudgetbackend.di
 
-import com.fasterxml.jackson.annotation.JsonProperty.Access
 import org.koin.dsl.module
 import ru.iuturakulov.mybudgetbackend.controller.analytics.AnalyticsController
 import ru.iuturakulov.mybudgetbackend.controller.notification.NotificationController
@@ -19,7 +18,6 @@ import ru.iuturakulov.mybudgetbackend.repositories.UserRepository
 import services.EmailService
 import services.InvitationService
 import services.NotificationService
-import services.TokenService
 
 val repositoryModule = module {
     single { UserRepository() }
@@ -37,7 +35,6 @@ val serviceModule = module {
     single { InvitationService() }
     single { EmailService() }
     single { AccessControl() }
-    single { TokenService() }
 }
 
 val controllerModule = module {

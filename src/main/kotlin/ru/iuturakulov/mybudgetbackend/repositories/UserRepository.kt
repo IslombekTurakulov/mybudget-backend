@@ -10,6 +10,7 @@ import ru.iuturakulov.mybudgetbackend.entities.user.UserEntity
 import ru.iuturakulov.mybudgetbackend.entities.user.UserTable
 import ru.iuturakulov.mybudgetbackend.extensions.AppException
 import ru.iuturakulov.mybudgetbackend.extensions.PasswordHasher
+import ru.iuturakulov.mybudgetbackend.models.response.LoginResponse
 import ru.iuturakulov.mybudgetbackend.models.user.body.LoginRequest
 import ru.iuturakulov.mybudgetbackend.models.user.body.RegistrationRequest
 import java.util.*
@@ -56,7 +57,8 @@ class UserRepository {
             it[email] = request.email.lowercase(Locale.getDefault())
             it[password] = hashedPassword
             it[name] = request.name
-            it[isEmailVerified] = false
+            // TODO: verify email routing
+            it[isEmailVerified] = true
             it[createdAt] = System.currentTimeMillis()
         }
 
@@ -73,7 +75,7 @@ class UserRepository {
     /**
      * **Авторизация пользователя (логин)**
      */
-    fun loginUser(request: LoginRequest): String {
+    fun loginUser(request: LoginRequest): LoginResponse {
 
         val user = getUserByEmail(request.email) ?: throw AppException.NotFound.User()
 
@@ -81,11 +83,13 @@ class UserRepository {
             throw AppException.InvalidProperty.PasswordNotMatch("Неверный пароль")
         }
 
-        if (!user.isEmailVerified) {
-            throw AppException.Authentication("Email не подтвержден. Проверьте почту.")
-        }
+//        if (!user.isEmailVerified) {
+//            throw AppException.Authentication("Email не подтвержден. Проверьте почту.")
+//        }
 
-        return JwtConfig.generateToken(user.id)
+        return LoginResponse(
+            token = JwtConfig.generateToken(user.id)
+        )
     }
 
     /**

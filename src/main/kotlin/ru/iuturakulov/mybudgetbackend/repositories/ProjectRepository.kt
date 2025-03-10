@@ -3,51 +3,18 @@ package ru.iuturakulov.mybudgetbackend.repositories
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.deleteWhere
-import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.update
 import ru.iuturakulov.mybudgetbackend.entities.participants.ParticipantTable
 import ru.iuturakulov.mybudgetbackend.entities.projects.ProjectEntity
-import ru.iuturakulov.mybudgetbackend.entities.projects.ProjectStatus
 import ru.iuturakulov.mybudgetbackend.entities.projects.ProjectsTable
 import ru.iuturakulov.mybudgetbackend.extensions.AppException
 import ru.iuturakulov.mybudgetbackend.models.UserRole
-import ru.iuturakulov.mybudgetbackend.models.project.CreateProjectRequest
 import ru.iuturakulov.mybudgetbackend.models.project.UpdateProjectRequest
-import java.util.*
 
 class ProjectRepository {
 
-    /**
-     * Создать новый проект
-     */
-    fun createProject(ownerId: String, request: CreateProjectRequest): ProjectEntity = transaction {
-        val generatedProjectId = UUID.randomUUID().toString()
-
-        ProjectsTable.insert { statement ->
-            statement[id] = generatedProjectId
-            statement[name] = request.name
-            statement[description] = request.description
-            statement[budgetLimit] = request.budgetLimit.toBigDecimal()
-            statement[amountSpent] = 0.toBigDecimal()
-            statement[status] = ProjectStatus.ACTIVE
-            statement[createdAt] = System.currentTimeMillis()
-            statement[lastModified] = System.currentTimeMillis()
-            statement[ProjectsTable.ownerId] = ownerId
-        }
-
-        // Добавляем владельца в участники проекта
-        ParticipantTable.insert {
-            it[id] = UUID.randomUUID().toString()
-            it[projectId] = generatedProjectId
-            it[userId] = ownerId
-            it[role] = UserRole.OWNER
-            it[createdAt] = System.currentTimeMillis()
-        }
-
-        getProjectById(generatedProjectId) ?: throw AppException.NotFound.Project()
-    }
 
     /**
      * Получить проект по ID

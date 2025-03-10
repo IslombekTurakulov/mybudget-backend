@@ -6,10 +6,12 @@ import ru.iuturakulov.mybudgetbackend.entities.projects.ProjectsTable
 import ru.iuturakulov.mybudgetbackend.entities.user.UserTable
 import ru.iuturakulov.mybudgetbackend.models.UserRole
 
-object ParticipantTable : Table("participant") {
+object ParticipantTable : Table("participants") {
     val id = varchar("id", 36) // UUID участника
     val projectId = reference("project_id", ProjectsTable.id) // Связь с проектом
     val userId = reference("user_id", UserTable.id) // Связь с пользователем
+    val name = varchar("name", 64) // Храним имя участника отдельно
+    val email = varchar("email", 128) // Храним email отдельно
     val role = enumerationByName("role", 10, UserRole::class)
     val createdAt = long("created_at").default(System.currentTimeMillis())
 
@@ -17,8 +19,8 @@ object ParticipantTable : Table("participant") {
         id = row[id],
         projectId = row[projectId],
         userId = row[userId],
-        name = row[UserTable.name], // Достаём имя из UserTable
-        email = row[UserTable.email], // Достаём email из UserTable
+        name = row[name],
+        email = row[email],
         role = row[role],
         createdAt = row[createdAt]
     )

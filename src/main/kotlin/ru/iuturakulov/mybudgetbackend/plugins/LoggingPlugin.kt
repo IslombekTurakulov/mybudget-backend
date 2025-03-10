@@ -5,6 +5,7 @@ import io.ktor.server.application.*
 import io.ktor.server.plugins.*
 import io.ktor.server.plugins.calllogging.*
 import io.ktor.server.request.*
+import io.ktor.util.*
 import org.slf4j.event.Level
 
 object LoggingPlugin {
@@ -14,7 +15,6 @@ object LoggingPlugin {
             format { call ->
                 val status = call.response.status() ?: HttpStatusCode.NotFound
                 val method = call.request.httpMethod.value
-                val userAgent = call.request.headers["User-Agent"] ?: "Unknown"
                 val path = call.request.path()
                 val queryParams = call.request.queryParameters.entries()
                     .joinToString(", ") { entry -> "${entry.key}=${entry.value}" }
@@ -28,9 +28,9 @@ object LoggingPlugin {
             |Status: ${colorStatus(status)}
             |Method: $method
             |Path: $path
+            |Headers: ${call.request.headers.toMap()}
             |Query Params: $queryParams
             |Remote Host: $remoteHost
-            |User Agent: $userAgent
             |Duration: ${duration}ms
             |---------------------------------------------------------
             """.trimMargin()

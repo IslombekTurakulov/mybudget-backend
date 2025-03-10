@@ -4,7 +4,6 @@ import com.auth0.jwt.JWT
 import com.auth0.jwt.JWTVerifier
 import com.auth0.jwt.algorithms.Algorithm
 import com.auth0.jwt.interfaces.DecodedJWT
-import ru.iuturakulov.mybudgetbackend.models.user.body.JwtTokenBody
 import java.util.*
 
 object JwtConfig {
@@ -19,6 +18,7 @@ object JwtConfig {
         JWT
             .require(ALGORITHM)
             .withIssuer(ISSUER)
+            .withAudience(AUDIENCE)
             .build()
     }
 

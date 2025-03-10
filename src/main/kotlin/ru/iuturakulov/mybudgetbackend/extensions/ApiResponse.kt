@@ -1,32 +1,30 @@
 package ru.iuturakulov.mybudgetbackend.extensions
 
 import io.ktor.http.*
-import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class ApiResponse<T>(
-    val isSuccess: Boolean,
-    val statusCode: @Contextual HttpStatusCode? = null,
-    val data: T? = null,
-    val error: T? = null
+    val isSuccess: Boolean,  // Успех или нет
+    val statusCode: Int,  // Числовой HTTP-код
+    val data: T? = null,  // Данные (если успех)
+    val error: T? = null  // Ошибка (если не успех)
 )
 
-
 object ApiResponseState {
-    fun <T> success(data: T, statsCode: HttpStatusCode?): ApiResponse<T> {
+    fun <T> success(data: T, statusCode: HttpStatusCode): ApiResponse<T> {
         return ApiResponse(
             isSuccess = true,
             data = data,
-            statusCode = statsCode
+            statusCode = statusCode.value
         )
     }
 
-    fun <T> failure(error: T, statsCode: HttpStatusCode?): ApiResponse<T> {
+    fun <T> failure(error: T, statusCode: HttpStatusCode): ApiResponse<T> {
         return ApiResponse(
             isSuccess = false,
             error = error,
-            statusCode = statsCode
+            statusCode = statusCode.value
         )
     }
 }

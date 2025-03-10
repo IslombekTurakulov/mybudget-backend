@@ -8,7 +8,7 @@ import ru.iuturakulov.mybudgetbackend.models.user.body.JwtTokenBody
 
 fun Application.configureAuth() {
     install(Authentication) {
-        jwt {
+        jwt("auth-jwt") {
             provideJwtAuthConfig(this)
         }
     }

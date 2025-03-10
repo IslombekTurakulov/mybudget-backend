@@ -9,6 +9,7 @@ import ru.iuturakulov.mybudgetbackend.extensions.ApiResponse
 import ru.iuturakulov.mybudgetbackend.extensions.ApiResponseState
 import ru.iuturakulov.mybudgetbackend.extensions.AppException
 import ru.iuturakulov.mybudgetbackend.extensions.PasswordHasher
+import ru.iuturakulov.mybudgetbackend.models.response.LoginResponse
 import ru.iuturakulov.mybudgetbackend.models.user.body.ChangePasswordRequest
 import ru.iuturakulov.mybudgetbackend.models.user.body.ForgetPasswordEmailRequest
 import ru.iuturakulov.mybudgetbackend.models.user.body.LoginRequest
@@ -18,6 +19,9 @@ import ru.iuturakulov.mybudgetbackend.models.user.body.VerifyEmailRequest
 import ru.iuturakulov.mybudgetbackend.repositories.UserRepository
 import services.EmailService
 import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import java.util.concurrent.ConcurrentHashMap
 
 private const val DURATION_BRUTE_FORCE_SPAM = 60
@@ -36,9 +40,24 @@ class UserController(private val userRepository: UserRepository, private val ema
         val savedUser = userRepository.createUser(request)
 
         // Генерируем код верификации email и отправляем пользователю
-        val verificationCode = generateVerificationCode()
-        userRepository.saveEmailVerificationCode(savedUser.email, verificationCode)
-        emailService.sendEmail(savedUser.email, "Подтвердите регистрацию", "Ваш код: $verificationCode")
+//        val verificationCode = generateVerificationCode()
+//        userRepository.saveEmailVerificationCode(savedUser.email, verificationCode)
+        val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")
+        val instant = Instant.ofEpochMilli(savedUser.createdAt)
+
+        val date = LocalDateTime.ofInstant(instant, ZoneId.systemDefault())
+        emailService.sendEmail(
+            savedUser.email, "Вы успешно зарегистрировались!", """
+            Вы зарегистрировались в системе Мой бюдже
+            
+            Имя: ${savedUser.name}
+            Почта: ${savedUser.email}
+            Пароль: ${savedUser.password}
+            
+            Время регистрации: ${formatter.format(date)}
+            Если это были не вы, возможно, кто-то зарегистрировался от вашего имени. В этом случае обратитесь в службу поддержки yndx-iuturakulov-khevj0@yandex.ru
+        """.trimIndent()
+        )
 
         return@callRequest ApiResponseState.success(
             "Регистрация успешна. Проверьте почту для подтверждения.",
@@ -49,9 +68,9 @@ class UserController(private val userRepository: UserRepository, private val ema
     /**
      * Вход пользователя
      */
-    suspend fun login(request: LoginRequest): ApiResponse<String> = callRequest {
-        val token = userRepository.loginUser(request)
-        return@callRequest ApiResponseState.success(token, HttpStatusCode.OK)
+    suspend fun login(request: LoginRequest): LoginResponse = callRequest {
+        val loginResponse = userRepository.loginUser(request)
+        return@callRequest loginResponse
     }
 
     /**
