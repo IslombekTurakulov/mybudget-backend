@@ -15,9 +15,9 @@ class InvitationService {
 
     private val invitationCooldown = mutableMapOf<String, Long>()
 
-    fun getInvitation(projectId: String, inviteCode: String) = transaction {
+    fun getInvitation(inviteCode: String) = transaction {
         InvitationTable.selectAll().where {
-            (InvitationTable.projectId eq projectId) and (InvitationTable.code eq inviteCode)
+            (InvitationTable.code eq inviteCode)
         }.mapNotNull { InvitationEntity.fromRow(it) }.singleOrNull()
     }
 

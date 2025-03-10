@@ -14,42 +14,45 @@ import ru.iuturakulov.mybudgetbackend.models.analytics.AnalyticsFilter
 import ru.iuturakulov.mybudgetbackend.models.user.body.JwtTokenBody
 
 fun Route.analyticsRoute(analyticsController: AnalyticsController) {
-    route("analytics") {
+    authenticate("auth-jwt") {
+        route("analytics") {
 
-        get("overview", {
-            tags("Analytics")
-            protected = true
-            summary = "Получить общую аналитику пользователя"
-            apiResponse()
-        }) {
-            val userId = call.principal<JwtTokenBody>()?.userId ?: return@get call.respondUnauthorized()
-            val analytics = analyticsController.getOverviewAnalytics(userId)
-            call.respond(ApiResponseState.success(analytics, HttpStatusCode.OK))
-        }
-
-        get("{projectId}/analytics", {
-            tags("Analytics")
-            protected = true
-            summary = "Получить аналитику проекта с фильтрацией по датам и категориям"
-            request {
-                pathParameter<String>("projectId") { description = "ID проекта" }
-                queryParameter<Long>("fromDate") { description = "Начало периода (timestamp)" }
-                queryParameter<Long>("toDate") { description = "Конец периода (timestamp)" }
-                queryParameter<List<String>>("categories") { description = "Фильтр по категориям" }
+            get("overview", {
+                tags("Analytics")
+                protected = true
+                summary = "Получить общую аналитику пользователя"
+                apiResponse()
+            }) {
+                val userId = call.principal<JwtTokenBody>()?.userId ?: return@get call.respondUnauthorized()
+                val analytics = analyticsController.getOverviewAnalytics(userId)
+                call.respond(HttpStatusCode.OK, analytics)
             }
-            apiResponse()
-        }) {
-            val userId = call.principal<JwtTokenBody>()?.userId ?: return@get call.respondUnauthorized()
-            val projectId = call.parameters["projectId"] ?: return@get call.respondBadRequest("Project ID is required")
 
-            val fromDate = call.request.queryParameters["fromDate"]?.toLongOrNull()
-            val toDate = call.request.queryParameters["toDate"]?.toLongOrNull()
-            val categories = call.request.queryParameters.getAll("categories") ?: emptyList()
+            get("project/{projectId}", {
+                tags("Analytics")
+                protected = true
+                summary = "Получить аналитику проекта с фильтрацией по датам и категориям"
+                request {
+                    pathParameter<String>("projectId") { description = "ID проекта" }
+                    queryParameter<Long>("fromDate") { description = "Начало периода (timestamp)" }
+                    queryParameter<Long>("toDate") { description = "Конец периода (timestamp)" }
+                    queryParameter<List<String>>("categories") { description = "Фильтр по категориям" }
+                }
+                apiResponse()
+            }) {
+                val userId = call.principal<JwtTokenBody>()?.userId ?: return@get call.respondUnauthorized()
+                val projectId =
+                    call.parameters["projectId"] ?: return@get call.respondBadRequest("Project ID is required")
 
-            val filter = AnalyticsFilter(fromDate, toDate, categories)
-            val analytics = analyticsController.getProjectAnalytics(userId, projectId, filter)
+                val fromDate = call.request.queryParameters["fromDate"]?.toLongOrNull()
+                val toDate = call.request.queryParameters["toDate"]?.toLongOrNull()
+                val categories = call.request.queryParameters.getAll("categories") ?: emptyList()
 
-            call.respond(ApiResponseState.success(analytics, HttpStatusCode.OK))
+                val filter = AnalyticsFilter(fromDate, toDate, categories)
+                val analytics = analyticsController.getProjectAnalytics(userId, projectId, filter)
+
+                call.respond(HttpStatusCode.OK, analytics)
+            }
         }
     }
 }

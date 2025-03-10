@@ -15,58 +15,61 @@ import ru.iuturakulov.mybudgetbackend.extensions.RoutingExtensions.respondUnauth
 import ru.iuturakulov.mybudgetbackend.models.user.body.JwtTokenBody
 
 fun Route.notificationRoute(notificationController: NotificationController) {
-    route("notifications") {
+    authenticate("auth-jwt") {
+        route("notifications") {
 
-        get({
-            tags("Notifications")
-            protected = true
-            summary = "Получить список уведомлений пользователя"
-            apiResponse()
-        }) {
-            val userId = call.principal<JwtTokenBody>()?.userId ?: return@get call.respondUnauthorized()
-            val notifications = notificationController.getUserNotifications(userId)
-            call.respond(ApiResponseState.success(notifications, HttpStatusCode.OK))
-        }
-
-        put("{notificationId}/read", {
-            tags("Notifications")
-            protected = true
-            summary = "Отметить уведомление как прочитанное"
-            request {
-                pathParameter<String>("notificationId") { description = "ID уведомления" }
+            get({
+                tags("Notifications")
+                protected = true
+                summary = "Получить список уведомлений пользователя"
+                apiResponse()
+            }) {
+                val userId = call.principal<JwtTokenBody>()?.userId ?: return@get call.respondUnauthorized()
+                val notifications = notificationController.getUserNotifications(userId)
+                call.respond(HttpStatusCode.OK, notifications)
             }
-            apiResponse()
-        }) {
-            val userId = call.principal<JwtTokenBody>()?.userId ?: return@put call.respondUnauthorized()
-            val notificationId =
-                call.parameters["notificationId"] ?: return@put call.respondBadRequest("ID уведомления обязателен")
 
-            val success = notificationController.markNotificationAsRead(userId, notificationId)
-            if (success) {
-                call.respond(ApiResponseState.success("Уведомление отмечено как прочитанное", HttpStatusCode.OK))
-            } else {
-                call.respond(ApiResponseState.failure("Не удалось отметить уведомление", HttpStatusCode.BadRequest))
+            put("{notificationId}/read", {
+                tags("Notifications")
+                protected = true
+                summary = "Отметить уведомление как прочитанное"
+                request {
+                    pathParameter<String>("notificationId") { description = "ID уведомления" }
+                }
+                apiResponse()
+            }) {
+                val userId = call.principal<JwtTokenBody>()?.userId ?: return@put call.respondUnauthorized()
+                val notificationId =
+                    call.parameters["notificationId"] ?: return@put call.respondBadRequest("ID уведомления обязателен")
+
+                val success = notificationController.markNotificationAsRead(userId, notificationId)
+                if (success) {
+                    call.respond(HttpStatusCode.OK, "Уведомление отмечено как прочитанное")
+                } else {
+                    call.respond(HttpStatusCode.BadRequest, "Не удалось отметить уведомление")
+                }
             }
-        }
 
-        delete("{notificationId}", {
-            tags("Notifications")
-            protected = true
-            summary = "Удалить уведомление"
-            request {
-                pathParameter<String>("notificationId") { description = "ID уведомления" }
-            }
-            apiResponse()
-        }) {
-            val userId = call.principal<JwtTokenBody>()?.userId ?: return@delete call.respondUnauthorized()
-            val notificationId =
-                call.parameters["notificationId"] ?: return@delete call.respondBadRequest("ID уведомления обязателен")
+            delete("{notificationId}", {
+                tags("Notifications")
+                protected = true
+                summary = "Удалить уведомление"
+                request {
+                    pathParameter<String>("notificationId") { description = "ID уведомления" }
+                }
+                apiResponse()
+            }) {
+                val userId = call.principal<JwtTokenBody>()?.userId ?: return@delete call.respondUnauthorized()
+                val notificationId =
+                    call.parameters["notificationId"]
+                        ?: return@delete call.respondBadRequest("ID уведомления обязателен")
 
-            val success = notificationController.deleteNotification(userId, notificationId)
-            if (success) {
-                call.respond(ApiResponseState.success("Уведомление удалено", HttpStatusCode.OK))
-            } else {
-                call.respond(ApiResponseState.failure("Не удалось удалить уведомление", HttpStatusCode.BadRequest))
+                val success = notificationController.deleteNotification(userId, notificationId)
+                if (success) {
+                    call.respond(HttpStatusCode.OK, "Уведомление удалено")
+                } else {
+                    call.respond(HttpStatusCode.BadRequest, "Не удалось удалить уведомление")
+                }
             }
         }
     }

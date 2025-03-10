@@ -1,14 +1,18 @@
 package ru.iuturakulov.mybudgetbackend.controller.project
 
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
+import ru.iuturakulov.mybudgetbackend.entities.notification.NotificationTable
 import ru.iuturakulov.mybudgetbackend.entities.notification.NotificationType
 import ru.iuturakulov.mybudgetbackend.entities.participants.ParticipantEntity
 import ru.iuturakulov.mybudgetbackend.entities.participants.ParticipantTable
 import ru.iuturakulov.mybudgetbackend.entities.projects.ProjectEntity
 import ru.iuturakulov.mybudgetbackend.entities.projects.ProjectStatus
 import ru.iuturakulov.mybudgetbackend.entities.projects.ProjectsTable
+import ru.iuturakulov.mybudgetbackend.entities.transaction.TransactionsTable
 import ru.iuturakulov.mybudgetbackend.entities.user.UserEntity
 import ru.iuturakulov.mybudgetbackend.entities.user.UserTable
 import ru.iuturakulov.mybudgetbackend.extensions.AccessControl
@@ -130,16 +134,37 @@ class ProjectController(
     /**
      * Удалить проект (только владелец)
      */
-    fun deleteProject(userId: String, projectId: String) {
-        val project = projectRepository.getProjectById(projectId) ?: throw AppException.NotFound.Project()
+    fun deleteProject(userId: String, projectId: String) = transaction {
+        val project = ProjectsTable.selectAll().where { ProjectsTable.id eq projectId }
+            .map { ProjectEntity.fromRow(it) }
+            .singleOrNull() ?: throw AppException.NotFound.Project("Проект не найден")
 
-        if (!accessControl.canDeleteProject(userId, project)) {
+        if (project.ownerId != userId) {
             throw AppException.Authorization("Только владелец может удалить проект")
         }
 
-        projectRepository.deleteProject(projectId)
-        auditLogService.logAction(userId, "Удален проект: $projectId")
+        NotificationTable.deleteWhere { NotificationTable.projectId eq projectId }
+
+        TransactionsTable.deleteWhere { TransactionsTable.projectId eq projectId }
+
+        ParticipantTable.deleteWhere { ParticipantTable.projectId eq projectId }
+
+        ProjectsTable.deleteWhere { id eq projectId }
+
+        auditLogService.logAction(userId, "Удалил проект: $projectId")
+
+        val participants = ParticipantTable.selectAll().where { ParticipantTable.projectId eq projectId }
+            .mapNotNull { it[ParticipantTable.userId] }
+        participants.forEach { participantId ->
+            notificationService.sendNotification(
+                userId = participantId,
+                type = NotificationType.SYSTEM_ALERT,
+                message = "Проект $projectId был удален владельцем",
+                projectId = projectId
+            )
+        }
     }
+
 
     /**
      * Пригласить участника
@@ -186,10 +211,10 @@ class ProjectController(
     /**
      * Принять приглашение
      */
-    fun acceptInvitation(userId: String, request: AcceptInviteRequest): Boolean {
+    fun acceptInvitation(userId: String, inviteCode: String): Boolean {
         return transaction {
-            val invitation = invitationService.getInvitation(request.projectId, request.inviteCode)
-                ?: return@transaction false
+            val invitation = invitationService.getInvitation(inviteCode)
+                ?: throw AppException.NotFound.Resource("Приглашения не существует")
 
             // Проверяем, не истекло ли приглашение
             if (invitation.isExpired()) {
@@ -207,7 +232,7 @@ class ProjectController(
             participantRepository.addParticipant(
                 ParticipantEntity(
                     id = UUID.randomUUID().toString(),
-                    projectId = request.projectId,
+                    projectId = invitation.projectId,
                     userId = userId,
                     name = user.name,
                     email = user.email,
@@ -218,17 +243,17 @@ class ProjectController(
 
             invitationService.deleteInvitation(invitation.id)
 
-            auditLogService.logAction(userId, "Принял приглашение в проект ${request.projectId}")
+            auditLogService.logAction(userId, "Принял приглашение в проект ${invitation.projectId}")
 
             // Отправляем уведомление владельцу проекта
-            val project = projectRepository.getProjectById(request.projectId)
+            val project = projectRepository.getProjectById(invitation.projectId)
                 ?: throw AppException.NotFound.Project("Проект не найден")
 
             notificationService.sendNotification(
                 userId = project.ownerId,
                 type = NotificationType.PROJECT_INVITE,
-                message = "Пользователь ${user.email} принял приглашение в проект $request.projectId",
-                projectId = request.projectId
+                message = "Пользователь ${user.email} принял приглашение в проект ${invitation.projectId}",
+                projectId = invitation.projectId
             )
             return@transaction true
         }
@@ -267,6 +292,17 @@ class ProjectController(
             )
             return@transaction true
         }
+    }
+
+    fun getProjectParticipants(userId: String, projectId: String): List<ParticipantEntity> {
+        val project = projectRepository.getProjectById(projectId)
+            ?: throw AppException.NotFound.Project("Проект не найден")
+
+        if (!projectRepository.isUserParticipant(userId, projectId)) {
+            throw AppException.Authorization("Вы не участник проекта")
+        }
+
+        return participantRepository.getParticipantsByProject(projectId)
     }
 
 

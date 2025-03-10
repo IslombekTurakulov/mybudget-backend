@@ -65,17 +65,6 @@ class ProjectRepository {
         getProjectById(projectId) ?: throw AppException.NotFound.Project()
     }
 
-    /**
-     * Удалить проект (только владелец)
-     */
-    fun deleteProject(projectId: String) = transaction {
-        // Удаляем участников проекта
-        ParticipantTable.deleteWhere { ParticipantTable.projectId eq projectId }
-
-        // Удаляем сам проект
-        ProjectsTable.deleteWhere { id eq projectId }
-    }
-
     fun isUserParticipant(userId: String, projectId: String): Boolean = transaction {
         ParticipantTable.selectAll().where {
             (ParticipantTable.userId eq userId) and (ParticipantTable.projectId eq projectId)
