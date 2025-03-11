@@ -96,7 +96,7 @@ class TransactionController(
             ?: throw AppException.NotFound.Transaction("Транзакция не найдена")
     }
 
-    fun updateTransaction(userId: String, request: UpdateTransactionRequest): Boolean {
+    fun updateTransaction(userId: String, request: UpdateTransactionRequest): TransactionEntity {
         return transaction {
             val transaction = transactionRepository.getTransactionById(request.transactionId)
                 ?: throw AppException.NotFound.Transaction("Транзакция не найдена")
@@ -107,8 +107,7 @@ class TransactionController(
             val participant = participantRepository.getParticipantByUserAndProjectId(
                 userId = userId,
                 projectId = transaction.projectId
-            )
-                ?: throw AppException.Authorization("Вы не участник проекта")
+            ) ?: throw AppException.Authorization("Вы не участник проекта")
 
             if (!accessControl.canEditProject(userId, project, participant)) {
                 throw AppException.Authorization("Вы не можете редактировать транзакции в этом проекте")
@@ -116,15 +115,15 @@ class TransactionController(
 
             auditLogService.logAction(userId, "Обновил транзакцию: ${request.name} в проекте ${transaction.projectId}")
 
-            return@transaction transactionRepository.updateTransaction(
-                transaction.copy(
-                    name = request.name ?: transaction.name,
-                    amount = request.amount ?: transaction.amount,
-                    category = request.category ?: transaction.category,
-                    categoryIcon = request.categoryIcon ?: transaction.categoryIcon,
-                    date = request.date ?: transaction.date
-                )
+            val transactionEntity = transaction.copy(
+                name = request.name ?: transaction.name,
+                amount = request.amount ?: transaction.amount,
+                category = request.category ?: transaction.category,
+                categoryIcon = request.categoryIcon ?: transaction.categoryIcon,
+                date = request.date ?: transaction.date
             )
+            transactionRepository.updateTransaction(transactionEntity)
+            transactionEntity
         }
     }
 

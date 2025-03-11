@@ -10,6 +10,7 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import ru.iuturakulov.mybudgetbackend.controller.transaction.TransactionController
+import ru.iuturakulov.mybudgetbackend.extensions.AppException
 import ru.iuturakulov.mybudgetbackend.extensions.AuditLogService
 import ru.iuturakulov.mybudgetbackend.extensions.RoutingExtensions.apiResponse
 import ru.iuturakulov.mybudgetbackend.extensions.RoutingExtensions.respondBadRequest
@@ -102,12 +103,25 @@ fun Route.transactionRoute(transactionController: TransactionController, auditLo
                     call.parameters["transactionId"] ?: return@put call.respondBadRequest("Transaction ID is required")
                 val requestBody = call.receive<UpdateTransactionRequest>().copy(transactionId = transactionId)
 
-                val success = transactionController.updateTransaction(userId, requestBody)
-                if (success) {
+                try {
+                    val success = transactionController.updateTransaction(userId, requestBody)
                     auditLogService.logAction(userId, "Обновлена транзакция $transactionId в проекте $projectId")
-                    call.respond(HttpStatusCode.OK, "Транзакция обновлена")
-                } else {
-                    call.respond(HttpStatusCode.BadRequest, "Ошибка обновления транзакции")
+                    call.respond(HttpStatusCode.OK, success)
+                } catch (e: AppException.Authorization) {
+                    call.respond(
+                        HttpStatusCode.Forbidden,
+                        "Вы не можете удалить эту транзакцию"
+                    )
+                } catch (e: AppException.NotFound.Project) {
+                    call.respond(
+                        HttpStatusCode.NotFound,
+                        "Транзакция не найдена"
+                    )
+                } catch (e: Exception) {
+                    call.respond(
+                        HttpStatusCode.InternalServerError,
+                        e.localizedMessage
+                    )
                 }
             }
 

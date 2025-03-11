@@ -38,7 +38,7 @@ fun Route.userRoute(userController: UserController) {
             } catch (e: Exception) {
                 call.respond(
                     HttpStatusCode.BadRequest,
-                    "Ошибка при входе: ${e.localizedMessage}"
+                    e.message.orEmpty()
                 )
             }
         }
