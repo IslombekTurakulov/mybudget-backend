@@ -4,7 +4,7 @@ import io.ktor.http.*
 import ru.iuturakulov.mybudgetbackend.config.JwtConfig
 import ru.iuturakulov.mybudgetbackend.database.DataBaseTransaction
 import ru.iuturakulov.mybudgetbackend.extensions.ApiExtensions.callRequest
-import ru.iuturakulov.mybudgetbackend.extensions.ApiExtensions.generateVerificationCode
+import ru.iuturakulov.mybudgetbackend.extensions.ApiExtensions.generatePassword
 import ru.iuturakulov.mybudgetbackend.extensions.ApiResponse
 import ru.iuturakulov.mybudgetbackend.extensions.ApiResponseState
 import ru.iuturakulov.mybudgetbackend.extensions.AppException
@@ -48,7 +48,7 @@ class UserController(private val userRepository: UserRepository, private val ema
         val date = LocalDateTime.ofInstant(instant, ZoneId.systemDefault())
         emailService.sendEmail(
             savedUser.email, "Вы успешно зарегистрировались!", """
-            Вы зарегистрировались в системе Мой бюдже
+            Вы зарегистрировались в системе Мой бюджет
             
             Имя: ${savedUser.name}
             Почта: ${savedUser.email}
@@ -97,13 +97,17 @@ class UserController(private val userRepository: UserRepository, private val ema
             throw AppException.Common("Слишком частые запросы сброса пароля. Подождите минуту.")
         }
 
-        val resetCode = generateVerificationCode()
-        userRepository.savePasswordResetCode(user.email, resetCode)
-        emailService.sendEmail(user.email, "Восстановление пароля", "Ваш код: $resetCode")
+        val generatedPassword = generatePassword()
+        userRepository.saveNewPasswordForUser(user.email, PasswordHasher.hash(generatedPassword))
+        emailService.sendEmail(
+            toEmail = user.email,
+            subject = "Восстановление пароля",
+            message = "Ваш новый пароль: $generatedPassword"
+        )
 
         passwordResetCooldown[request.email] = Instant.now().epochSecond
 
-        return@callRequest ApiResponseState.success("Код для сброса пароля отправлен на email", HttpStatusCode.OK)
+        return@callRequest ApiResponseState.success("Новый пароль отправлен на email", HttpStatusCode.OK)
     }
 
 

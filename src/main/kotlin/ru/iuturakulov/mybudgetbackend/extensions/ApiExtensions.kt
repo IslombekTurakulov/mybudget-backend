@@ -36,4 +36,11 @@ object ApiExtensions {
             .map { chars.random() }
             .joinToString("")
     }
+
+    fun generatePassword(length: Int = 8): String {
+        val chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!@#"
+        return (1..length)
+            .map { chars.random() }
+            .joinToString("")
+    }
 }

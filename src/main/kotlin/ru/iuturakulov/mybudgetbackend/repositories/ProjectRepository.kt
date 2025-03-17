@@ -34,6 +34,12 @@ class ProjectRepository {
             .map { ProjectsTable.fromRow(it) }
     }
 
+    fun updateAmountSpent(projectId: String, newAmountSpent: Double) = transaction {
+        ProjectsTable.update({ ProjectsTable.id eq projectId }) {
+            it[amountSpent] = newAmountSpent.toBigDecimal()
+        }
+    }
+
     /**
      * Проверить, является ли пользователь владельцем проекта
      */

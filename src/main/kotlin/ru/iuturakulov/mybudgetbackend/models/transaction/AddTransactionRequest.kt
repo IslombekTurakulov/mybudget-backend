@@ -8,10 +8,13 @@ data class AddTransactionRequest(
     val name: String,
     val projectId: String,
     val amount: Double,
-    val category: String,
-    val categoryIcon: String,
-    val date: Long
+    val category: String? = null,
+    val categoryIcon: String? = null,
+    val date: Long,
+    val transactionType: TransactionType? = null,
+    val images: List<String>? = null,
 ) {
+
     fun validation() {
         validate(this) {
             validate(AddTransactionRequest::name).isNotBlank()

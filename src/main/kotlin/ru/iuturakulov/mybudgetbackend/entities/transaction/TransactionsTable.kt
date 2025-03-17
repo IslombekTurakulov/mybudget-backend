@@ -4,6 +4,7 @@ import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.Table
 import ru.iuturakulov.mybudgetbackend.entities.projects.ProjectsTable
 import ru.iuturakulov.mybudgetbackend.entities.user.UserTable
+import ru.iuturakulov.mybudgetbackend.models.transaction.TransactionType
 
 object TransactionsTable : Table("transactions") {
     val id = varchar("id", 36)
@@ -14,6 +15,8 @@ object TransactionsTable : Table("transactions") {
     val category = varchar("category", 50)
     val categoryIcon = varchar("category_icon", 100)
     val date = long("date")
+    val transactionType = enumerationByName("transaction_type", 10, TransactionType::class)
+    val images = text("images")
 
     override val primaryKey = PrimaryKey(id)
 
@@ -25,6 +28,8 @@ object TransactionsTable : Table("transactions") {
         amount = row[amount].toDouble(),
         category = row[category],
         categoryIcon = row[categoryIcon],
-        date = row[date]
+        date = row[date],
+        transactionType = row[transactionType],
+        images = if (row[images].isBlank()) emptyList() else row[images].split(",")
     )
 }

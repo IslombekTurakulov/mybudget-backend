@@ -10,6 +10,7 @@ import org.jetbrains.exposed.sql.update
 import ru.iuturakulov.mybudgetbackend.entities.transaction.TransactionEntity
 import ru.iuturakulov.mybudgetbackend.entities.transaction.TransactionsTable
 import ru.iuturakulov.mybudgetbackend.models.analytics.AnalyticsFilter
+import ru.iuturakulov.mybudgetbackend.models.transaction.TransactionType
 
 class TransactionRepository {
 
@@ -20,17 +21,24 @@ class TransactionRepository {
             insertStatement[userId] = transaction.userId
             insertStatement[name] = transaction.name
             insertStatement[amount] = transaction.amount.toBigDecimal()
-            insertStatement[category] = transaction.category
-            insertStatement[categoryIcon] = transaction.categoryIcon
+            transaction.category?.let {
+                insertStatement[category] = transaction.category
+            }
+            transaction.categoryIcon?.let {
+                insertStatement[categoryIcon] = transaction.categoryIcon
+            }
             insertStatement[date] = transaction.date
+            // Здесь вместо safe-call используем значение по умолчанию, если transactionType равен null
+            insertStatement[transactionType] = transaction.transactionType ?: TransactionType.INCOME
+            insertStatement[images] = transaction.images.orEmpty().joinToString(",")
         }
         transaction
     }
 
     fun getTransactionsByProject(projectId: String): List<TransactionEntity> = transaction {
-        TransactionsTable.selectAll()
-            .where { TransactionsTable.projectId eq projectId }
-            .map { TransactionsTable.fromRow(it) }
+        TransactionsTable.selectAll().where {
+            TransactionsTable.projectId eq projectId
+        }.map { TransactionsTable.fromRow(it) }
     }
 
     fun getTransactionById(transactionId: String): TransactionEntity? = transaction {
@@ -43,9 +51,17 @@ class TransactionRepository {
         TransactionsTable.update({ TransactionsTable.id eq transaction.id }) { statement ->
             statement[name] = transaction.name
             statement[amount] = transaction.amount.toBigDecimal()
-            statement[category] = transaction.category
-            statement[categoryIcon] = transaction.categoryIcon
+            transaction.category?.let {
+                statement[category] = transaction.category
+            }
+            transaction.categoryIcon?.let {
+                statement[categoryIcon] = transaction.categoryIcon
+            }
             statement[date] = transaction.date
+            transaction.transactionType?.let {
+                statement[transactionType] = transaction.transactionType
+            }
+            statement[images] = transaction.images.orEmpty().joinToString(",")
         } > 0
     }
 

@@ -4,11 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4bbd917-8929-44b4-afda-19b441d6e48e" name="Changes" comment="MYBUDGETBACKEND-7: Project, transaction fixes">
+    <list default="true" id="c4bbd917-8929-44b4-afda-19b441d6e48e" name="Changes" comment="MYBUDGETBACKEND-8: Transaction fixes">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/controller/transaction/TransactionController.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/controller/transaction/TransactionController.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/routing/TransactionRoute.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/routing/TransactionRoute.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/routing/UserRoute.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/routing/UserRoute.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -61,6 +58,9 @@
     &quot;accountId&quot;: &quot;717e616e-61ab-4e05-a453-e5e5decd602e&quot;
   }
 }</component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.zaxxer/HikariCP/6.0.0/a5102a877d78170c07faad88f360840b61f45252/HikariCP-6.0.0.jar!/com/zaxxer/hikari/pool/HikariPool.class" root0="SKIP_INSPECTION" />
+  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 0
 }</component>
@@ -172,7 +172,15 @@
       <option name="project" value="LOCAL" />
       <updated>1741576658245</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="MYBUDGETBACKEND-8: Transaction fixes">
+      <option name="closed" value="true" />
+      <created>1741732469197</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1741732469197</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -182,7 +190,8 @@
     <MESSAGE value="MYBUDGETBACKEND-5: Analytics, Notifications, transcation" />
     <MESSAGE value="MYBUDGETBACKEND-6: Project, transaction, auth, database and call response fixes" />
     <MESSAGE value="MYBUDGETBACKEND-7: Project, transaction fixes" />
-    <option name="LAST_COMMIT_MESSAGE" value="MYBUDGETBACKEND-7: Project, transaction fixes" />
+    <MESSAGE value="MYBUDGETBACKEND-8: Transaction fixes" />
+    <option name="LAST_COMMIT_MESSAGE" value="MYBUDGETBACKEND-8: Transaction fixes" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

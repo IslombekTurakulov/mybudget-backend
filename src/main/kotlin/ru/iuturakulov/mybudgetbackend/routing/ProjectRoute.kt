@@ -49,7 +49,7 @@ fun Route.projectRoute(projectController: ProjectController, auditLogService: Au
 
                 projectController.acceptInvitation(userId, inviteCode).let { result ->
                     if (result) {
-                        auditLogService.logAction(userId, "Accepted invite to project: ${inviteCode}")
+                        auditLogService.logAction(userId, "Accepted invite to project: $inviteCode")
                         call.respond(HttpStatusCode.OK, "Приглашение принято")
                     } else {
                         call.respond(HttpStatusCode.BadRequest, "Ошибка принятия приглашения")

@@ -42,11 +42,13 @@ class AnalyticsController(
         // Распределение по категориям (фильтрованные категории)
         val categoryDistribution = transactions
             .groupBy { transactionEntity -> transactionEntity.category }
-            .map { (category, txList) ->
-                CategoryStats(
-                    category = category,
-                    totalAmount = txList.sumOf { it.amount }
-                )
+            .mapNotNull { (category, txList) ->
+                category?.let {
+                    CategoryStats(
+                        category = category,
+                        totalAmount = txList.sumOf { it.amount }
+                    )
+                }
             }
 
         // Распределение по периодам (группируем по месяцам)

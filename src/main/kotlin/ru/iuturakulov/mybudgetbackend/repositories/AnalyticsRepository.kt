@@ -29,8 +29,10 @@ class AnalyticsRepository {
         val totalSpent = transactions.sumOf { it.amount }
 
         val categoryStats = transactions.groupBy { it.category }
-            .map { (category, txList) ->
-                CategoryStats(category, txList.sumOf { it.amount })
+            .mapNotNull { (category, txList) ->
+                category?.let {
+                    CategoryStats(category, txList.sumOf { it.amount })
+                }
             }
 
         val periodStats = transactions.groupBy {

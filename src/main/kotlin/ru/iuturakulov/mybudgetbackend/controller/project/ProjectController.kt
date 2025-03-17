@@ -87,14 +87,14 @@ class ProjectController(
                 statement[ProjectsTable.ownerId] = ownerId
             }
 
-            ParticipantTable.insert {
-                it[id] = UUID.randomUUID().toString()
-                it[projectId] = generatedProjectId
-                it[userId] = ownerId
-                it[name] = user.name
-                it[email] = user.email
-                it[role] = UserRole.OWNER
-                it[createdAt] = System.currentTimeMillis()
+            ParticipantTable.insert { insertStatement ->
+                insertStatement[id] = UUID.randomUUID().toString()
+                insertStatement[projectId] = generatedProjectId
+                insertStatement[userId] = ownerId
+                insertStatement[name] = user.name
+                insertStatement[email] = user.email
+                insertStatement[role] = UserRole.OWNER
+                insertStatement[createdAt] = System.currentTimeMillis()
             }
 
             auditLogService.logAction(ownerId, "Создан проект: $generatedProjectId")

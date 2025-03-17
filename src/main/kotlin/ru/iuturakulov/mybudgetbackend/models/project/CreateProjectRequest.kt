@@ -13,7 +13,9 @@ data class CreateProjectRequest(
     fun validation() {
         validate(this) {
             validate(CreateProjectRequest::name).isNotBlank().hasSize(3, 64)
-            validate(CreateProjectRequest::description).isNotBlank().hasSize(3, 255)
+            if (description.isNotBlank()) {
+                validate(CreateProjectRequest::description).hasSize(3, 255)
+            }
             validate(CreateProjectRequest::budgetLimit).isGreaterThan(0.0)
         }
     }

@@ -32,13 +32,20 @@ fun Route.transactionRoute(transactionController: TransactionController, auditLo
                 }
                 apiResponse()
             }) {
-                val userId = call.principal<JwtTokenBody>()?.userId ?: return@get call.respondUnauthorized()
-                val projectId =
-                    call.parameters["projectId"] ?: return@get call.respondBadRequest("Project ID is required")
+                try {
+                    val userId = call.principal<JwtTokenBody>()?.userId ?: return@get call.respondUnauthorized()
+                    val projectId =
+                        call.parameters["projectId"] ?: return@get call.respondBadRequest("Project ID is required")
 
-                val transactions = transactionController.getProjectTransactions(userId, projectId)
-                auditLogService.logAction(userId, "Запрошен список транзакций проекта: $projectId")
-                call.respond(HttpStatusCode.OK, transactions)
+                    val transactions = transactionController.getProjectTransactions(userId, projectId)
+                    auditLogService.logAction(userId, "Запрошен список транзакций проекта: $projectId")
+                    call.respond(HttpStatusCode.OK, transactions)
+                } catch (e: Exception) {
+                    call.respond(
+                        HttpStatusCode.InternalServerError,
+                        e.localizedMessage
+                    )
+                }
             }
 
             // Получить одну транзакцию по ID
@@ -74,14 +81,21 @@ fun Route.transactionRoute(transactionController: TransactionController, auditLo
                 }
                 apiResponse()
             }) {
-                val userId = call.principal<JwtTokenBody>()?.userId ?: return@post call.respondUnauthorized()
-                val projectId =
-                    call.parameters["projectId"] ?: return@post call.respondBadRequest("Project ID is required")
-                val requestBody = call.receive<AddTransactionRequest>().copy(projectId = projectId)
+                try {
+                    val userId = call.principal<JwtTokenBody>()?.userId ?: return@post call.respondUnauthorized()
+                    val projectId =
+                        call.parameters["projectId"] ?: return@post call.respondBadRequest("Project ID is required")
+                    val requestBody = call.receive<AddTransactionRequest>().copy(projectId = projectId)
 
-                val transaction = transactionController.addTransaction(userId, requestBody)
-                auditLogService.logAction(userId, "Добавлена транзакция ${transaction.name} в проекте $projectId")
-                call.respond(HttpStatusCode.Created, transaction)
+                    val transaction = transactionController.addTransaction(userId, requestBody)
+                    auditLogService.logAction(userId, "Добавлена транзакция ${transaction.name} в проекте $projectId")
+                    call.respond(HttpStatusCode.Created, transaction)
+                } catch (e: Exception) {
+                    call.respond(
+                        HttpStatusCode.InternalServerError,
+                        e.localizedMessage
+                    )
+                }
             }
 
             // Обновить транзакцию

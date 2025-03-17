@@ -134,6 +134,12 @@ class UserRepository {
         }
     }
 
+    fun saveNewPasswordForUser(email: String, newPassword: String) = transaction {
+        UserTable.update({ UserTable.email eq email.lowercase(Locale.getDefault()) }) {
+            it[password] = newPassword
+        }
+    }
+
     /**
      * **Проверка кода сброса пароля**
      */
