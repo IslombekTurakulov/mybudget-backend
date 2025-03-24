@@ -37,13 +37,20 @@ class TransactionController(
             throw AppException.Authorization("Вы не можете добавлять транзакции в этот проект")
         }
 
-        // Если транзакция является расходом, то увеличиваем сумму расходов,
-        // если доходом – сумма расходов остаётся неизменной.
+        // Определяем, является ли транзакция расходом
         val isExpense = request.transactionType == TransactionType.EXPENSE
-        val newSpent = if (isExpense) project.amountSpent + request.amount else project.amountSpent
 
-        if (isExpense && newSpent > project.budgetLimit) {
-            throw AppException.InvalidProperty.Transaction("Сумма расходов превышает бюджет проекта")
+        // Если расход – вычисляем новую сумму расходов и проверяем, не превышает ли она бюджет
+        if (isExpense) {
+            val newSpent = project.amountSpent + request.amount
+            if (newSpent > project.budgetLimit) {
+                throw AppException.InvalidProperty.Transaction("Сумма расходов превышает бюджет проекта")
+            }
+            projectRepository.updateAmountSpent(request.projectId, newSpent)
+        } else {
+            // Если доход – прибавляем сумму к бюджету
+            val newBudget = project.budgetLimit + request.amount
+            projectRepository.updateBudgetAmount(request.projectId, newBudget)
         }
 
         val transaction = TransactionEntity(
@@ -61,9 +68,6 @@ class TransactionController(
 
         transactionRepository.addTransaction(transaction)
 
-        // Обновляем сумму расходов только если транзакция – расход
-        projectRepository.updateAmountSpent(request.projectId, newSpent)
-
         auditLogService.logAction(userId, "Добавил транзакцию: ${transaction.name} в проект ${request.projectId}")
 
         notificationService.sendNotification(
@@ -75,6 +79,7 @@ class TransactionController(
 
         return@transaction transaction
     }
+
 
     fun getProjectTransactions(userId: String, projectId: String): List<TransactionEntity> {
         val project = projectRepository.getProjectById(projectId)

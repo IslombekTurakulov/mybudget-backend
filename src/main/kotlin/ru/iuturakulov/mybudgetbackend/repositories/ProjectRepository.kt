@@ -40,6 +40,11 @@ class ProjectRepository {
         }
     }
 
+    fun updateBudgetAmount(projectId: String, newBudgetAmount: Double) = transaction {
+        ProjectsTable.update({ ProjectsTable.id eq projectId }) {
+            it[budgetLimit] = newBudgetAmount.toBigDecimal()
+        }
+    }
     /**
      * Проверить, является ли пользователь владельцем проекта
      */

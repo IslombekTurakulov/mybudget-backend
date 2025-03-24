@@ -5,6 +5,7 @@ import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.sql.update
 import ru.iuturakulov.mybudgetbackend.entities.notification.NotificationTable
 import ru.iuturakulov.mybudgetbackend.entities.notification.NotificationType
 import ru.iuturakulov.mybudgetbackend.entities.participants.ParticipantEntity
@@ -132,6 +133,40 @@ class ProjectController(
     }
 
     /**
+     * Архивировать проект (только владелец)
+     */
+    fun archiveProject(userId: String, projectId: String) = transaction {
+        val project = ProjectsTable.selectAll().where { ProjectsTable.id eq projectId }
+            .map { ProjectEntity.fromRow(it) }
+            .singleOrNull() ?: throw AppException.NotFound.Project("Проект не найден")
+
+        if (project.ownerId != userId) {
+            throw AppException.Authorization("Только владелец может архивировать проект")
+        }
+
+        ProjectsTable.update({ ProjectsTable.id eq projectId }) {
+            it[status] = ProjectStatus.ARCHIVED
+        }
+
+        auditLogService.logAction(userId, "Архивировал проект: $projectId")
+
+        val participants = ParticipantTable.selectAll().where { ParticipantTable.projectId eq projectId }
+            .mapNotNull { it[ParticipantTable.userId] }
+
+        participants.forEach { participantId ->
+            notificationService.sendNotification(
+                userId = participantId,
+                type = NotificationType.SYSTEM_ALERT,
+                message = "Проект \"${project.name}\" был архивирован владельцем",
+                projectId = projectId
+            )
+        }
+        project.copy(
+            status = ProjectStatus.ARCHIVED
+        )
+    }
+
+    /**
      * Удалить проект (только владелец)
      */
     fun deleteProject(userId: String, projectId: String) = transaction {
@@ -149,7 +184,9 @@ class ProjectController(
 
         ParticipantTable.deleteWhere { ParticipantTable.projectId eq projectId }
 
-        ProjectsTable.deleteWhere { id eq projectId }
+        ProjectsTable.update({ ProjectsTable.id eq projectId }) {
+            it[status] = ProjectStatus.DELETED
+        }
 
         auditLogService.logAction(userId, "Удалил проект: $projectId")
 
@@ -159,7 +196,7 @@ class ProjectController(
             notificationService.sendNotification(
                 userId = participantId,
                 type = NotificationType.SYSTEM_ALERT,
-                message = "Проект $projectId был удален владельцем",
+                message = "Проект \"${project.name}\" был удален владельцем",
                 projectId = projectId
             )
         }
@@ -171,7 +208,7 @@ class ProjectController(
      */
     fun inviteParticipant(userId: String, projectId: String, request: InviteParticipantRequest): InviteResult {
         return transaction {
-            projectRepository.getProjectById(projectId)
+            val project = projectRepository.getProjectById(projectId)
                 ?: return@transaction InviteResult(success = false, message = "Проект не найден")
 
             if (!projectRepository.isUserOwner(projectId, userId)) {
@@ -197,7 +234,7 @@ class ProjectController(
             notificationService.sendNotification(
                 userId = request.email,
                 type = NotificationType.PROJECT_INVITE,
-                message = "Вас пригласили в проект $projectId",
+                message = "Вас пригласили в проект \"${project.name}\"",
                 projectId = projectId
             )
 
@@ -252,7 +289,7 @@ class ProjectController(
             notificationService.sendNotification(
                 userId = project.ownerId,
                 type = NotificationType.PROJECT_INVITE,
-                message = "Пользователь ${user.email} принял приглашение в проект ${invitation.projectId}",
+                message = "Пользователь ${user.email} принял приглашение в проект \"${project.name}\"",
                 projectId = invitation.projectId
             )
             return@transaction true

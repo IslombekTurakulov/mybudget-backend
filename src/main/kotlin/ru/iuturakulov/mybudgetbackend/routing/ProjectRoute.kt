@@ -10,6 +10,7 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import ru.iuturakulov.mybudgetbackend.controller.project.ProjectController
+import ru.iuturakulov.mybudgetbackend.entities.projects.ProjectStatus
 import ru.iuturakulov.mybudgetbackend.extensions.ApiResponseState
 import ru.iuturakulov.mybudgetbackend.extensions.AppException
 import ru.iuturakulov.mybudgetbackend.extensions.AuditLogService
@@ -143,8 +144,24 @@ fun Route.projectRoute(projectController: ProjectController, auditLogService: Au
                     call.parameters["projectId"] ?: return@put call.respondBadRequest("Project ID is required")
                 val requestBody = call.receive<UpdateProjectRequest>()
 
-                val updatedProject = projectController.updateProject(userId, projectId, requestBody)
-                call.respond(HttpStatusCode.OK, updatedProject)
+                try {
+                    val updatedProject = if (requestBody.type == ProjectStatus.ARCHIVED) {
+                        projectController.archiveProject(userId, projectId)
+                    } else {
+                        projectController.updateProject(userId, projectId, requestBody)
+                    }
+                    call.respond(HttpStatusCode.OK, updatedProject)
+                } catch (e: AppException.NotFound.Project) {
+                    call.respond(
+                        HttpStatusCode.NotFound,
+                        "Проект не найден"
+                    )
+                } catch (e: Exception) {
+                    call.respond(
+                        HttpStatusCode.InternalServerError,
+                        e.localizedMessage
+                    )
+                }
             }
 
             delete("{projectId}", {
