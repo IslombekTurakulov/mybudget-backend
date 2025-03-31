@@ -21,7 +21,6 @@ import ru.iuturakulov.mybudgetbackend.extensions.AppException
 import ru.iuturakulov.mybudgetbackend.extensions.AuditLogService
 import ru.iuturakulov.mybudgetbackend.models.InviteResult
 import ru.iuturakulov.mybudgetbackend.models.UserRole
-import ru.iuturakulov.mybudgetbackend.models.project.AcceptInviteRequest
 import ru.iuturakulov.mybudgetbackend.models.project.ChangeRoleRequest
 import ru.iuturakulov.mybudgetbackend.models.project.CreateProjectRequest
 import ru.iuturakulov.mybudgetbackend.models.project.InviteParticipantRequest
@@ -29,8 +28,8 @@ import ru.iuturakulov.mybudgetbackend.models.project.UpdateProjectRequest
 import ru.iuturakulov.mybudgetbackend.repositories.ParticipantRepository
 import ru.iuturakulov.mybudgetbackend.repositories.ProjectRepository
 import ru.iuturakulov.mybudgetbackend.repositories.UserRepository
-import services.InvitationService
-import services.NotificationService
+import ru.iuturakulov.mybudgetbackend.services.InvitationService
+import ru.iuturakulov.mybudgetbackend.services.NotificationService
 import java.util.*
 
 class ProjectController(
@@ -208,6 +207,8 @@ class ProjectController(
      */
     fun inviteParticipant(userId: String, projectId: String, request: InviteParticipantRequest): InviteResult {
         return transaction {
+            // TODO: Сделать проверку, что нельзя приглашать самого себя
+
             val project = projectRepository.getProjectById(projectId)
                 ?: return@transaction InviteResult(success = false, message = "Проект не найден")
 
@@ -339,7 +340,9 @@ class ProjectController(
             throw AppException.Authorization("Вы не участник проекта")
         }
 
-        return participantRepository.getParticipantsByProject(projectId)
+        return participantRepository.getParticipantsByProject(projectId).filter { participants ->
+            participants.userId == userId
+        }
     }
 
 

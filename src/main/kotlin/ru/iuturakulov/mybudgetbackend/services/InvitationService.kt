@@ -1,4 +1,4 @@
-package services
+package ru.iuturakulov.mybudgetbackend.services
 
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.and

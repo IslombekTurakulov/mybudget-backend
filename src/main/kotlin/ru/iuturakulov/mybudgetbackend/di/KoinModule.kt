@@ -4,6 +4,7 @@ import org.koin.dsl.module
 import ru.iuturakulov.mybudgetbackend.controller.analytics.AnalyticsController
 import ru.iuturakulov.mybudgetbackend.controller.notification.NotificationController
 import ru.iuturakulov.mybudgetbackend.controller.project.ProjectController
+import ru.iuturakulov.mybudgetbackend.controller.settings.SettingsController
 import ru.iuturakulov.mybudgetbackend.controller.transaction.TransactionController
 import ru.iuturakulov.mybudgetbackend.controller.user.UserController
 import ru.iuturakulov.mybudgetbackend.extensions.AccessControl
@@ -13,11 +14,12 @@ import ru.iuturakulov.mybudgetbackend.repositories.AuditLogRepository
 import ru.iuturakulov.mybudgetbackend.repositories.NotificationRepository
 import ru.iuturakulov.mybudgetbackend.repositories.ParticipantRepository
 import ru.iuturakulov.mybudgetbackend.repositories.ProjectRepository
+import ru.iuturakulov.mybudgetbackend.repositories.SettingsRepository
 import ru.iuturakulov.mybudgetbackend.repositories.TransactionRepository
 import ru.iuturakulov.mybudgetbackend.repositories.UserRepository
-import services.EmailService
-import services.InvitationService
-import services.NotificationService
+import ru.iuturakulov.mybudgetbackend.services.EmailService
+import ru.iuturakulov.mybudgetbackend.services.InvitationService
+import ru.iuturakulov.mybudgetbackend.services.NotificationService
 
 val repositoryModule = module {
     single { UserRepository() }
@@ -27,6 +29,7 @@ val repositoryModule = module {
     single { NotificationRepository() }
     single { AuditLogRepository() }
     single { AnalyticsRepository() }
+    single { SettingsRepository() }
 }
 
 val serviceModule = module {
@@ -38,11 +41,41 @@ val serviceModule = module {
 }
 
 val controllerModule = module {
-    single { UserController(get(), get()) }
-    single { ProjectController(get(), get(), get(), get(), get(), get()) }
-    single { NotificationController(get()) }
-    single { TransactionController(get(), get(), get(), get(), get(), get()) }
-    single { AnalyticsController(get(), get(), get()) }
+    single {
+        UserController(
+            userRepository = get(),
+            emailService = get()
+        )
+    }
+    single {
+        ProjectController(
+            projectRepository = get(),
+            participantRepository = get(),
+            accessControl = get(),
+            invitationService = get(),
+            notificationService = get(),
+            auditLogService = get()
+        )
+    }
+    single { NotificationController(notificationService = get()) }
+    single {
+        TransactionController(
+            transactionRepository = get(),
+            projectRepository = get(),
+            participantRepository = get(),
+            accessControl = get(),
+            auditLogService = get(),
+            notificationService = get()
+        )
+    }
+    single {
+        AnalyticsController(
+            analyticsRepository = get(),
+            projectRepository = get(),
+            transactionRepository = get()
+        )
+    }
+    single { SettingsController(settingsRepository = get()) }
 }
 
 val appModule = listOf(repositoryModule, serviceModule, controllerModule)

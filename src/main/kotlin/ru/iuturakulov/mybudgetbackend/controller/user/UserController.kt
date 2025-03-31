@@ -17,7 +17,7 @@ import ru.iuturakulov.mybudgetbackend.models.user.body.RefreshTokenRequest
 import ru.iuturakulov.mybudgetbackend.models.user.body.RegistrationRequest
 import ru.iuturakulov.mybudgetbackend.models.user.body.VerifyEmailRequest
 import ru.iuturakulov.mybudgetbackend.repositories.UserRepository
-import services.EmailService
+import ru.iuturakulov.mybudgetbackend.services.EmailService
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId

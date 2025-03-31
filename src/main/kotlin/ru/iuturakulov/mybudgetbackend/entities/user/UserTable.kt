@@ -8,6 +8,8 @@ object UserTable : Table("users") {
     val name = varchar("name", 64)
     val email = varchar("email", 128).uniqueIndex()
     val password = varchar("password", 256)
+    val language = varchar("language", 16).default("Русский")
+    val notificationsEnabled = bool("notifications_enabled").default(true)
     val isEmailVerified = bool("is_email_verified").default(false)
     val emailVerificationCode = varchar("email_verification_code", 6).nullable()
     val passwordResetCode = varchar("password_reset_code", 6).nullable()

@@ -11,7 +11,7 @@ data class AddTransactionRequest(
     val category: String? = null,
     val categoryIcon: String? = null,
     val date: Long,
-    val transactionType: TransactionType? = null,
+    val type: TransactionType? = null,
     val images: List<String>? = null,
 ) {
 

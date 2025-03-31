@@ -12,7 +12,7 @@ data class UpdateTransactionRequest(
     val category: String? = null,
     val categoryIcon: String? = null,
     val date: Long? = null,
-    val transactionType: TransactionType? = null,
+    val type: TransactionType? = null,
     val images: List<String> = emptyList(),
 ) {
     fun validation() {

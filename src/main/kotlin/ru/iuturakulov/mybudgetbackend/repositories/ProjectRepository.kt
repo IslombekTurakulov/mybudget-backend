@@ -1,8 +1,6 @@
 package ru.iuturakulov.mybudgetbackend.repositories
 
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.and
-import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.update
@@ -45,6 +43,7 @@ class ProjectRepository {
             it[budgetLimit] = newBudgetAmount.toBigDecimal()
         }
     }
+
     /**
      * Проверить, является ли пользователь владельцем проекта
      */

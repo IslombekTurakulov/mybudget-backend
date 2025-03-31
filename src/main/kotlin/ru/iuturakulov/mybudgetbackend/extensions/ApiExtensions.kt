@@ -1,19 +1,10 @@
 package ru.iuturakulov.mybudgetbackend.extensions
 
-import io.github.smiley4.ktorswaggerui.dsl.routes.OpenApiRoute
 import io.ktor.http.*
 import io.ktor.server.application.*
-import io.ktor.server.auth.*
 import io.ktor.server.response.*
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.apache.commons.mail.DefaultAuthenticator
-import org.apache.commons.mail.EmailException
-import org.apache.commons.mail.SimpleEmail
-import org.jetbrains.exposed.sql.transactions.transaction
-import ru.iuturakulov.mybudgetbackend.models.user.body.JwtTokenBody
 
 object ApiExtensions {
 

@@ -6,12 +6,12 @@ data class TransactionEntity(
     val id: String,
     val projectId: String,
     val userId: String,
+    val userName: String,
     val name: String,
     val amount: Double,
     val category: String?,
     val categoryIcon: String?,
     val date: Long,
-    val transactionType: TransactionType,
+    val type: TransactionType,
     val images: List<String>?,
 )
-

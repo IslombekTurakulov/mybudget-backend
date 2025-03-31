@@ -1,4 +1,4 @@
-package services
+package ru.iuturakulov.mybudgetbackend.services
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

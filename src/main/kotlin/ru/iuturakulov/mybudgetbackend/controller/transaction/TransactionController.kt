@@ -12,7 +12,7 @@ import ru.iuturakulov.mybudgetbackend.models.transaction.UpdateTransactionReques
 import ru.iuturakulov.mybudgetbackend.repositories.ParticipantRepository
 import ru.iuturakulov.mybudgetbackend.repositories.ProjectRepository
 import ru.iuturakulov.mybudgetbackend.repositories.TransactionRepository
-import services.NotificationService
+import ru.iuturakulov.mybudgetbackend.services.NotificationService
 import java.util.*
 
 class TransactionController(
@@ -38,7 +38,7 @@ class TransactionController(
         }
 
         // Определяем, является ли транзакция расходом
-        val isExpense = request.transactionType == TransactionType.EXPENSE
+        val isExpense = request.type == TransactionType.EXPENSE
 
         // Если расход – вычисляем новую сумму расходов и проверяем, не превышает ли она бюджет
         if (isExpense) {
@@ -56,13 +56,14 @@ class TransactionController(
         val transaction = TransactionEntity(
             id = UUID.randomUUID().toString(),
             projectId = request.projectId,
-            userId = userId,
+            userId = participant.userId,
+            userName = participant.name,
             name = request.name,
             amount = request.amount,
             category = request.category,
             categoryIcon = request.categoryIcon,
             date = System.currentTimeMillis(),
-            transactionType = request.transactionType ?: TransactionType.INCOME,
+            type = request.type ?: TransactionType.INCOME,
             images = request.images
         )
 
@@ -89,7 +90,15 @@ class TransactionController(
             throw AppException.Authorization("Вы не участник проекта")
         }
 
-        return transactionRepository.getTransactionsByProject(projectId)
+        return transactionRepository.getTransactionsByProject(projectId).map { transaction ->
+            if (transaction.userId == userId) {
+                transaction.copy(
+                    userName = "Вы"
+                )
+            } else {
+                transaction
+            }
+        }
     }
 
     fun getTransactionById(userId: String, projectId: String, transactionId: String): TransactionEntity {
@@ -126,10 +135,10 @@ class TransactionController(
         }
 
         // Сначала "убираем" вклад старой транзакции, если она была расходом
-        val oldExpense = if (transaction.transactionType == TransactionType.EXPENSE) transaction.amount else 0.0
+        val oldExpense = if (transaction.type == TransactionType.EXPENSE) transaction.amount else 0.0
 
         // Новые значения: если поле не передано, остаётся старое значение
-        val newType = request.transactionType ?: transaction.transactionType
+        val newType = request.type ?: transaction.type
         val newAmount = request.amount ?: transaction.amount
         // Вклад новой транзакции, если она расход
         val newExpense = if (newType == TransactionType.EXPENSE) newAmount else 0.0
@@ -147,14 +156,17 @@ class TransactionController(
             category = request.category ?: transaction.category,
             categoryIcon = request.categoryIcon ?: transaction.categoryIcon,
             date = request.date ?: transaction.date,
-            transactionType = newType,
-            images = request.images ?: transaction.images
+            type = newType,
+            images = request.images
         )
 
         transactionRepository.updateTransaction(updatedTransaction)
         projectRepository.updateAmountSpent(project.id, updatedAmountSpent)
 
-        auditLogService.logAction(userId, "Обновил транзакцию: ${request.name ?: transaction.name} в проекте ${transaction.projectId}")
+        auditLogService.logAction(
+            userId,
+            "Обновил транзакцию: ${request.name ?: transaction.name} в проекте ${transaction.projectId}"
+        )
 
         return@transaction updatedTransaction
     }
@@ -180,7 +192,7 @@ class TransactionController(
         transactionRepository.deleteTransaction(transactionId)
 
         // Если удаляемая транзакция – расход, вычитаем её сумму
-        val newSpent = if (transaction.transactionType == TransactionType.EXPENSE) {
+        val newSpent = if (transaction.type == TransactionType.EXPENSE) {
             project.amountSpent - transaction.amount
         } else {
             project.amountSpent

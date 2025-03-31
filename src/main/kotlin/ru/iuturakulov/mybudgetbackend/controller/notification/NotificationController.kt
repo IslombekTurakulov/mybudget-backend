@@ -1,7 +1,7 @@
 package ru.iuturakulov.mybudgetbackend.controller.notification
 
 import ru.iuturakulov.mybudgetbackend.entities.notification.NotificationEntity
-import services.NotificationService
+import ru.iuturakulov.mybudgetbackend.services.NotificationService
 
 class NotificationController(private val notificationService: NotificationService) {
 

@@ -19,6 +19,7 @@ class TransactionRepository {
             insertStatement[id] = transaction.id
             insertStatement[projectId] = transaction.projectId
             insertStatement[userId] = transaction.userId
+            insertStatement[userName] = transaction.userName
             insertStatement[name] = transaction.name
             insertStatement[amount] = transaction.amount.toBigDecimal()
             transaction.category?.let {
@@ -28,8 +29,8 @@ class TransactionRepository {
                 insertStatement[categoryIcon] = transaction.categoryIcon
             }
             insertStatement[date] = transaction.date
-            // Здесь вместо safe-call используем значение по умолчанию, если transactionType равен null
-            insertStatement[transactionType] = transaction.transactionType ?: TransactionType.INCOME
+            // если transactionType равен null
+            insertStatement[transactionType] = transaction.type
             insertStatement[images] = transaction.images.orEmpty().joinToString(",")
         }
         transaction
@@ -58,8 +59,8 @@ class TransactionRepository {
                 statement[categoryIcon] = transaction.categoryIcon
             }
             statement[date] = transaction.date
-            transaction.transactionType?.let {
-                statement[transactionType] = transaction.transactionType
+            transaction.type.let {
+                statement[transactionType] = transaction.type
             }
             statement[images] = transaction.images.orEmpty().joinToString(",")
         } > 0

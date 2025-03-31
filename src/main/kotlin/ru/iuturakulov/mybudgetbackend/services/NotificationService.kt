@@ -1,4 +1,4 @@
-package services
+package ru.iuturakulov.mybudgetbackend.services
 
 import ru.iuturakulov.mybudgetbackend.entities.notification.NotificationEntity
 import ru.iuturakulov.mybudgetbackend.entities.notification.NotificationType
