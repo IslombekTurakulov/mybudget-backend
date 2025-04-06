@@ -69,6 +69,9 @@ class UserController(private val userRepository: UserRepository, private val ema
      * Вход пользователя
      */
     suspend fun login(request: LoginRequest): LoginResponse = callRequest {
+        val user = userRepository.getUserByEmail(request.email)
+            ?: throw AppException.NotFound.User("Пользователь с таким email не найден")
+
         val loginResponse = userRepository.loginUser(request)
         return@callRequest loginResponse
     }

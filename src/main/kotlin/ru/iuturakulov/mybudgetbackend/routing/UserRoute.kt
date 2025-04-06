@@ -35,6 +35,16 @@ fun Route.userRoute(userController: UserController) {
                 val response = userController.login(requestBody)
 
                 call.respond(HttpStatusCode.OK, response)
+            } catch (e: AppException.NotFound.User) {
+                call.respond(
+                    HttpStatusCode.NotFound,
+                    e.message.orEmpty()
+                )
+            } catch (e: AppException.InvalidProperty.PasswordNotMatch) {
+                call.respond(
+                    HttpStatusCode.ExpectationFailed,
+                    e.message.orEmpty()
+                )
             } catch (e: Exception) {
                 call.respond(
                     HttpStatusCode.BadRequest,

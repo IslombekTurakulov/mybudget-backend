@@ -13,13 +13,14 @@ data class UserSettingsRequest(
     val name: String,
     val email: String,
     val language: String,
-    val notificationsEnabled: Boolean
+    val notificationsEnabled: Boolean,
+    val darkThemeEnabled: Boolean
 ) {
     fun validation() {
         validate(this) {
             validate(UserSettingsRequest::name).isNotBlank().isNotNull().hasSize(min = 4, max = 64)
             validate(UserSettingsRequest::email).isNotBlank().isEmail().hasSize(5, 128)
-            validate(UserSettingsRequest::language).isIn("Русский", "English")
+            validate(UserSettingsRequest::language).isIn("ru", "en")
         }
     }
 }

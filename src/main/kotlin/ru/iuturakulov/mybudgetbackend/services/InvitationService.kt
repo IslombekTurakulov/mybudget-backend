@@ -24,23 +24,25 @@ class InvitationService {
     fun hasRecentInvitation(email: String, projectId: String): Boolean {
         val key = "$email-$projectId"
         val lastSent = invitationCooldown[key] ?: 0L
-        val cooldownTime = 5 * 60 * 1000L // 5 минут
+        val cooldownTime = 30 * 1000L // 30 секунд (в миллисекундах)
 
         return if (System.currentTimeMillis() - lastSent < cooldownTime) {
-            true
+            true // Приглашение уже отправлялось недавно
         } else {
-            invitationCooldown[key] = System.currentTimeMillis()
-            false
+            invitationCooldown[key] = System.currentTimeMillis() // Обновляем время последней отправки
+            false // Можно отправлять новое приглашение
         }
     }
 
     fun generateInvitation(projectId: String, email: String, role: UserRole): String = transaction {
         val code = UUID.randomUUID().toString().substring(0, 8)
         InvitationTable.insert {
+            it[InvitationTable.id] = UUID.randomUUID().toString()
             it[InvitationTable.projectId] = projectId
             it[InvitationTable.email] = email
             it[InvitationTable.code] = code
             it[InvitationTable.role] = role
+            it[InvitationTable.createdAt] = System.currentTimeMillis()
         }
         return@transaction code
     }

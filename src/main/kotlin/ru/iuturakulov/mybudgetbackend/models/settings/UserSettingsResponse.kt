@@ -7,5 +7,6 @@ data class UserSettingsResponse(
     val name: String,
     val email: String,
     val language: String,
-    val notificationsEnabled: Boolean
+    val notificationsEnabled: Boolean,
+    val darkThemeEnabled: Boolean,
 )

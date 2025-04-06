@@ -15,7 +15,8 @@ class SettingsRepository {
                 name = row[UserTable.name],
                 email = row[UserTable.email],
                 language = row[UserTable.language],
-                notificationsEnabled = row[UserTable.notificationsEnabled]
+                notificationsEnabled = row[UserTable.notificationsEnabled],
+                darkThemeEnabled = row[UserTable.darkThemeEnabled]
             )
         }.singleOrNull()
     }
@@ -26,6 +27,7 @@ class SettingsRepository {
                 statement[name] = request.name
                 statement[language] = request.language
                 statement[notificationsEnabled] = request.notificationsEnabled
+                statement[darkThemeEnabled] = request.darkThemeEnabled
             }
         }
     }

@@ -76,7 +76,6 @@ class UserRepository {
      * **Авторизация пользователя (логин)**
      */
     fun loginUser(request: LoginRequest): LoginResponse {
-
         val user = getUserByEmail(request.email) ?: throw AppException.NotFound.User()
 
         if (!PasswordHasher.verify(request.password, user.password)) {

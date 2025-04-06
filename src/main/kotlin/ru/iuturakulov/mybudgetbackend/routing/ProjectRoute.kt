@@ -58,6 +58,27 @@ fun Route.projectRoute(projectController: ProjectController, auditLogService: Au
                 }
             }
 
+            delete( "{projectId}/participants/{participantId}", {
+                tags("Projects")
+                protected = true
+                summary = "Удалить участника из проекта"
+                request {
+                    pathParameter<String>("participantId") { description = "ID пользователя" }
+                    pathParameter<String>("projectId") { description = "ID проекта" }
+                }
+                apiResponse()
+            }) {
+                val userId = call.principal<JwtTokenBody>()?.userId ?: return@delete call.respondUnauthorized()
+                val participantId =
+                    call.parameters["participantId"] ?: return@delete call.respondBadRequest("User ID is required")
+                val projectId =
+                    call.parameters["projectId"] ?: return@delete call.respondBadRequest("Project ID is required")
+
+                projectController.removeParticipant(userId, projectId, participantId)
+                auditLogService.logAction(userId, "Removed $participantId from project: $projectId")
+                call.respond(HttpStatusCode.OK, "Пользователь удален из проекта")
+            }
+
             post("{projectId}/invite", {
                 tags("Projects")
                 protected = true
@@ -73,13 +94,12 @@ fun Route.projectRoute(projectController: ProjectController, auditLogService: Au
                     call.parameters["projectId"] ?: return@post call.respondBadRequest("Project ID is required")
                 val requestBody = call.receive<InviteParticipantRequest>()
 
-                projectController.inviteParticipant(userId, projectId, requestBody).let { result ->
-                    if (result.success) {
-                        auditLogService.logAction(userId, "Invited ${requestBody.email} to project: $projectId")
-                        call.respond(HttpStatusCode.OK, "Приглашение отправлено")
-                    } else {
-                        call.respond(HttpStatusCode.TooManyRequests, result.message)
-                    }
+                val result = projectController.inviteParticipant(userId, projectId, requestBody)
+                if (result.success) {
+                    auditLogService.logAction(userId, "Invited ${requestBody.email} to project: $projectId")
+                    call.respond(HttpStatusCode.OK, "Приглашение отправлено")
+                } else {
+                    call.respond(HttpStatusCode.Forbidden, result.message)
                 }
             }
 
@@ -197,25 +217,6 @@ fun Route.projectRoute(projectController: ProjectController, auditLogService: Au
                         e.localizedMessage
                     )
                 }
-            }
-
-            post("{projectId}/invite", {
-                tags("Projects")
-                protected = true
-                summary = "Пригласить участника в проект"
-                request {
-                    pathParameter<String>("projectId") { description = "ID проекта" }
-                    body<InviteParticipantRequest>()
-                }
-                apiResponse()
-            }) {
-                val userId = call.principal<JwtTokenBody>()?.userId ?: return@post call.respondUnauthorized()
-                val projectId =
-                    call.parameters["projectId"] ?: return@post call.respondBadRequest("Project ID is required")
-                val requestBody = call.receive<InviteParticipantRequest>()
-
-                projectController.inviteParticipant(userId, projectId, requestBody)
-                call.respond(ApiResponseState.success("Приглашение отправлено", HttpStatusCode.OK))
             }
 
             put("{projectId}/role", {

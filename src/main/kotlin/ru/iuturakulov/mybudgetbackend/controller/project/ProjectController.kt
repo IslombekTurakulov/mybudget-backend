@@ -206,44 +206,51 @@ class ProjectController(
      * Пригласить участника
      */
     fun inviteParticipant(userId: String, projectId: String, request: InviteParticipantRequest): InviteResult {
-        return transaction {
-            // TODO: Сделать проверку, что нельзя приглашать самого себя
 
-            val project = projectRepository.getProjectById(projectId)
-                ?: return@transaction InviteResult(success = false, message = "Проект не найден")
+        val project = projectRepository.getProjectById(projectId)
+            ?: return InviteResult(success = false, message = "Проект не найден")
 
-            if (!projectRepository.isUserOwner(projectId, userId)) {
-                return@transaction InviteResult(
-                    success = false,
-                    message = "Только владелец может приглашать участников"
-                )
-            }
+        val user = UserRepository().getUserByEmail(request.email)
+            ?: throw AppException.NotFound.User("Пользователь не найден")
 
-            if (invitationService.hasRecentInvitation(request.email, projectId)) {
-                return@transaction InviteResult(
-                    success = false,
-                    message = "Слишком много приглашений, попробуйте позже"
-                )
-            }
+        // TODO Проверяем права: владелец проекта или пользователь удаляет себя
+//        if (userId != user.id) {
+//            throw AppException.ActionNotAllowed("Вы не можете пригласить самого себя")
+//        }
 
-            val inviteCode = invitationService.generateInvitation(projectId, request.email, request.role)
-            invitationService.sendInvitationEmail(request.email, inviteCode)
 
-            auditLogService.logAction(userId, "Приглашен ${request.email} в проект $projectId")
-
-            // Отправляем уведомление
-            notificationService.sendNotification(
-                userId = request.email,
-                type = NotificationType.PROJECT_INVITE,
-                message = "Вас пригласили в проект \"${project.name}\"",
-                projectId = projectId
-            )
-
-            return@transaction InviteResult(
-                success = true,
-                message = "Приглашение отправлено"
+        if (!projectRepository.isUserOwner(projectId, userId)) {
+            return InviteResult(
+                success = false,
+                message = "Только владелец может приглашать участников"
             )
         }
+
+        if (invitationService.hasRecentInvitation(request.email, projectId)) {
+            return InviteResult(
+                success = false,
+                message = "Слишком много приглашений, попробуйте позже"
+            )
+        }
+
+        // TODO: не отправлять нотификацию и апдейтить текущую или отправлять одну такую же
+        val inviteCode = invitationService.generateInvitation(projectId, request.email, request.role)
+        invitationService.sendInvitationEmail(request.email, inviteCode)
+
+        auditLogService.logAction(userId, "Приглашен ${request.email} в проект $projectId")
+
+        // Отправляем уведомление
+        notificationService.sendNotification(
+            userId = user.id,
+            type = NotificationType.PROJECT_INVITE,
+            message = "Вас пригласили в проект \"${project.name}\"",
+            projectId = projectId
+        )
+
+        return InviteResult(
+            success = true,
+            message = "Приглашение отправлено"
+        )
     }
 
     /**
@@ -254,17 +261,14 @@ class ProjectController(
             val invitation = invitationService.getInvitation(inviteCode)
                 ?: throw AppException.NotFound.Resource("Приглашения не существует")
 
-            // Проверяем, не истекло ли приглашение
+            // Проверяем, не истекло ли приглашение если прошло больше 24 часов
             if (invitation.isExpired()) {
                 invitationService.deleteInvitation(invitation.id)
-                return@transaction false
+                throw AppException.ActionNotAllowed("Время приглашения истекло")
             }
 
-            val user = transaction {
-                UserTable.selectAll().where { UserTable.id eq userId }
-                    .map { row -> UserEntity.fromRow(row) }
-                    .singleOrNull()
-            } ?: throw AppException.NotFound.User("Пользователь не найден")
+            val user = UserRepository().getUserById(userId)
+                ?: throw AppException.NotFound.User("Пользователь не найден")
 
             // Добавляем участника в проект
             participantRepository.addParticipant(
@@ -340,9 +344,7 @@ class ProjectController(
             throw AppException.Authorization("Вы не участник проекта")
         }
 
-        return participantRepository.getParticipantsByProject(projectId).filter { participants ->
-            participants.userId == userId
-        }
+        return participantRepository.getParticipantsByProject(projectId)
     }
 
 
@@ -371,7 +373,7 @@ class ProjectController(
                 throw AppException.Authorization("Вы не можете удалить этого участника")
             }
 
-            participantRepository.removeParticipant(participantId)
+            participantRepository.removeParticipant(participantId = participantId, projectId = projectId)
 
             auditLogService.logAction(userId, "Удален участник $participantId из проекта $projectId")
 

@@ -26,7 +26,12 @@ class AnalyticsController(
     }
 
 
-    fun getProjectAnalytics(userId: String, projectId: String, filter: AnalyticsFilter?): ProjectAnalyticsDto {
+    fun getProjectAnalytics(
+        userId: String,
+        projectId: String,
+        filter: AnalyticsFilter?
+    ): ProjectAnalyticsDto {
+        // 1. Валидация проекта и прав доступа
         val project = projectRepository.getProjectById(projectId)
             ?: throw AppException.NotFound.Project("Проект не найден")
 
@@ -34,39 +39,58 @@ class AnalyticsController(
             throw AppException.Authorization("Вы не участник проекта")
         }
 
+        // 2. Получение транзакций с учетом фильтра
+
         val transactions = transactionRepository.getTransactionsByProject(projectId, filter)
+            .takeIf { it.isNotEmpty() }
+            ?: return ProjectAnalyticsDto(
+                projectId = projectId,
+                projectName = project.name,
+                totalAmount = 0.0,
+                categoryDistribution = emptyList(),
+                periodDistribution = emptyList()
+            )
 
-        // Подсчет общей суммы расходов
-        val totalSpent = transactions.sumOf { transactionEntity -> transactionEntity.amount }
-
-        // Распределение по категориям (фильтрованные категории)
-        val categoryDistribution = transactions
-            .groupBy { transactionEntity -> transactionEntity.category }
-            .mapNotNull { (category, txList) ->
-                category?.let {
-                    CategoryStats(
-                        category = category,
-                        totalAmount = txList.sumOf { it.amount }
-                    )
+        // 3. Оптимизированный расчет статистики
+        val dateFormat = SimpleDateFormat("yyyy-MM", Locale.getDefault())
+        val (categoryStats, periodStats) = transactions
+            .asSequence()
+            .fold(
+                Triple(
+                    mutableMapOf<String, Double>(), // category -> sum
+                    mutableMapOf<String, Double>(), // period -> sum
+                    0.0 // total
+                )
+            ) { (categoryMap, periodMap, total), tx ->
+                // Категории
+                tx.category?.let { category ->
+                    categoryMap[category] = categoryMap.getOrDefault(category, 0.0) + tx.amount
                 }
+
+                // Периоды
+                val period = dateFormat.format(Date(tx.date))
+                periodMap[period] = periodMap.getOrDefault(period, 0.0) + tx.amount
+
+                Triple(categoryMap, periodMap, total + tx.amount)
             }
 
-        // Распределение по периодам (группируем по месяцам)
-        val periodDistribution = transactions.groupBy { tx ->
-            SimpleDateFormat("yyyy-MM", Locale.getDefault()).format(Date(tx.date))
-        }.map { (period, txList) ->
-            PeriodStats(
-                period = period,
-                totalAmount = txList.sumOf { transactionEntity -> transactionEntity.amount }
-            )
-        }
+        // 4. Сортировка результатов
+        val sortedCategories = categoryStats
+            .map { (category, amount) -> CategoryStats(category, amount) }
+            .sortedByDescending { it.totalAmount }
+
+        val sortedPeriods = periodStats
+            .map { (period, amount) -> PeriodStats(period, amount) }
+            .sortedBy { it.period } // Сортировка по дате
+
+        val totalSpent = project.amountSpent
 
         return ProjectAnalyticsDto(
             projectId = projectId,
             projectName = project.name,
             totalAmount = totalSpent,
-            categoryDistribution = categoryDistribution,
-            periodDistribution = periodDistribution
+            categoryDistribution = sortedCategories,
+            periodDistribution = sortedPeriods
         )
     }
 }

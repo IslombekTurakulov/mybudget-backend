@@ -13,7 +13,7 @@ data class InvitationEntity(
 ) {
 
     /**
-     * Проверяет, истекло ли приглашение (например, если прошло больше 24 часов)
+     * Проверяет, истекло ли приглашение (если прошло больше 24 часов)
      */
     fun isExpired(expirationTimeMillis: Long = 24 * 60 * 60 * 1000): Boolean {
         return System.currentTimeMillis() - createdAt > expirationTimeMillis

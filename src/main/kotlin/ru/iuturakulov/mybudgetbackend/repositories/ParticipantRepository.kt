@@ -21,9 +21,10 @@ class ParticipantRepository {
     }
 
     fun getParticipantByUserAndProjectId(userId: String, projectId: String): ParticipantEntity? = transaction {
-        ParticipantTable.selectAll().where {
+        val participants = ParticipantTable.selectAll().where {
             (ParticipantTable.userId eq userId) and (ParticipantTable.projectId eq projectId)
-        }.map { ParticipantTable.fromRow(it) }.firstOrNull()
+        }
+        return@transaction participants.map { ParticipantTable.fromRow(it) }.firstOrNull()
     }
 
     fun addParticipant(participant: ParticipantEntity) = transaction {
@@ -45,8 +46,8 @@ class ParticipantRepository {
         }.count()
     }
 
-    fun removeParticipant(participantId: String): Boolean = transaction {
-        val deletedRows = ParticipantTable.deleteWhere { id eq participantId }
+    fun removeParticipant(participantId: String, projectId: String): Boolean = transaction {
+        val deletedRows = ParticipantTable.deleteWhere { (userId eq participantId) and (this.projectId eq projectId) }
         if (deletedRows == 0) {
             throw AppException.NotFound.User("Участник не найден")
         }

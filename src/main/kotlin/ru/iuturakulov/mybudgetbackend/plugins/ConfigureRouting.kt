@@ -12,6 +12,7 @@ import ru.iuturakulov.mybudgetbackend.controller.user.UserController
 import ru.iuturakulov.mybudgetbackend.extensions.AuditLogService
 import ru.iuturakulov.mybudgetbackend.routing.analyticsRoute
 import ru.iuturakulov.mybudgetbackend.routing.notificationRoute
+import ru.iuturakulov.mybudgetbackend.routing.pingRoute
 import ru.iuturakulov.mybudgetbackend.routing.projectRoute
 import ru.iuturakulov.mybudgetbackend.routing.settingsRoute
 import ru.iuturakulov.mybudgetbackend.routing.transactionRoute
@@ -27,6 +28,7 @@ fun Application.configureRoutes() {
     val auditLogService: AuditLogService by inject()
 
     routing {
+        pingRoute()
         userRoute(userController = userController)
         projectRoute(projectController = projectController, auditLogService = auditLogService)
         transactionRoute(transactionController = transactionController, auditLogService = auditLogService)

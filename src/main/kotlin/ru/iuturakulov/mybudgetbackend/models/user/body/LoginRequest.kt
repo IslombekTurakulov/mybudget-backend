@@ -15,7 +15,7 @@ data class LoginRequest(
     fun validation() {
         validate(this) {
             validate(LoginRequest::email).isNotBlank().isNotNull().isEmail()
-            validate(LoginRequest::password).isNotBlank().isNotNull().hasSize(6, 64)
+            validate(LoginRequest::password).isNotBlank().isNotNull().hasSize(3, 64)
         }
     }
 }
