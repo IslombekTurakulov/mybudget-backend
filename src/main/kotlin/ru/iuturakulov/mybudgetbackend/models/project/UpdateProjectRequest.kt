@@ -6,5 +6,5 @@ data class UpdateProjectRequest(
     val name: String?,
     val description: String?,
     val budgetLimit: Double?,
-    val type: ProjectStatus? = null,
+    val status: ProjectStatus? = null,
 )

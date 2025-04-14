@@ -91,11 +91,7 @@ fun Route.userRoute(userController: UserController) {
                 emailRequest.validation()
                 val result = userController.verifyEmail(emailRequest)
 
-                if (result.isSuccess) {
-                    call.respond(HttpStatusCode.OK, "Email подтвержден")
-                } else {
-                    call.respond(ApiResponseState.failure("Неверный код", HttpStatusCode.BadRequest))
-                }
+                call.respond(HttpStatusCode.OK, result)
             } catch (e: Exception) {
                 call.respond(
                     HttpStatusCode.InternalServerError,

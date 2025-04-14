@@ -34,7 +34,7 @@ class UserController(private val userRepository: UserRepository, private val ema
     /**
      * Регистрация нового пользователя
      */
-    suspend fun register(request: RegistrationRequest): ApiResponse<String> = callRequest {
+    suspend fun register(request: RegistrationRequest): String = callRequest {
         val existingUser = userRepository.getUserByEmail(request.email)
         if (existingUser != null) throw AppException.AlreadyExists.Email("Почта уже используется")
         val savedUser = userRepository.createUser(request)
@@ -45,24 +45,34 @@ class UserController(private val userRepository: UserRepository, private val ema
         val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")
         val instant = Instant.ofEpochMilli(savedUser.createdAt)
 
-        val date = LocalDateTime.ofInstant(instant, ZoneId.systemDefault())
-        emailService.sendEmail(
-            savedUser.email, "Вы успешно зарегистрировались!", """
-            Вы зарегистрировались в системе Мой бюджет
+        val registrationDate = LocalDateTime.ofInstant(instant, ZoneId.systemDefault())
+        val formattedDate = formatter.format(registrationDate)
+
+        val subject = "Вы успешно зарегистрировались!"
+        val message = """
+                Дорогой пользователь,
             
-            Имя: ${savedUser.name}
-            Почта: ${savedUser.email}
-            Пароль: ${savedUser.password}
+                Вы успешно зарегистрировались в системе "Мой бюджет". Пожалуйста, сохраните эту информацию в безопасности.
             
-            Время регистрации: ${formatter.format(date)}
-            Если это были не вы, возможно, кто-то зарегистрировался от вашего имени. В этом случае обратитесь в службу поддержки yndx-iuturakulov-khevj0@yandex.ru
+                Ваши данные:
+                Имя: ${request.name}
+                Почта: ${request.email}
+                Время регистрации: $formattedDate
+            
+                Если вы не совершали регистрацию, пожалуйста, свяжитесь с нашей службой поддержки по адресу: 
+                yndx-iuturakulov-khevj0@yandex.ru
+            
+                С уважением,
+                Команда поддержки "Мой бюджет"
         """.trimIndent()
+
+        emailService.sendEmail(
+            toEmail = request.email,
+            subject = subject,
+            message = message
         )
 
-        return@callRequest ApiResponseState.success(
-            "Регистрация успешна. Проверьте почту для подтверждения.",
-            HttpStatusCode.Created
-        )
+        return@callRequest  "Регистрация успешна. Проверьте почту для подтверждения."
     }
 
     /**
@@ -79,18 +89,18 @@ class UserController(private val userRepository: UserRepository, private val ema
     /**
      * Подтверждение email
      */
-    suspend fun verifyEmail(request: VerifyEmailRequest): ApiResponse<String> = callRequest {
+    suspend fun verifyEmail(request: VerifyEmailRequest): String = callRequest {
         val verificationStatus = userRepository.verifyEmailCode(request.email, request.verificationCode)
         if (verificationStatus == DataBaseTransaction.NOT_FOUND) {
             throw AppException.InvalidProperty.EmailNotExist("Неверный код подтверждения")
         }
-        return@callRequest ApiResponseState.success("Email подтвержден", HttpStatusCode.OK)
+        return@callRequest "Email подтвержден"
     }
 
     /**
      * Запрос на восстановление пароля
      */
-    suspend fun requestPasswordReset(request: ForgetPasswordEmailRequest): ApiResponse<String> = callRequest {
+    suspend fun requestPasswordReset(request: ForgetPasswordEmailRequest): String = callRequest {
         val user = userRepository.getUserByEmail(request.email)
             ?: throw AppException.NotFound.User("Пользователь с таким email не найден")
 
@@ -110,7 +120,7 @@ class UserController(private val userRepository: UserRepository, private val ema
 
         passwordResetCooldown[request.email] = Instant.now().epochSecond
 
-        return@callRequest ApiResponseState.success("Новый пароль отправлен на email", HttpStatusCode.OK)
+        return@callRequest "Новый пароль отправлен на email"
     }
 
 
@@ -131,7 +141,7 @@ class UserController(private val userRepository: UserRepository, private val ema
         return@callRequest ApiResponseState.success("Пароль изменен", HttpStatusCode.OK)
     }
 
-    suspend fun refreshToken(request: RefreshTokenRequest): ApiResponse<String> = callRequest {
+    suspend fun refreshToken(request: RefreshTokenRequest): String = callRequest {
         val decodedJWT = try {
             JwtConfig.verify(request.refreshToken)
         } catch (e: Exception) {
@@ -146,7 +156,7 @@ class UserController(private val userRepository: UserRepository, private val ema
 
         // Генерируем новый access-token
         val newAccessToken = JwtConfig.generateToken(user.id)
-        return@callRequest ApiResponseState.success(newAccessToken, HttpStatusCode.OK)
+        return@callRequest newAccessToken
     }
 
 }

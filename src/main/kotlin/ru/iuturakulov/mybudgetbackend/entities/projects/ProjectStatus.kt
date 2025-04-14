@@ -5,10 +5,10 @@ import com.fasterxml.jackson.annotation.JsonValue
 import kotlinx.serialization.Serializable
 
 @Serializable
-enum class ProjectStatus(@JsonValue val type: String) {
+enum class ProjectStatus {
     @JsonEnumDefaultValue
-    UNKNOWN("unknown"),
-    ACTIVE("active"),
-    ARCHIVED("archived"),
-    DELETED("deleted")
+    UNKNOWN,
+    ACTIVE,
+    ARCHIVED,
+    DELETED
 }

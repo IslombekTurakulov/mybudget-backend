@@ -165,7 +165,7 @@ fun Route.projectRoute(projectController: ProjectController, auditLogService: Au
                 val requestBody = call.receive<UpdateProjectRequest>()
 
                 try {
-                    val updatedProject = if (requestBody.type == ProjectStatus.ARCHIVED) {
+                    val updatedProject = if (requestBody.status == ProjectStatus.ARCHIVED) {
                         projectController.archiveProject(userId, projectId)
                     } else {
                         projectController.updateProject(userId, projectId, requestBody)
@@ -234,8 +234,58 @@ fun Route.projectRoute(projectController: ProjectController, auditLogService: Au
                     call.parameters["projectId"] ?: return@put call.respondBadRequest("Project ID is required")
                 val requestBody = call.receive<ChangeRoleRequest>()
 
-                projectController.changeParticipantRole(userId, projectId, requestBody)
-                call.respond(ApiResponseState.success("Роль участника изменена", HttpStatusCode.OK))
+                try {
+                    projectController.changeParticipantRole(userId, projectId, requestBody)
+                    call.respond(HttpStatusCode.OK, "Роль участника изменена")
+                } catch (e: AppException.Authorization) {
+                    call.respond(
+                        HttpStatusCode.Forbidden,
+                        e.localizedMessage
+                    )
+                } catch (e: AppException.NotFound.Project) {
+                    call.respond(
+                        HttpStatusCode.NotFound,
+                        "Проект не найден"
+                    )
+                } catch (e: Exception) {
+                    call.respond(
+                        HttpStatusCode.InternalServerError,
+                        e.localizedMessage
+                    )
+                }
+            }
+
+            get("{projectId}/currentRole", {
+                tags("Projects")
+                protected = true
+                summary = "Изменить роль участника в проекте"
+                request {
+                    pathParameter<String>("projectId") { description = "ID проекта" }
+                }
+                apiResponse()
+            }) {
+                val userId = call.principal<JwtTokenBody>()?.userId ?: return@get call.respondUnauthorized()
+                val projectId =
+                    call.parameters["projectId"] ?: return@get call.respondBadRequest("Project ID is required")
+
+                try {
+                    call.respond(HttpStatusCode.OK, projectController.getCurrentUserProjectRole(userId, projectId))
+                } catch (e: AppException.Authorization) {
+                    call.respond(
+                        HttpStatusCode.Forbidden,
+                        e.localizedMessage
+                    )
+                } catch (e: AppException.NotFound.Project) {
+                    call.respond(
+                        HttpStatusCode.NotFound,
+                        "Проект не найден"
+                    )
+                } catch (e: Exception) {
+                    call.respond(
+                        HttpStatusCode.InternalServerError,
+                        e.localizedMessage
+                    )
+                }
             }
         }
     }

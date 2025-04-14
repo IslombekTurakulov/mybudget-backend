@@ -14,8 +14,6 @@ import ru.iuturakulov.mybudgetbackend.entities.projects.ProjectEntity
 import ru.iuturakulov.mybudgetbackend.entities.projects.ProjectStatus
 import ru.iuturakulov.mybudgetbackend.entities.projects.ProjectsTable
 import ru.iuturakulov.mybudgetbackend.entities.transaction.TransactionsTable
-import ru.iuturakulov.mybudgetbackend.entities.user.UserEntity
-import ru.iuturakulov.mybudgetbackend.entities.user.UserTable
 import ru.iuturakulov.mybudgetbackend.extensions.AccessControl
 import ru.iuturakulov.mybudgetbackend.extensions.AppException
 import ru.iuturakulov.mybudgetbackend.extensions.AuditLogService
@@ -45,7 +43,9 @@ class ProjectController(
      * Получить список проектов пользователя
      */
     fun getUserProjects(userId: String): List<ProjectEntity> {
-        return projectRepository.getProjectsByUser(userId)
+        return projectRepository.getProjectsByUser(userId).sortedBy { project ->
+            project.createdAt
+        }
     }
 
     /**
@@ -119,6 +119,11 @@ class ProjectController(
     fun updateProject(userId: String, projectId: String, request: UpdateProjectRequest): ProjectEntity {
         return transaction {
             val project = projectRepository.getProjectById(projectId) ?: throw AppException.NotFound.Project()
+
+            if (project.status == ProjectStatus.ARCHIVED && request.status == ProjectStatus.ACTIVE) {
+                return@transaction unarchiveProject(userId, projectId)
+            }
+
             val participant = participantRepository.getParticipantByUserAndProjectId(userId, projectId)
 
             if (!accessControl.canEditProject(userId, project, participant)) {
@@ -162,6 +167,37 @@ class ProjectController(
         }
         project.copy(
             status = ProjectStatus.ARCHIVED
+        )
+    }
+
+    fun unarchiveProject(userId: String, projectId: String) = transaction {
+        val project = ProjectsTable.selectAll().where { ProjectsTable.id eq projectId }
+            .map { ProjectEntity.fromRow(it) }
+            .singleOrNull() ?: throw AppException.NotFound.Project("Проект не найден")
+
+        if (project.ownerId != userId) {
+            throw AppException.Authorization("Только владелец может разархивировать проект")
+        }
+
+        ProjectsTable.update({ ProjectsTable.id eq projectId }) {
+            it[status] = ProjectStatus.ACTIVE
+        }
+
+        auditLogService.logAction(userId, "Зарархивировал проект: $projectId")
+
+        val participants = ParticipantTable.selectAll().where { ParticipantTable.projectId eq projectId }
+            .mapNotNull { it[ParticipantTable.userId] }
+
+        participants.forEach { participantId ->
+            notificationService.sendNotification(
+                userId = participantId,
+                type = NotificationType.SYSTEM_ALERT,
+                message = "Проект \"${project.name}\" был разархивирован владельцем",
+                projectId = projectId
+            )
+        }
+        project.copy(
+            status = ProjectStatus.ACTIVE
         )
     }
 
@@ -334,6 +370,20 @@ class ProjectController(
             )
             return@transaction true
         }
+    }
+
+    fun getCurrentUserProjectRole(userId: String, projectId: String): ParticipantEntity {
+        val project = projectRepository.getProjectById(projectId)
+            ?: throw AppException.NotFound.Project("Проект не найден")
+
+        if (!projectRepository.isUserParticipant(userId, projectId)) {
+            throw AppException.Authorization("Вы не участник проекта")
+        }
+
+        val participant = participantRepository.getParticipantByUserAndProjectId(userId, projectId)
+            ?: throw AppException.NotFound.User("Участник не найден")
+
+        return participant
     }
 
     fun getProjectParticipants(userId: String, projectId: String): List<ParticipantEntity> {

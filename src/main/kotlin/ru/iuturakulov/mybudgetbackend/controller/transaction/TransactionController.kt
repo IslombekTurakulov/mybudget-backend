@@ -98,6 +98,8 @@ class TransactionController(
             } else {
                 transaction
             }
+        }.sortedBy { transaction ->
+            transaction.date
         }
     }
 
