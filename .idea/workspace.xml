@@ -4,29 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4bbd917-8929-44b4-afda-19b441d6e48e" name="Changes" comment="MYBUDGETBACKEND-13: project, refresh-token and transaction fixes">
-      <change afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/services/EmailContent.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/services/EmailTemplates.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/yatool.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/yatool.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/controller/analytics/AnalyticsController.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/controller/analytics/AnalyticsController.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/controller/project/ProjectController.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/controller/project/ProjectController.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/controller/transaction/TransactionController.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/controller/transaction/TransactionController.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/controller/user/UserController.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/controller/user/UserController.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/di/KoinModule.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/di/KoinModule.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/extensions/AuditLogService.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/extensions/AuditLogService.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/models/analytics/AnalyticsFilter.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/models/analytics/AnalyticsFilter.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/models/analytics/CategoryStats.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/models/analytics/CategoryStats.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/models/analytics/OverviewAnalyticsDto.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/models/analytics/OverviewAnalyticsDto.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/models/analytics/ProjectAnalyticsDto.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/models/analytics/ProjectAnalyticsDto.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/models/user/body/ChangePasswordRequest.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/models/user/body/ChangePasswordRequest.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/repositories/AnalyticsRepository.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/repositories/AnalyticsRepository.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/repositories/AuditLogRepository.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/repositories/AuditLogRepository.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/repositories/ProjectRepository.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/repositories/ProjectRepository.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/repositories/TransactionRepository.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/repositories/TransactionRepository.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/routing/AnalyticsRoute.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/routing/AnalyticsRoute.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/routing/UserRoute.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/routing/UserRoute.kt" afterDir="false" />
-    </list>
+    <list default="true" id="c4bbd917-8929-44b4-afda-19b441d6e48e" name="Changes" comment="MYBUDGETBACKEND-14: fix analytics, project, transaction and email sending template" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -242,7 +220,15 @@
       <option name="project" value="LOCAL" />
       <updated>1744597519327</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="MYBUDGETBACKEND-14: fix analytics, project, transaction and email sending template">
+      <option name="closed" value="true" />
+      <created>1744935037252</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1744935037252</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -258,7 +244,8 @@
     <MESSAGE value="MYBUDGETBACKEND-11: Transaction, Settings, Project fixes and updates" />
     <MESSAGE value="MYBUDGETBACKEND-12: auth, settings, invitation, logging, analytics, project and transaction fixes" />
     <MESSAGE value="MYBUDGETBACKEND-13: project, refresh-token and transaction fixes" />
-    <option name="LAST_COMMIT_MESSAGE" value="MYBUDGETBACKEND-13: project, refresh-token and transaction fixes" />
+    <MESSAGE value="MYBUDGETBACKEND-14: fix analytics, project, transaction and email sending template" />
+    <option name="LAST_COMMIT_MESSAGE" value="MYBUDGETBACKEND-14: fix analytics, project, transaction and email sending template" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

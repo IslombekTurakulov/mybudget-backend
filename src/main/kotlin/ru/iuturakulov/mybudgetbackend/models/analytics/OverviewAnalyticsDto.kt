@@ -9,9 +9,9 @@ package ru.iuturakulov.mybudgetbackend.models.analytics
 
 data class OverviewAnalyticsDto(
     val totalAmount: Double,                                 // общая сумма по всем проектам
-    val categoryDistribution: List<OverviewCategoryStats>,   // для доната
-    val periodDistribution: List<OverviewPeriodStats>,       // для bar-chart по периодам
-    val projectComparison: List<ProjectComparisonStats>      // для bar-chart «сравнение проектов»
+    val categoryDistribution: List<OverviewCategoryStats>,
+    val periodDistribution: List<OverviewPeriodStats>,
+    val projectComparison: List<ProjectComparisonStats>
 )
 
 data class OverviewCategoryStats(
