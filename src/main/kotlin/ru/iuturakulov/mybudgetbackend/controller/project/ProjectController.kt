@@ -254,7 +254,6 @@ class ProjectController(
 //            throw AppException.ActionNotAllowed("Вы не можете пригласить самого себя")
 //        }
 
-
         if (!projectRepository.isUserOwner(projectId, userId)) {
             return InviteResult(
                 success = false,

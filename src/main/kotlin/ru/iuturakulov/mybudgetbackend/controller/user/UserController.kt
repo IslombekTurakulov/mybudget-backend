@@ -18,145 +18,103 @@ import ru.iuturakulov.mybudgetbackend.models.user.body.RegistrationRequest
 import ru.iuturakulov.mybudgetbackend.models.user.body.VerifyEmailRequest
 import ru.iuturakulov.mybudgetbackend.repositories.UserRepository
 import ru.iuturakulov.mybudgetbackend.services.EmailService
+import ru.iuturakulov.mybudgetbackend.services.EmailTemplates
+import java.time.Duration
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.concurrent.ConcurrentHashMap
 
-private const val DURATION_BRUTE_FORCE_SPAM = 60
+const val DEFAULT_SPAM_INTERVAL_SEC = 60L
 
-// TODO: Implement audit service
-class UserController(private val userRepository: UserRepository, private val emailService: EmailService) {
+interface DateTimeProvider {
+    fun now(): Instant
+}
 
-    private val passwordResetCooldown = ConcurrentHashMap<String, Long>()
+class SystemDateTimeProvider : DateTimeProvider {
+    override fun now(): Instant = Instant.now()
+}
 
-    /**
-     * Регистрация нового пользователя
-     */
-    suspend fun register(request: RegistrationRequest): String = callRequest {
-        val existingUser = userRepository.getUserByEmail(request.email)
-        if (existingUser != null) throw AppException.AlreadyExists.Email("Почта уже используется")
-        val savedUser = userRepository.createUser(request)
+class RateLimiter(private val intervalSec: Long, private val clock: DateTimeProvider) {
+    private val lastRequests = ConcurrentHashMap<String, Instant>()
 
-        // Генерируем код верификации email и отправляем пользователю
-//        val verificationCode = generateVerificationCode()
-//        userRepository.saveEmailVerificationCode(savedUser.email, verificationCode)
-        val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")
-        val instant = Instant.ofEpochMilli(savedUser.createdAt)
+    fun check(key: String) {
+        val now = clock.now()
+        val last = lastRequests[key]
+        if (last != null && Duration.between(last, now).seconds < intervalSec) {
+            throw AppException.Common("Слишком частые запросы. Попробуйте позже.")
+        }
+        lastRequests[key] = now
+    }
+}
 
-        val registrationDate = LocalDateTime.ofInstant(instant, ZoneId.systemDefault())
-        val formattedDate = formatter.format(registrationDate)
+class UserController(
+    private val userRepo: UserRepository,
+    private val emailService: EmailService,
+    private val clock: DateTimeProvider = SystemDateTimeProvider(),
+    private val zone: ZoneId = ZoneId.systemDefault()
+) {
+    private val limiter = RateLimiter(DEFAULT_SPAM_INTERVAL_SEC, clock)
 
-        val subject = "Вы успешно зарегистрировались!"
-        val message = """
-                Дорогой пользователь,
-            
-                Вы успешно зарегистрировались в системе "Мой бюджет". Пожалуйста, сохраните эту информацию в безопасности.
-            
-                Ваши данные:
-                Имя: ${request.name}
-                Почта: ${request.email}
-                Время регистрации: $formattedDate
-            
-                Если вы не совершали регистрацию, пожалуйста, свяжитесь с нашей службой поддержки по адресу: 
-                yndx-iuturakulov-khevj0@yandex.ru
-            
-                С уважением,
-                Команда поддержки "Мой бюджет"
-        """.trimIndent()
-
-        emailService.sendEmail(
-            toEmail = request.email,
-            subject = subject,
-            message = message
-        )
-
-        return@callRequest  "Регистрация успешна. Проверьте почту для подтверждения."
+    suspend fun register(req: RegistrationRequest): String = callRequest {
+        userRepo.getUserByEmail(req.email)?.let {
+            throw AppException.AlreadyExists.Email("Почта уже используется")
+        }
+        val saved = userRepo.createUser(req)
+        val emailContent = EmailTemplates.registration(req.name, req.email, Instant.ofEpochMilli(saved.createdAt), zone)
+        emailService.sendEmail(req.email, emailContent.subject, emailContent.body)
+        "Регистрация успешна. Проверьте почту для подтверждения."
     }
 
-    /**
-     * Вход пользователя
-     */
-    suspend fun login(request: LoginRequest): LoginResponse = callRequest {
-        val user = userRepository.getUserByEmail(request.email)
-            ?: throw AppException.NotFound.User("Пользователь с таким email не найден")
-
-        val loginResponse = userRepository.loginUser(request)
-        return@callRequest loginResponse
+    suspend fun login(req: LoginRequest): LoginResponse = callRequest {
+        val user = userRepo.getUserByEmail(req.email)
+            ?: throw AppException.NotFound.User("Пользователь не найден")
+        userRepo.loginUser(req)
     }
 
-    /**
-     * Подтверждение email
-     */
-    suspend fun verifyEmail(request: VerifyEmailRequest): String = callRequest {
-        val verificationStatus = userRepository.verifyEmailCode(request.email, request.verificationCode)
-        if (verificationStatus == DataBaseTransaction.NOT_FOUND) {
+    suspend fun verifyEmail(req: VerifyEmailRequest): String = callRequest {
+        val status = userRepo.verifyEmailCode(req.email, req.verificationCode)
+        if (status == DataBaseTransaction.NOT_FOUND) {
             throw AppException.InvalidProperty.EmailNotExist("Неверный код подтверждения")
         }
-        return@callRequest "Email подтвержден"
+        "Email подтвержден"
     }
 
-    /**
-     * Запрос на восстановление пароля
-     */
-    suspend fun requestPasswordReset(request: ForgetPasswordEmailRequest): String = callRequest {
-        val user = userRepository.getUserByEmail(request.email)
-            ?: throw AppException.NotFound.User("Пользователь с таким email не найден")
-
-        // Проверяем частоту запросов сброса пароля (1 минута)
-        val lastRequestTime = passwordResetCooldown[request.email] ?: 0L
-        if (Instant.now().epochSecond - lastRequestTime < DURATION_BRUTE_FORCE_SPAM) {
-            throw AppException.Common("Слишком частые запросы сброса пароля. Подождите минуту.")
-        }
-
-        val generatedPassword = generatePassword()
-        userRepository.saveNewPasswordForUser(user.email, PasswordHasher.hash(generatedPassword))
-        emailService.sendEmail(
-            toEmail = user.email,
-            subject = "Восстановление пароля",
-            message = "Ваш новый пароль: $generatedPassword"
-        )
-
-        passwordResetCooldown[request.email] = Instant.now().epochSecond
-
-        return@callRequest "Новый пароль отправлен на email"
+    suspend fun requestPasswordReset(req: ForgetPasswordEmailRequest): String = callRequest {
+        userRepo.getUserByEmail(req.email)?.let { user ->
+            limiter.check(req.email)
+            val newPass = generatePassword()
+            userRepo.saveNewPasswordForUser(user.email, PasswordHasher.hash(newPass))
+            val emailContent = EmailTemplates.passwordReset(user.email, newPass)
+            emailService.sendEmail(user.email, emailContent.subject, emailContent.body)
+            "Новый пароль отправлен на email"
+        } ?: throw AppException.NotFound.User("Пользователь не найден")
     }
 
-
-    /**
-     * Смена пароля
-     */
-    suspend fun changePassword(userId: String, request: ChangePasswordRequest): ApiResponse<String> = callRequest {
-        val user = userRepository.getUserById(userId)
+    suspend fun changePassword(userId: String, req: ChangePasswordRequest): ApiResponse<String> = callRequest {
+        val user = userRepo.getUserById(userId)
             ?: throw AppException.NotFound.User("Пользователь не найден")
-
-        if (!PasswordHasher.verify(request.oldPassword, user.password)) {
+        if (!PasswordHasher.verify(req.oldPassword, user.password)) {
             throw AppException.InvalidProperty.PasswordNotMatch("Старый пароль неверен")
         }
-
-        val hashedNewPassword = PasswordHasher.hash(request.newPassword)
-        userRepository.updateUserPassword(userId, hashedNewPassword)
-
-        return@callRequest ApiResponseState.success("Пароль изменен", HttpStatusCode.OK)
+        val hashed = PasswordHasher.hash(req.newPassword)
+        userRepo.updateUserPassword(userId, hashed)
+        val emailContent = EmailTemplates.passwordChange(user.name, user.email, req.newPassword, clock.now(), zone)
+        emailService.sendEmail(user.email, emailContent.subject, emailContent.body)
+        ApiResponseState.success("Пароль изменён", HttpStatusCode.OK)
     }
 
-    suspend fun refreshToken(request: RefreshTokenRequest): String = callRequest {
-        val decodedJWT = try {
-            JwtConfig.verify(request.refreshToken)
+    suspend fun refreshToken(req: RefreshTokenRequest): String = callRequest {
+        val decoded = try {
+            JwtConfig.verify(req.refreshToken)
         } catch (e: Exception) {
             throw AppException.Authentication("Недействительный refresh-токен")
         }
-
-        val userId = decodedJWT?.getClaim("userId")?.asString()
+        val userId = decoded?.getClaim("userId")?.asString()
             ?: throw AppException.Authentication("Ошибка верификации токена")
-
-        val user = userRepository.getUserById(userId)
-            ?: throw AppException.NotFound.User("Пользователь не найден")
-
-        // Генерируем новый access-token
-        val newAccessToken = JwtConfig.generateToken(user.id)
-        return@callRequest newAccessToken
+        userRepo.getUserById(userId) ?: throw AppException.NotFound.User("Пользователь не найден")
+        JwtConfig.generateToken(userId)
     }
-
 }
+

@@ -1,5 +1,6 @@
 package ru.iuturakulov.mybudgetbackend.repositories
 
+import org.jetbrains.exposed.sql.SortOrder
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.andWhere
 import org.jetbrains.exposed.sql.deleteWhere
@@ -12,77 +13,98 @@ import ru.iuturakulov.mybudgetbackend.entities.transaction.TransactionsTable
 import ru.iuturakulov.mybudgetbackend.models.analytics.AnalyticsFilter
 import ru.iuturakulov.mybudgetbackend.models.transaction.TransactionType
 
+
 class TransactionRepository {
 
-    fun addTransaction(transaction: TransactionEntity): TransactionEntity = transaction {
-        TransactionsTable.insert { insertStatement ->
-            insertStatement[id] = transaction.id
-            insertStatement[projectId] = transaction.projectId
-            insertStatement[userId] = transaction.userId
-            insertStatement[userName] = transaction.userName
-            insertStatement[name] = transaction.name
-            insertStatement[amount] = transaction.amount.toBigDecimal()
-            transaction.category?.let {
-                insertStatement[category] = transaction.category
-            }
-            transaction.categoryIcon?.let {
-                insertStatement[categoryIcon] = transaction.categoryIcon
-            }
-            insertStatement[date] = transaction.date
-            // если transactionType равен null
-            insertStatement[transactionType] = transaction.type
-            insertStatement[images] = transaction.images.orEmpty().joinToString(",")
-        }
-        transaction
-    }
+    fun addTransaction(tx: TransactionEntity): TransactionEntity = transaction {
+        TransactionsTable.insert { stmt ->
+            stmt[id] = tx.id
+            stmt[projectId] = tx.projectId
+            stmt[userId] = tx.userId
+            stmt[userName] = tx.userName
+            stmt[name] = tx.name
+            stmt[amount] = tx.amount.toBigDecimal()
 
-    fun getTransactionsByProject(projectId: String): List<TransactionEntity> = transaction {
-        TransactionsTable.selectAll().where {
-            TransactionsTable.projectId eq projectId
-        }.map { TransactionsTable.fromRow(it) }
+            tx.category?.let { stmt[category] = it }
+            tx.categoryIcon?.let { stmt[categoryIcon] = it }
+
+            stmt[date] = tx.date
+            // если type == null, ставим EXPENSE по-умолчанию
+            stmt[transactionType] = tx.type ?: TransactionType.EXPENSE
+
+            stmt[images] = tx.images
+                .orEmpty()
+                .joinToString(",")
+        }
+        tx
     }
 
     fun getTransactionById(transactionId: String): TransactionEntity? = transaction {
-        TransactionsTable.selectAll().where { TransactionsTable.id eq transactionId }
-            .mapNotNull { TransactionsTable.fromRow(it) }
-            .singleOrNull()
+        TransactionsTable
+            .selectAll().where { TransactionsTable.id eq transactionId }
+            .limit(1)
+            .firstOrNull()
+            ?.let(TransactionsTable::fromRow)
     }
 
-    fun updateTransaction(transaction: TransactionEntity): Boolean = transaction {
-        TransactionsTable.update({ TransactionsTable.id eq transaction.id }) { statement ->
-            statement[name] = transaction.name
-            statement[amount] = transaction.amount.toBigDecimal()
-            transaction.category?.let {
-                statement[category] = transaction.category
-            }
-            transaction.categoryIcon?.let {
-                statement[categoryIcon] = transaction.categoryIcon
-            }
-            statement[date] = transaction.date
-            transaction.type.let {
-                statement[transactionType] = transaction.type
-            }
-            statement[images] = transaction.images.orEmpty().joinToString(",")
+    fun getTransactionsByProject(projectId: String): List<TransactionEntity> = transaction {
+        TransactionsTable
+            .selectAll().where { TransactionsTable.projectId eq projectId }
+            .orderBy(TransactionsTable.date to SortOrder.ASC)
+            .map(TransactionsTable::fromRow)
+    }
+
+    fun getTransactionsByUser(userId: String): List<TransactionEntity> = transaction {
+        TransactionsTable
+            .selectAll().where { TransactionsTable.userId eq userId }
+            .orderBy(TransactionsTable.date to SortOrder.ASC)
+            .map(TransactionsTable::fromRow)
+    }
+
+    fun updateTransaction(tx: TransactionEntity): Boolean = transaction {
+        TransactionsTable.update({ TransactionsTable.id eq tx.id }) { stmt ->
+            stmt[name] = tx.name
+            stmt[amount] = tx.amount.toBigDecimal()
+
+            tx.category?.let { stmt[category] = it }
+            tx.categoryIcon?.let { stmt[categoryIcon] = it }
+
+            stmt[date] = tx.date
+            // обновляем только если type != null
+            tx.type?.let { stmt[transactionType] = it }
+
+            stmt[images] = tx.images
+                .orEmpty()
+                .joinToString(",")
         } > 0
     }
 
     fun deleteTransaction(transactionId: String): Boolean = transaction {
-        TransactionsTable.deleteWhere { id eq transactionId } > 0
+        TransactionsTable.deleteWhere { TransactionsTable.id eq transactionId } > 0
     }
 
-    fun getTransactionsByProject(projectId: String, filter: AnalyticsFilter?): List<TransactionEntity> = transaction {
-        val query = TransactionsTable.selectAll().where { TransactionsTable.projectId eq projectId }
+    fun getTransactionsByProject(
+        projectId: String,
+        filter: AnalyticsFilter?
+    ): List<TransactionEntity> = transaction {
+        // базовый запрос
+        var transactions = TransactionsTable
+            .selectAll().where { TransactionsTable.projectId eq projectId }
 
-        // Фильтр по диапазону дат
-        if (filter?.fromDate != null && filter.toDate != null) {
-            query.andWhere { TransactionsTable.date.between(filter.fromDate, filter.toDate) }
-        }
+        // диапазон дат
+        filter?.fromDate
+            ?.let { from -> filter.toDate?.let { to ->
+                transactions = transactions.andWhere { TransactionsTable.date.between(from, to) }
+            } }
 
-        // Фильтр по категориям
-        if (filter?.categories?.isNotEmpty() == true) {
-            query.andWhere { TransactionsTable.category inList filter.categories }
-        }
+        // категории
+        filter?.categories
+            .takeIf { it?.isNotEmpty() == true }
+            ?.let { cats ->
+                transactions = transactions.andWhere { TransactionsTable.category inList cats!! }
+            }
 
-        query.mapNotNull { TransactionsTable.fromRow(it) }
+        transactions.orderBy(TransactionsTable.date to SortOrder.ASC)
+            .map(TransactionsTable::fromRow)
     }
 }

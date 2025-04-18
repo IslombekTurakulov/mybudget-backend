@@ -11,6 +11,7 @@ import ru.iuturakulov.mybudgetbackend.extensions.RoutingExtensions.apiResponse
 import ru.iuturakulov.mybudgetbackend.extensions.RoutingExtensions.respondBadRequest
 import ru.iuturakulov.mybudgetbackend.extensions.RoutingExtensions.respondUnauthorized
 import ru.iuturakulov.mybudgetbackend.models.analytics.AnalyticsFilter
+import ru.iuturakulov.mybudgetbackend.models.analytics.Granularity
 import ru.iuturakulov.mybudgetbackend.models.user.body.JwtTokenBody
 
 fun Route.analyticsRoute(analyticsController: AnalyticsController) {
@@ -21,10 +22,28 @@ fun Route.analyticsRoute(analyticsController: AnalyticsController) {
                 tags("Analytics")
                 protected = true
                 summary = "Получить общую аналитику пользователя"
+                request {
+                    queryParameter<Long>("fromDate") { description = "Начало периода (timestamp)" }
+                    queryParameter<Long>("toDate") { description = "Конец периода (timestamp)" }
+                    queryParameter<List<String>>("categories") { description = "Фильтр по категориям" }
+                    queryParameter<Granularity>("granularity") { description = "Фильтр по периоду" }
+                }
                 apiResponse()
             }) {
                 val userId = call.principal<JwtTokenBody>()?.userId ?: return@get call.respondUnauthorized()
-                val analytics = analyticsController.getOverviewAnalytics(userId)
+
+                val fromDate = call.request.queryParameters["fromDate"]?.toLongOrNull()
+                val toDate = call.request.queryParameters["toDate"]?.toLongOrNull()
+
+                val granularity = Granularity.entries.find {
+                    it.name.lowercase() == call.request.queryParameters["granularity"]?.lowercase()
+                } ?: Granularity.MONTH
+
+                val categories = call.request.queryParameters.getAll("categories") ?: emptyList()
+
+                val filter = AnalyticsFilter(fromDate, toDate, categories, granularity)
+
+                val analytics = analyticsController.getOverviewAnalytics(userId, filter)
                 call.respond(HttpStatusCode.OK, analytics)
             }
 
@@ -37,6 +56,7 @@ fun Route.analyticsRoute(analyticsController: AnalyticsController) {
                     queryParameter<Long>("fromDate") { description = "Начало периода (timestamp)" }
                     queryParameter<Long>("toDate") { description = "Конец периода (timestamp)" }
                     queryParameter<List<String>>("categories") { description = "Фильтр по категориям" }
+                    queryParameter<Granularity>("granularity") { description = "Фильтр по периоду" }
                 }
                 apiResponse()
             }) {
@@ -46,9 +66,14 @@ fun Route.analyticsRoute(analyticsController: AnalyticsController) {
 
                 val fromDate = call.request.queryParameters["fromDate"]?.toLongOrNull()
                 val toDate = call.request.queryParameters["toDate"]?.toLongOrNull()
+
+                val granularity = Granularity.entries.find {
+                    it.name.lowercase() == call.request.queryParameters["granularity"]?.lowercase()
+                } ?: Granularity.MONTH
+
                 val categories = call.request.queryParameters.getAll("categories") ?: emptyList()
 
-                val filter = AnalyticsFilter(fromDate, toDate, categories)
+                val filter = AnalyticsFilter(fromDate, toDate, categories, granularity)
                 val analytics = analyticsController.getProjectAnalytics(userId, projectId, filter)
 
                 call.respond(HttpStatusCode.OK, analytics)

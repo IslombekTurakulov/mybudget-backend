@@ -43,7 +43,7 @@ val serviceModule = module {
 val controllerModule = module {
     single {
         UserController(
-            userRepository = get(),
+            userRepo = get(),
             emailService = get()
         )
     }
@@ -64,7 +64,7 @@ val controllerModule = module {
             projectRepository = get(),
             participantRepository = get(),
             accessControl = get(),
-            auditLogService = get(),
+            auditLog = get(),
             notificationService = get()
         )
     }

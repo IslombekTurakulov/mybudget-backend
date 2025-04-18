@@ -118,54 +118,56 @@ fun Route.userRoute(userController: UserController) {
             }
         }
 
-        put("change-password", {
-            tags("User")
-            protected = true
-            request { body<ChangePasswordRequest>() }
-            apiResponse()
-        }) {
-            try {
-                val requestBody = call.receive<ChangePasswordRequest>()
-                requestBody.validation()
-                val loginUser = call.principal<JwtTokenBody>()?.userId ?: let {
+        authenticate("auth-jwt") {
+            post("change-password", {
+                tags("User")
+                protected = true
+                request { body<ChangePasswordRequest>() }
+                apiResponse()
+            }) {
+                try {
+                    val requestBody = call.receive<ChangePasswordRequest>()
+                    requestBody.validation()
+                    val userId = call.principal<JwtTokenBody>()?.userId ?: let {
+                        call.respond(
+                            HttpStatusCode.InternalServerError,
+                            "User with current email is not found"
+                        )
+                        return@post
+                    }
+                    val result = userController.changePassword(userId, requestBody)
+
+                    if (result.isSuccess) {
+                        call.respond(HttpStatusCode.OK, "Пароль изменен")
+                    } else {
+                        call.respond(HttpStatusCode.BadRequest, "Старый пароль неверен")
+                    }
+                } catch (e: Exception) {
                     call.respond(
                         HttpStatusCode.InternalServerError,
-                        "User with current email is not found"
+                        "Ошибка изменения пароля: ${e.localizedMessage}"
                     )
-                    return@put
                 }
-                val result = userController.changePassword(loginUser, requestBody)
-
-                if (result.isSuccess) {
-                    call.respond(HttpStatusCode.OK, "Пароль изменен")
-                } else {
-                    call.respond(HttpStatusCode.BadRequest, "Старый пароль неверен")
-                }
-            } catch (e: Exception) {
-                call.respond(
-                    HttpStatusCode.InternalServerError,
-                    "Ошибка изменения пароля: ${e.localizedMessage}"
-                )
             }
         }
 
-        post("refresh-token", {
-            tags("User")
-            request { body<RefreshTokenRequest>() }
-            apiResponse()
-        }) {
-            try {
-                val requestBody = call.receive<RefreshTokenRequest>()
-                val newAccessToken = userController.refreshToken(requestBody)
+            post("refresh-token", {
+                tags("User")
+                request { body<RefreshTokenRequest>() }
+                apiResponse()
+            }) {
+                try {
+                    val requestBody = call.receive<RefreshTokenRequest>()
+                    val newAccessToken = userController.refreshToken(requestBody)
 
-                call.respond(HttpStatusCode.OK, newAccessToken)
-            } catch (e: AppException.Authentication) {
-                call.respond(HttpStatusCode.Unauthorized, "Недействительный refresh-токен")
-            } catch (e: Exception) {
-                call.respond(
-                    HttpStatusCode.InternalServerError,
-                    "Ошибка обновления токена: ${e.localizedMessage}"
-                )
+                    call.respond(HttpStatusCode.OK, newAccessToken)
+                } catch (e: AppException.Authentication) {
+                    call.respond(HttpStatusCode.Unauthorized, "Недействительный refresh-токен")
+                } catch (e: Exception) {
+                    call.respond(
+                        HttpStatusCode.InternalServerError,
+                        "Ошибка обновления токена: ${e.localizedMessage}"
+                    )
             }
         }
     }

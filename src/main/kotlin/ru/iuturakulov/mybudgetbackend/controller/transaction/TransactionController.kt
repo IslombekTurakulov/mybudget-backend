@@ -1,6 +1,10 @@
 package ru.iuturakulov.mybudgetbackend.controller.transaction
 
 import org.jetbrains.exposed.sql.transactions.transaction
+import ru.iuturakulov.mybudgetbackend.controller.user.DEFAULT_SPAM_INTERVAL_SEC
+import ru.iuturakulov.mybudgetbackend.controller.user.DateTimeProvider
+import ru.iuturakulov.mybudgetbackend.controller.user.RateLimiter
+import ru.iuturakulov.mybudgetbackend.controller.user.SystemDateTimeProvider
 import ru.iuturakulov.mybudgetbackend.entities.notification.NotificationType
 import ru.iuturakulov.mybudgetbackend.entities.transaction.TransactionEntity
 import ru.iuturakulov.mybudgetbackend.extensions.AccessControl
@@ -20,198 +24,165 @@ class TransactionController(
     private val projectRepository: ProjectRepository,
     private val participantRepository: ParticipantRepository,
     private val accessControl: AccessControl,
-    private val auditLogService: AuditLogService,
-    private val notificationService: NotificationService
+    private val auditLog: AuditLogService,
+    private val notificationService: NotificationService,
+    private val clock: DateTimeProvider = SystemDateTimeProvider(),
 ) {
+    private val limiter = RateLimiter(DEFAULT_SPAM_INTERVAL_SEC, clock)
 
-    fun addTransaction(userId: String, request: AddTransactionRequest): TransactionEntity = transaction {
-        val project = projectRepository.getProjectById(request.projectId)
+    fun addTransaction(userId: String, req: AddTransactionRequest): TransactionEntity = transaction {
+        val project = projectRepository.getProjectById(req.projectId)
             ?: throw AppException.NotFound.Project("Проект не найден")
-
-        val participant = participantRepository.getParticipantByUserAndProjectId(
-            userId = userId,
-            projectId = request.projectId
-        ) ?: throw AppException.Authorization("Вы не участник проекта")
-
+        val participant = participantRepository.getParticipantByUserAndProjectId(userId, req.projectId)
+            ?: throw AppException.Authorization("Вы не участник проекта")
         if (!accessControl.canEditProject(userId, project, participant)) {
-            throw AppException.Authorization("Вы не можете добавлять транзакции в этот проект")
+            throw AppException.Authorization("Нет прав для добавления транзакций")
         }
 
-        // Определяем, является ли транзакция расходом
-        val isExpense = request.type == TransactionType.EXPENSE
-
-        // Если расход – вычисляем новую сумму расходов и проверяем, не превышает ли она бюджет
-        if (isExpense) {
-            val newSpent = project.amountSpent + request.amount
-            if (newSpent > project.budgetLimit) {
-                throw AppException.InvalidProperty.Transaction("Сумма расходов превышает бюджет проекта")
-            }
-            projectRepository.updateAmountSpent(request.projectId, newSpent)
-        } else {
-            // Если доход – прибавляем сумму к бюджету
-            val newBudget = project.budgetLimit + request.amount
-            projectRepository.updateBudgetAmount(request.projectId, newBudget)
+        // вычисляем дельты и проверяем бюджет
+        val isExpense = req.type == TransactionType.EXPENSE
+        val spentDelta = if (isExpense) req.amount else 0.0
+        val budgetDelta = if (!isExpense) req.amount else 0.0
+        val newSpent = project.amountSpent + spentDelta
+        if (newSpent > project.budgetLimit) {
+            throw AppException.InvalidProperty.Transaction("Сумма расходов превышает бюджет")
         }
 
-        val transaction = TransactionEntity(
-            id = UUID.randomUUID().toString(),
-            projectId = request.projectId,
-            userId = participant.userId,
-            userName = participant.name,
-            name = request.name,
-            amount = request.amount,
-            category = request.category,
-            categoryIcon = request.categoryIcon,
-            date = System.currentTimeMillis(),
-            type = request.type ?: TransactionType.INCOME,
-            images = request.images
+        // обновляем проект за один вызов
+        projectRepository.updateProjectAmounts(
+            projectId   = project.id!!,
+            amountSpent = newSpent.toBigDecimal(),
+            budgetLimit = (project.budgetLimit + budgetDelta).toBigDecimal()
         )
 
-        transactionRepository.addTransaction(transaction)
+        val nowEpoch = clock.now().toEpochMilli()
+        val transactionEntitity = TransactionEntity(
+            id = UUID.randomUUID().toString(),
+            projectId = req.projectId,
+            userId = participant.userId,
+            userName = participant.name,
+            name = req.name,
+            amount = req.amount,
+            category = req.category,
+            categoryIcon = req.categoryIcon,
+            date = nowEpoch,
+            type = req.type ?: TransactionType.INCOME,
+            images = req.images
+        )
+        transactionRepository.addTransaction(transactionEntitity)
 
-        auditLogService.logAction(userId, "Добавил транзакцию: ${transaction.name} в проект ${request.projectId}")
-
+        auditLog.logAction(userId, "Добавил транзакцию '${transactionEntitity.name}' в проект ${req.projectId}")
         notificationService.sendNotification(
             userId = project.ownerId,
             type = NotificationType.TRANSACTION_ADDED,
-            message = "Пользователь $userId добавил новую транзакцию в проект ${request.projectId}",
-            projectId = request.projectId
+            message = "Пользователь $userId добавил транзакцию",
+            projectId = req.projectId
         )
-
-        return@transaction transaction
+        transactionEntitity
     }
-
 
     fun getProjectTransactions(userId: String, projectId: String): List<TransactionEntity> {
         val project = projectRepository.getProjectById(projectId)
             ?: throw AppException.NotFound.Project("Проект не найден")
-
         if (!projectRepository.isUserParticipant(userId, projectId)) {
             throw AppException.Authorization("Вы не участник проекта")
         }
-
-        return transactionRepository.getTransactionsByProject(projectId).map { transaction ->
-            if (transaction.userId == userId) {
-                transaction.copy(
-                    userName = "Вы"
-                )
-            } else {
-                transaction
-            }
-        }.sortedBy { transaction ->
-            transaction.date
-        }
+        return transactionRepository.getTransactionsByProject(projectId)
+            .sortedBy { it.date }
+            .map { tx -> if (tx.userId == userId) tx.copy(userName = "Вы") else tx }
     }
 
-    fun getTransactionById(userId: String, projectId: String, transactionId: String): TransactionEntity {
+    fun getTransactionById(userId: String, projectId: String, txId: String): TransactionEntity {
         val project = projectRepository.getProjectById(projectId)
             ?: throw AppException.NotFound.Project("Проект не найден")
-
-        val participant = participantRepository.getParticipantByUserAndProjectId(userId, projectId)
+        participantRepository.getParticipantByUserAndProjectId(userId, projectId)
             ?: throw AppException.Authorization("Вы не участник проекта")
-
-        if (!accessControl.canViewProject(userId, project, participant)) {
-            throw AppException.Authorization("У вас нет прав на просмотр транзакции")
+        if (!accessControl.canViewProject(
+                userId,
+                project,
+                participantRepository.getParticipantByUserAndProjectId(userId, projectId)!!
+            )
+        ) {
+            throw AppException.Authorization("Нет прав для просмотра")
         }
-
-        return transactionRepository.getTransactionById(transactionId)
+        return transactionRepository.getTransactionById(txId)
             ?: throw AppException.NotFound.Transaction("Транзакция не найдена")
     }
 
-    fun updateTransaction(userId: String, request: UpdateTransactionRequest): TransactionEntity = transaction {
-        val transaction = transactionRepository.getTransactionById(request.transactionId)
-            ?: throw AppException.NotFound.Transaction("Транзакция не найдена")
-
-        val project = projectRepository.getProjectById(transaction.projectId)
+    fun updateTransaction(userId: String, req: UpdateTransactionRequest): TransactionEntity = transaction {
+        val oldTx = transactionRepository.getTransactionById(req.transactionId)
+            ?: throw AppException.NotFound.Transaction("Не найдена транзакция")
+        val project = projectRepository.getProjectById(oldTx.projectId)
             ?: throw AppException.NotFound.Project("Проект не найден")
-
-        project.id ?: throw AppException.NotFound.Project("Проект не найден")
-
-        val participant = participantRepository.getParticipantByUserAndProjectId(
-            userId = userId,
-            projectId = transaction.projectId
-        ) ?: throw AppException.Authorization("Вы не участник проекта")
-
-        if (!accessControl.canEditProject(userId, project, participant)) {
-            throw AppException.Authorization("Вы не можете редактировать транзакции в этом проекте")
+        participantRepository.getParticipantByUserAndProjectId(userId, oldTx.projectId)
+            ?: throw AppException.Authorization("Вы не участник")
+        if (!accessControl.canEditProject(
+                userId,
+                project,
+                participantRepository.getParticipantByUserAndProjectId(userId, oldTx.projectId)!!
+            )
+        ) {
+            throw AppException.Authorization("Нет прав на редактирование")
         }
 
-        // Сначала "убираем" вклад старой транзакции, если она была расходом
-        val oldExpense = if (transaction.type == TransactionType.EXPENSE) transaction.amount else 0.0
-
-        // Новые значения: если поле не передано, остаётся старое значение
-        val newType = request.type ?: transaction.type
-        val newAmount = request.amount ?: transaction.amount
-        // Вклад новой транзакции, если она расход
+        val oldExp = if (oldTx.type == TransactionType.EXPENSE) oldTx.amount else 0.0
+        val newType = req.type ?: oldTx.type
+        val newAmount = req.amount ?: oldTx.amount
         val newExpense = if (newType == TransactionType.EXPENSE) newAmount else 0.0
-
-        // Пересчитываем сумму расходов проекта
-        val updatedAmountSpent = project.amountSpent - oldExpense + newExpense
-
-        if (updatedAmountSpent > project.budgetLimit) {
-            throw AppException.InvalidProperty.Transaction("Сумма расходов превышает бюджет проекта")
+        val updatedSpent = project.amountSpent - oldExp + newExpense
+        if (updatedSpent > project.budgetLimit) {
+            throw AppException.InvalidProperty.Transaction("Сумма расходов превышает бюджет")
         }
 
-        val updatedTransaction = transaction.copy(
-            name = request.name ?: transaction.name,
+        val updated = oldTx.copy(
+            name = req.name ?: oldTx.name,
             amount = newAmount,
-            category = request.category ?: transaction.category,
-            categoryIcon = request.categoryIcon ?: transaction.categoryIcon,
-            date = request.date ?: transaction.date,
+            category = req.category ?: oldTx.category,
+            categoryIcon = req.categoryIcon ?: oldTx.categoryIcon,
+            date = req.date ?: oldTx.date,
             type = newType,
-            images = request.images
+            images = req.images
         )
+        transactionRepository.updateTransaction(updated)
+        project.id?.let { projectid ->
+            projectRepository.updateProjectAmounts(projectId = projectid, amountSpent = updatedSpent.toBigDecimal())
+        }
 
-        transactionRepository.updateTransaction(updatedTransaction)
-        projectRepository.updateAmountSpent(project.id, updatedAmountSpent)
-
-        auditLogService.logAction(
-            userId,
-            "Обновил транзакцию: ${request.name ?: transaction.name} в проекте ${transaction.projectId}"
-        )
-
-        return@transaction updatedTransaction
+        auditLog.logAction(userId, "Обновил транзакцию '${updated.name}' в проекте ${oldTx.projectId}")
+        updated
     }
 
-    fun deleteTransaction(userId: String, transactionId: String) = transaction {
-        val transaction = transactionRepository.getTransactionById(transactionId)
+    fun deleteTransaction(userId: String, txId: String) = transaction {
+        val transactionEntity = transactionRepository.getTransactionById(txId)
             ?: throw AppException.NotFound.Transaction("Транзакция не найдена")
-
-        val project = projectRepository.getProjectById(transaction.projectId)
+        val project = projectRepository.getProjectById(transactionEntity.projectId)
             ?: throw AppException.NotFound.Project("Проект не найден")
-
-        project.id ?: throw AppException.NotFound.Project("Проект не найден")
-
-        val participant = participantRepository.getParticipantByUserAndProjectId(
-            userId = userId,
-            projectId = transaction.projectId
-        ) ?: throw AppException.Authorization("Вы не участник проекта")
-
-        if (!accessControl.canEditProject(userId, project, participant)) {
-            throw AppException.Authorization("Вы не можете удалять транзакции в этом проекте")
+        participantRepository.getParticipantByUserAndProjectId(userId, transactionEntity.projectId)
+            ?: throw AppException.Authorization("Вы не участник проекта")
+        if (!accessControl.canEditProject(
+                userId,
+                project,
+                participantRepository.getParticipantByUserAndProjectId(userId, transactionEntity.projectId)!!
+            )
+        ) {
+            throw AppException.Authorization("Нет прав на удаление")
         }
 
-        transactionRepository.deleteTransaction(transactionId)
-
-        // Если удаляемая транзакция – расход, вычитаем её сумму
-        val newSpent = if (transaction.type == TransactionType.EXPENSE) {
-            project.amountSpent - transaction.amount
-        } else {
-            project.amountSpent
+        transactionRepository.deleteTransaction(txId)
+        val adjust = if (transactionEntity.type == TransactionType.EXPENSE) -transactionEntity.amount else 0.0
+        project.id?.let { projectId ->
+            projectRepository.updateProjectAmounts(
+                projectId = projectId,
+                amountSpent = (project.amountSpent + adjust).toBigDecimal()
+            )
         }
 
-        projectRepository.updateAmountSpent(project.id, newSpent)
-
-        auditLogService.logAction(
-            userId,
-            "Удалил транзакцию: ${transaction.name} в проекте ${transaction.projectId}"
-        )
-
+        auditLog.logAction(userId, "Удалил транзакцию '${transactionEntity.name}' в проекте ${transactionEntity.projectId}")
         notificationService.sendNotification(
             userId = project.ownerId,
             type = NotificationType.TRANSACTION_REMOVED,
-            message = "Пользователь $userId удалил транзакцию из проекта ${transaction.projectId}",
-            projectId = transaction.projectId
+            message = "Пользователь $userId удалил транзакцию",
+            projectId = transactionEntity.projectId
         )
     }
 }
