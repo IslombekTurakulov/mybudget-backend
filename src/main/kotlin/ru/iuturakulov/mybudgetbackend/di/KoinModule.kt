@@ -72,7 +72,9 @@ val controllerModule = module {
         AnalyticsController(
             analyticsRepository = get(),
             projectRepository = get(),
-            transactionRepository = get()
+            transactionRepository = get(),
+            userRepository = get(),
+            emailService = get()
         )
     }
     single { SettingsController(settingsRepository = get()) }

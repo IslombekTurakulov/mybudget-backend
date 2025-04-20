@@ -61,6 +61,13 @@ dependencies {
     implementation(libs.koin.ktor)
     implementation(libs.koin.core)
     implementation(libs.koin.logger)
+
+    // CSV‑экспорт
+    implementation("com.opencsv:opencsv:5.9")
+    // PDF‑экспорт (iText 7)
+    implementation("com.itextpdf:itext7-core:8.0.0")
+
+    implementation("org.jfree:jfreechart:1.5.0")
 }
 kotlin {
     jvmToolchain {

@@ -8,45 +8,118 @@ import org.apache.commons.mail.EmailException
 import org.apache.commons.mail.SimpleEmail
 import ru.iuturakulov.mybudgetbackend.extensions.AppException
 
+import kotlinx.coroutines.*
+import org.apache.commons.mail.*
+import ru.iuturakulov.mybudgetbackend.models.analytics.AnalyticsExportFormat
+import javax.activation.*
+import javax.mail.util.ByteArrayDataSource
+
 class EmailService {
 
-    fun sendVerificationEmail(email: String, code: String) {
-        sendEmail(email, subject = "Подтверждение почты", message = "Ваш код подтверждения: $code")
-    }
+    fun sendVerificationEmail(email: String, code: String) =
+        sendEmail(
+            toEmail = email,
+            subject = "Подтверждение почты",
+            message = "Ваш код подтверждения: $code"
+        )
 
-    fun sendPasswordResetEmail(email: String, code: String) {
-        sendEmail(email, subject = "Восстановление пароля", message = "Ваш код для сброса пароля: $code")
-    }
+    fun sendPasswordResetEmail(email: String, code: String) =
+        sendEmail(
+            toEmail = email,
+            subject = "Восстановление пароля",
+            message = "Ваш код для сброса пароля: $code"
+        )
 
+    /** Отправка простого письма без вложений */
     fun sendEmail(
         toEmail: String,
         subject: String,
-        message: String,
-        fromEmail: String = SmtpServer.SENDING_EMAIL,
-        smtpHost: String = SmtpServer.HOST_NAME,
-        smtpPort: Int = SmtpServer.PORT,
-        smtpUser: String = SmtpServer.DEFAULT_AUTHENTICATOR,
-        smtpPassword: String = SmtpServer.DEFAULT_AUTHENTICATOR_PASSWORD
-    ) {
+        message: String
+    ) = CoroutineScope(Dispatchers.IO).launch {
         try {
-            CoroutineScope(Dispatchers.IO).launch {
-                SimpleEmail().apply {
-                    hostName = smtpHost
-                    setSmtpPort(smtpPort)
-                    setAuthenticator(DefaultAuthenticator(smtpUser, smtpPassword))
-                    isSSLOnConnect = true
-                    setFrom(fromEmail)
-                    this.subject = subject
-                    setMsg(message)
-                    addTo(toEmail)
-                    send()
-                }
+            buildEmail<SimpleEmail>().apply {
+                setSubject(subject)
+                setMsg(message)
+                addTo(toEmail)
+                send()
             }
         } catch (e: EmailException) {
             throw AppException.InvalidProperty.Email("Failed to send email: ${e.message}")
-        } catch (e: Exception) {
-            throw AppException.Common("Email sending failed", e)
         }
+    }
+
+    /** Универсальный метод с одним вложением */
+    fun sendEmailWithAttachment(
+        toEmail: String,
+        subject: String,
+        message: String,
+        attachmentName: String,
+        attachmentBytes: ByteArray,
+        attachmentMime: String
+    ) = CoroutineScope(Dispatchers.IO).launch {
+        try {
+            val dataSource: DataSource = ByteArrayDataSource(attachmentBytes, attachmentMime)
+
+            buildEmail<MultiPartEmail>().apply {
+                setSubject(subject)
+                setMsg(message)
+                addTo(toEmail)
+
+                attach(dataSource, attachmentName, "auto‑generated analytics export")
+
+                send()
+            }
+        } catch (e: EmailException) {
+            throw AppException.InvalidProperty.Email("Failed to send email with attachment: ${e.message}")
+        }
+    }
+
+    /** Удобный обёртка именно для экспорта аналитики */
+    fun sendAnalyticsExportEmail(
+        toEmail: String,
+        attachmentName: String,
+        attachmentBytes: ByteArray,
+        exportFormat: AnalyticsExportFormat   // enum { CSV, PDF }
+    ) {
+        val mime = when (exportFormat) {
+            AnalyticsExportFormat.CSV -> "text/csv"
+            AnalyticsExportFormat.PDF -> "application/pdf"
+        }
+
+        sendEmailWithAttachment(
+            toEmail = toEmail,
+            subject = "Экспорт аналитики",
+            message = "Во вложении – запрошенный отчёт.",
+            attachmentName = attachmentName,
+            attachmentBytes = attachmentBytes,
+            attachmentMime = mime
+        )
+    }
+
+    /**
+     * Единообразно настраиваем SMTP‑параметры
+     */
+    private inline fun <reified T : Email> buildEmail(): T {
+        val email = when (T::class) {
+            SimpleEmail::class -> SimpleEmail()
+            MultiPartEmail::class -> MultiPartEmail()
+            else -> error("Unsupported email type")
+        } as T
+
+        with(email) {
+            hostName = SmtpServer.HOST_NAME
+            setSmtpPort(SmtpServer.PORT)
+            setAuthenticator(
+                DefaultAuthenticator(
+                    SmtpServer.DEFAULT_AUTHENTICATOR,
+                    SmtpServer.DEFAULT_AUTHENTICATOR_PASSWORD
+                )
+            )
+            isSSLOnConnect = true
+            setFrom(SmtpServer.SENDING_EMAIL)
+            setCharset("UTF-8")
+        }
+        return email
     }
 
     object SmtpServer {

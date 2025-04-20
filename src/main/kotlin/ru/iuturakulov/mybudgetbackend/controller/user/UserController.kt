@@ -2,6 +2,7 @@ package ru.iuturakulov.mybudgetbackend.controller.user
 
 import io.ktor.http.*
 import ru.iuturakulov.mybudgetbackend.config.JwtConfig
+import ru.iuturakulov.mybudgetbackend.config.TokensResponse
 import ru.iuturakulov.mybudgetbackend.database.DataBaseTransaction
 import ru.iuturakulov.mybudgetbackend.extensions.ApiExtensions.callRequest
 import ru.iuturakulov.mybudgetbackend.extensions.ApiExtensions.generatePassword
@@ -105,16 +106,23 @@ class UserController(
         ApiResponseState.success("Пароль изменён", HttpStatusCode.OK)
     }
 
-    suspend fun refreshToken(req: RefreshTokenRequest): String = callRequest {
+    suspend fun refreshToken(req: RefreshTokenRequest): TokensResponse = callRequest {
         val decoded = try {
             JwtConfig.verify(req.refreshToken)
         } catch (e: Exception) {
-            throw AppException.Authentication("Недействительный refresh-токен")
+            throw AppException.Authentication("Недействительный или просроченный refresh‑токен")
         }
+
         val userId = decoded?.getClaim("userId")?.asString()
-            ?: throw AppException.Authentication("Ошибка верификации токена")
-        userRepo.getUserById(userId) ?: throw AppException.NotFound.User("Пользователь не найден")
-        JwtConfig.generateToken(userId)
+            ?: throw AppException.Authentication("Не удалось извлечь userId из токена")
+
+        val user = userRepo.getUserById(userId)
+            ?: throw AppException.NotFound.User("Пользователь не найден")
+
+        val newAccessToken  = JwtConfig.generateToken(userId)
+        val newRefreshToken = JwtConfig.generateToken(userId)
+
+        TokensResponse(newAccessToken, newRefreshToken)
     }
 }
 

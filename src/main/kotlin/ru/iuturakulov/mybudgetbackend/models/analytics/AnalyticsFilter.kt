@@ -14,7 +14,14 @@ data class AnalyticsFilter(
     val toDate: Long? = null,    // Конец периода (timestamp)
     val categories: List<String>? = null, // Список категорий для анализа
     val granularity: Granularity = Granularity.MONTH
-)
+) {
+    fun toSuffix(): String {
+        val period = listOfNotNull(fromDate, toDate)
+            .joinToString("_") { it.toString() }
+            .ifBlank { "all_time" }
+        return "${period}_${granularity.name.lowercase()}"
+    }
+}
 
 @Serializable
 enum class Granularity {
@@ -23,5 +30,13 @@ enum class Granularity {
 
     @JsonEnumDefaultValue
     MONTH,
-    YEAR
+    YEAR;
+
+    companion object {
+        fun safeValueOf(v: String): Granularity? {
+            return entries.firstOrNull {
+                it.name.equals(v, true)
+            }
+        }
+    }
 }
