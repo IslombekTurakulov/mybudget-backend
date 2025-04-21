@@ -270,7 +270,7 @@ class ProjectController(
 
         // TODO: не отправлять нотификацию и апдейтить текущую или отправлять одну такую же
         val inviteCode = invitationService.generateInvitation(projectId, request.email, request.role)
-        invitationService.sendInvitationEmail(request.email, inviteCode)
+        invitationService.sendInvitationEmail(request.email, inviteCode, project.name)
 
         auditLogService.logAction(userId, "Приглашен ${request.email} в проект $projectId")
 
@@ -278,7 +278,7 @@ class ProjectController(
         notificationService.sendNotification(
             userId = user.id,
             type = NotificationType.PROJECT_INVITE,
-            message = "Вас пригласили в проект \"${project.name}\"",
+            message = "Вас пригласили в проект \"${project.name}\"!. Для того, чтобы присоединиться к проекту, зайдите в вашу почту ${user.email} и поищите код приглашения.",
             projectId = projectId
         )
 
@@ -341,7 +341,7 @@ class ProjectController(
      */
     fun changeParticipantRole(userId: String, projectId: String, request: ChangeRoleRequest): Boolean {
         return transaction {
-            projectRepository.getProjectById(projectId) ?: return@transaction false
+            val project = projectRepository.getProjectById(projectId) ?: return@transaction false
 
             if (!projectRepository.isUserOwner(projectId, userId)) {
                 throw AppException.Authorization("Только владелец может изменять роли участников")
@@ -364,7 +364,7 @@ class ProjectController(
             notificationService.sendNotification(
                 userId = request.userId,
                 type = NotificationType.ROLE_CHANGE,
-                message = "Ваша роль в проекте $projectId изменена на ${request.role}",
+                message = "Ваша роль в проекте \"${project.name}\" изменена на ${request.role}",
                 projectId = projectId
             )
             return@transaction true

@@ -1,11 +1,13 @@
 package ru.iuturakulov.mybudgetbackend.controller.transaction
 
+import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import ru.iuturakulov.mybudgetbackend.controller.user.DEFAULT_SPAM_INTERVAL_SEC
 import ru.iuturakulov.mybudgetbackend.controller.user.DateTimeProvider
 import ru.iuturakulov.mybudgetbackend.controller.user.RateLimiter
 import ru.iuturakulov.mybudgetbackend.controller.user.SystemDateTimeProvider
 import ru.iuturakulov.mybudgetbackend.entities.notification.NotificationType
+import ru.iuturakulov.mybudgetbackend.entities.participants.ParticipantTable
 import ru.iuturakulov.mybudgetbackend.entities.transaction.TransactionEntity
 import ru.iuturakulov.mybudgetbackend.extensions.AccessControl
 import ru.iuturakulov.mybudgetbackend.extensions.AppException
@@ -72,12 +74,21 @@ class TransactionController(
         transactionRepository.addTransaction(transactionEntitity)
 
         auditLog.logAction(userId, "Добавил транзакцию '${transactionEntitity.name}' в проект ${req.projectId}")
-        notificationService.sendNotification(
-            userId = project.ownerId,
-            type = NotificationType.TRANSACTION_ADDED,
-            message = "Пользователь $userId добавил транзакцию",
-            projectId = req.projectId
-        )
+        val participants = ParticipantTable.selectAll().where { ParticipantTable.projectId eq project.id.orEmpty() }
+            .mapNotNull { it[ParticipantTable.userId] }
+
+        participants.forEach { participantId ->
+            notificationService.sendNotification(
+                userId = participantId,
+                type = NotificationType.TRANSACTION_ADDED,
+                message = if (userId == participantId) {
+                    "Вы добавили транзакцию ${transactionEntitity.name} в проекте ${project.name}"
+                } else {
+                    "Пользователь ${participant.name} / ${participant.email} добавил транзакцию ${transactionEntitity.name} в проекте ${project.name}"
+                },
+                projectId = req.projectId
+            )
+        }
         transactionEntitity
     }
 
@@ -114,7 +125,7 @@ class TransactionController(
             ?: throw AppException.NotFound.Transaction("Не найдена транзакция")
         val project = projectRepository.getProjectById(oldTx.projectId)
             ?: throw AppException.NotFound.Project("Проект не найден")
-        participantRepository.getParticipantByUserAndProjectId(userId, oldTx.projectId)
+        val participant = participantRepository.getParticipantByUserAndProjectId(userId, oldTx.projectId)
             ?: throw AppException.Authorization("Вы не участник")
         if (!accessControl.canEditProject(
                 userId,
@@ -149,6 +160,21 @@ class TransactionController(
         }
 
         auditLog.logAction(userId, "Обновил транзакцию '${updated.name}' в проекте ${oldTx.projectId}")
+        val participants = ParticipantTable.selectAll().where { ParticipantTable.projectId eq project.id.orEmpty() }
+            .mapNotNull { it[ParticipantTable.userId] }
+
+        participants.forEach { participantId ->
+            notificationService.sendNotification(
+                userId = participantId,
+                type = NotificationType.TRANSACTION_ADDED,
+                message = if (userId == participantId) {
+                    "Вы обновили транзакцию ${updated.name} в проекте ${project.name}"
+                } else {
+                    "Пользователь ${participant.name} / ${participant.email} обновил транзакцию ${updated.name} в проекте ${project.name}"
+                },
+                projectId = project.id
+            )
+        }
         updated
     }
 
@@ -157,7 +183,7 @@ class TransactionController(
             ?: throw AppException.NotFound.Transaction("Транзакция не найдена")
         val project = projectRepository.getProjectById(transactionEntity.projectId)
             ?: throw AppException.NotFound.Project("Проект не найден")
-        participantRepository.getParticipantByUserAndProjectId(userId, transactionEntity.projectId)
+        val participant = participantRepository.getParticipantByUserAndProjectId(userId, transactionEntity.projectId)
             ?: throw AppException.Authorization("Вы не участник проекта")
         if (!accessControl.canEditProject(
                 userId,
@@ -178,11 +204,16 @@ class TransactionController(
         }
 
         auditLog.logAction(userId, "Удалил транзакцию '${transactionEntity.name}' в проекте ${transactionEntity.projectId}")
-        notificationService.sendNotification(
-            userId = project.ownerId,
-            type = NotificationType.TRANSACTION_REMOVED,
-            message = "Пользователь $userId удалил транзакцию",
-            projectId = transactionEntity.projectId
-        )
+        val participants = ParticipantTable.selectAll().where { ParticipantTable.projectId eq project.id.orEmpty() }
+            .mapNotNull { it[ParticipantTable.userId] }
+
+        participants.forEach { participantId ->
+            notificationService.sendNotification(
+                userId = participantId,
+                type = NotificationType.TRANSACTION_REMOVED,
+                message = "Пользователь ${participant.name} / ${participant.email} удалил транзакцию ${transactionEntity.name} в проекте ${project.name}",
+                projectId = transactionEntity.projectId
+            )
+        }
     }
 }

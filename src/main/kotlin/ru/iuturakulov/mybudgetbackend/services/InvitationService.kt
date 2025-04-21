@@ -51,10 +51,10 @@ class InvitationService {
         InvitationTable.deleteWhere { id eq inviteId }
     }
 
-    fun sendInvitationEmail(email: String, inviteCode: String) {
+    fun sendInvitationEmail(email: String, inviteCode: String, projectName: String) {
         EmailService().sendEmail(
             toEmail = email,
-            subject = "Приглашение в проект",
+            subject = "Приглашение в проект \"${projectName}\"",
             message = "Вы приглашены в проект. Код приглашения: $inviteCode"
         )
     }

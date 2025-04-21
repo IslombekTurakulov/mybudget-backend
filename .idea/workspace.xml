@@ -4,32 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4bbd917-8929-44b4-afda-19b441d6e48e" name="Changes" comment="MYBUDGETBACKEND-14: fix analytics, project, transaction and email sending template">
-      <change afterPath="$PROJECT_DIR$/.idea/codeStyles/Project.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/codeStyles/codeStyleConfig.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/config/TokensResponse.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/controller/analytics/AnalyticsExporter.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/models/analytics/AnalyticsExportFormat.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/models/analytics/AnalyticsExportFrom.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/models/analytics/ExportFile.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/models/analytics/UserStats.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/fonts/NotoSans-Medium.ttf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/gradle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/gradle.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+    <list default="true" id="c4bbd917-8929-44b4-afda-19b441d6e48e" name="Changes" comment="MYBUDGETBACKEND-15: add analytics export feature, fix project, fix token authorization">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle.kts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/controller/analytics/AnalyticsController.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/controller/analytics/AnalyticsController.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/controller/user/UserController.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/controller/user/UserController.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/di/KoinModule.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/di/KoinModule.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/models/analytics/AnalyticsFilter.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/models/analytics/AnalyticsFilter.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/models/analytics/OverviewAnalyticsDto.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/models/analytics/OverviewAnalyticsDto.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/models/analytics/PeriodStats.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/models/analytics/PeriodStats.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/models/analytics/ProjectAnalyticsDto.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/models/analytics/ProjectAnalyticsDto.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/models/response/LoginResponse.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/models/response/LoginResponse.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/repositories/UserRepository.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/repositories/UserRepository.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/routing/AnalyticsRoute.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/routing/AnalyticsRoute.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/services/EmailService.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/services/EmailService.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/services/EmailTemplates.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/services/EmailTemplates.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/controller/project/ProjectController.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/controller/project/ProjectController.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/controller/transaction/TransactionController.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/controller/transaction/TransactionController.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/entities/notification/NotificationTable.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/entities/notification/NotificationTable.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/repositories/NotificationRepository.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/repositories/NotificationRepository.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -255,8 +235,27 @@
       <option name="project" value="LOCAL" />
       <updated>1744935037252</updated>
     </task>
-    <option name="localTasksCounter" value="14" />
+    <task id="LOCAL-00014" summary="MYBUDGETBACKEND-15: add analytics export feature, fix project, fix token authorization">
+      <option name="closed" value="true" />
+      <created>1745192022822</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1745192022822</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="MYBUDGETBACKEND-2: Fix SMTP mail sending and exceptions handling" />
@@ -272,7 +271,8 @@
     <MESSAGE value="MYBUDGETBACKEND-12: auth, settings, invitation, logging, analytics, project and transaction fixes" />
     <MESSAGE value="MYBUDGETBACKEND-13: project, refresh-token and transaction fixes" />
     <MESSAGE value="MYBUDGETBACKEND-14: fix analytics, project, transaction and email sending template" />
-    <option name="LAST_COMMIT_MESSAGE" value="MYBUDGETBACKEND-14: fix analytics, project, transaction and email sending template" />
+    <MESSAGE value="MYBUDGETBACKEND-15: add analytics export feature, fix project, fix token authorization" />
+    <option name="LAST_COMMIT_MESSAGE" value="MYBUDGETBACKEND-15: add analytics export feature, fix project, fix token authorization" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -393,7 +393,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="kotlin-line">
           <url>file://$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/controller/transaction/TransactionController.kt</url>
-          <line>90</line>
+          <line>101</line>
           <option name="timeStamp" value="72" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="kotlin-line">

@@ -14,6 +14,7 @@ object NotificationTable : Table("notifications") {
     val createdAt = long("created_at").default(System.currentTimeMillis())
     val isRead = bool("is_read").default(false)
 
+
     override val primaryKey = PrimaryKey(id)
 
     fun fromRow(row: ResultRow) = NotificationEntity(

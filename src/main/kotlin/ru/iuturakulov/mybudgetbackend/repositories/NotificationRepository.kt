@@ -25,7 +25,7 @@ class NotificationRepository {
 
     fun getUserNotifications(userId: String): List<NotificationEntity> = transaction {
         NotificationTable.selectAll().where { NotificationTable.userId eq userId }
-            .map { NotificationTable.fromRow(it) }
+            .map { NotificationTable.fromRow(it) }.sortedByDescending { it.createdAt }
     }
 
     fun markNotificationAsRead(notificationId: String): Boolean = transaction {
