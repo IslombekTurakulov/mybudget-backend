@@ -17,6 +17,7 @@ import ru.iuturakulov.mybudgetbackend.entities.transaction.TransactionsTable
 import ru.iuturakulov.mybudgetbackend.extensions.AccessControl
 import ru.iuturakulov.mybudgetbackend.extensions.AppException
 import ru.iuturakulov.mybudgetbackend.extensions.AuditLogService
+import ru.iuturakulov.mybudgetbackend.extensions.BudgetUtils.maybeNotifyLimit
 import ru.iuturakulov.mybudgetbackend.models.InviteResult
 import ru.iuturakulov.mybudgetbackend.models.UserRole
 import ru.iuturakulov.mybudgetbackend.models.project.ChangeRoleRequest
@@ -116,25 +117,55 @@ class ProjectController(
     /**
      * Обновить проект (разрешено владельцу и редакторам)
      */
-    fun updateProject(userId: String, projectId: String, request: UpdateProjectRequest): ProjectEntity {
-        return transaction {
-            val project = projectRepository.getProjectById(projectId) ?: throw AppException.NotFound.Project()
+    fun updateProject(
+        userId: String,
+        projectId: String,
+        request: UpdateProjectRequest
+    ): ProjectEntity = transaction {
+        val project = projectRepository.getProjectById(projectId)
+            ?: throw AppException.NotFound.Project()
 
-            if (project.status == ProjectStatus.ARCHIVED && request.status == ProjectStatus.ACTIVE) {
-                return@transaction unarchiveProject(userId, projectId)
-            }
+        // восстановление архива
+        if (project.status == ProjectStatus.ARCHIVED &&
+            request.status == ProjectStatus.ACTIVE
+        ) {
+            return@transaction unarchiveProject(userId, projectId)
+        }
 
-            val participant = participantRepository.getParticipantByUserAndProjectId(userId, projectId)
+        val participant = participantRepository
+            .getParticipantByUserAndProjectId(userId, projectId)
 
-            if (!accessControl.canEditProject(userId, project, participant)) {
-                throw AppException.Authorization("Вы не можете редактировать этот проект")
-            }
+        if (!accessControl.canEditProject(userId, project, participant)) {
+            throw AppException.Authorization("Вы не можете редактировать этот проект")
+        }
 
-            projectRepository.updateProject(projectId, request).also {
-                auditLogService.logAction(userId, "Обновлен проект: $projectId")
+        request.budgetLimit?.let { newLimit ->
+            val spent = project.amountSpent
+            if (newLimit < spent) {
+                throw AppException.InvalidProperty.Project(
+                    "Новый лимит (${newLimit.formatMoney()}) меньше уже потраченной " +
+                            "суммы (${spent.formatMoney()})"
+                )
             }
         }
+
+        val updated = projectRepository.updateProject(projectId, request)
+
+        // при уменьшении лимита проверяем 90 %
+        request.budgetLimit?.let { newLimit ->
+            maybeNotifyLimit(
+                project = updated,
+                amountSpent = updated.amountSpent,
+                participantRepo = participantRepository,
+                notificationService = notificationService
+            )
+        }
+
+        auditLogService.logAction(userId, "Обновлен проект: $projectId")
+        updated
     }
+
+    private fun Double.formatMoney() = "%,.2f ₽".format(this)
 
     /**
      * Архивировать проект (только владелец)

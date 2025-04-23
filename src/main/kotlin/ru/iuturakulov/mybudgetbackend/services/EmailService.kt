@@ -8,27 +8,12 @@ import org.apache.commons.mail.EmailException
 import org.apache.commons.mail.SimpleEmail
 import ru.iuturakulov.mybudgetbackend.extensions.AppException
 
-import kotlinx.coroutines.*
 import org.apache.commons.mail.*
 import ru.iuturakulov.mybudgetbackend.models.analytics.AnalyticsExportFormat
 import javax.activation.*
 import javax.mail.util.ByteArrayDataSource
 
 class EmailService {
-
-    fun sendVerificationEmail(email: String, code: String) =
-        sendEmail(
-            toEmail = email,
-            subject = "Подтверждение почты",
-            message = "Ваш код подтверждения: $code"
-        )
-
-    fun sendPasswordResetEmail(email: String, code: String) =
-        sendEmail(
-            toEmail = email,
-            subject = "Восстановление пароля",
-            message = "Ваш код для сброса пароля: $code"
-        )
 
     /** Отправка простого письма без вложений */
     fun sendEmail(
@@ -76,6 +61,7 @@ class EmailService {
 
     /** Удобный обёртка именно для экспорта аналитики */
     fun sendAnalyticsExportEmail(
+        topicName: String,
         toEmail: String,
         attachmentName: String,
         attachmentBytes: ByteArray,
@@ -86,15 +72,28 @@ class EmailService {
             AnalyticsExportFormat.PDF -> "application/pdf"
         }
 
+        val message = """
+        Здравствуйте!
+        
+        Во вложении вы найдёте отчёт по аналитике «$topicName» в формате ${exportFormat.name.lowercase()}.
+        Надеемся, что данные будут полезны для вас.
+        
+        Если возникнут вопросы — пишите нам в поддержку.
+        
+        С уважением,
+        «Мой Бюджет»
+        """.trimIndent()
+
         sendEmailWithAttachment(
             toEmail = toEmail,
-            subject = "Экспорт аналитики",
-            message = "Во вложении – запрошенный отчёт.",
+            subject = "Экспорт аналитики «$topicName»",
+            message = message,
             attachmentName = attachmentName,
             attachmentBytes = attachmentBytes,
             attachmentMime = mime
         )
     }
+
 
     /**
      * Единообразно настраиваем SMTP‑параметры

@@ -27,6 +27,12 @@ class ParticipantRepository {
         return@transaction participants.map { ParticipantTable.fromRow(it) }.firstOrNull()
     }
 
+    fun getProjectOwnerId(projectId: String) = transaction {
+        ParticipantTable.selectAll().where {
+            (ParticipantTable.projectId eq projectId) and (ParticipantTable.role eq UserRole.OWNER)
+        }.map { ParticipantTable.fromRow(it) }.firstOrNull()
+    }
+
     fun addParticipant(participant: ParticipantEntity) = transaction {
         ParticipantTable.insert { statement ->
             statement[id] = participant.id ?: UUID.randomUUID().toString() // Генерация ID

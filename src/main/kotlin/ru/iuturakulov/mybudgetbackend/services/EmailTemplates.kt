@@ -19,6 +19,9 @@ object EmailTemplates {
             Время регистрации: $time
 
             Если вы не совершали регистрацию, пожалуйста, свяжитесь с поддержкой.
+        
+            С уважением,
+            «Мой Бюджет»
             """.trimIndent()
         return EmailContent(subject, message)
     }
@@ -39,7 +42,10 @@ object EmailTemplates {
             Новый пароль: $newPassword
             Время смены: $time
 
-            Если вы не совершали это действие, свяжитесь с поддержкой.
+            Если возникнут вопросы — пишите нам в поддержку.
+        
+            С уважением,
+            «Мой Бюджет»
             """.trimIndent()
         return EmailContent(subject, message)
     }

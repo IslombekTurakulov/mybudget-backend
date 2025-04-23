@@ -8,10 +8,12 @@ import ru.iuturakulov.mybudgetbackend.controller.user.RateLimiter
 import ru.iuturakulov.mybudgetbackend.controller.user.SystemDateTimeProvider
 import ru.iuturakulov.mybudgetbackend.entities.notification.NotificationType
 import ru.iuturakulov.mybudgetbackend.entities.participants.ParticipantTable
+import ru.iuturakulov.mybudgetbackend.entities.projects.ProjectEntity
 import ru.iuturakulov.mybudgetbackend.entities.transaction.TransactionEntity
 import ru.iuturakulov.mybudgetbackend.extensions.AccessControl
 import ru.iuturakulov.mybudgetbackend.extensions.AppException
 import ru.iuturakulov.mybudgetbackend.extensions.AuditLogService
+import ru.iuturakulov.mybudgetbackend.extensions.BudgetUtils.maybeNotifyLimit
 import ru.iuturakulov.mybudgetbackend.models.transaction.AddTransactionRequest
 import ru.iuturakulov.mybudgetbackend.models.transaction.TransactionType
 import ru.iuturakulov.mybudgetbackend.models.transaction.UpdateTransactionRequest
@@ -42,19 +44,21 @@ class TransactionController(
         }
 
         // вычисляем дельты и проверяем бюджет
+        val beforeSpent = project.amountSpent
         val isExpense = req.type == TransactionType.EXPENSE
         val spentDelta = if (isExpense) req.amount else 0.0
-        val budgetDelta = if (!isExpense) req.amount else 0.0
+        val limitDelta = if (!isExpense) req.amount else 0.0
         val newSpent = project.amountSpent + spentDelta
+
         if (newSpent > project.budgetLimit) {
             throw AppException.InvalidProperty.Transaction("Сумма расходов превышает бюджет")
         }
 
         // обновляем проект за один вызов
         projectRepository.updateProjectAmounts(
-            projectId   = project.id!!,
-            amountSpent = newSpent.toBigDecimal(),
-            budgetLimit = (project.budgetLimit + budgetDelta).toBigDecimal()
+            projectId = project.id!!,
+            amountSpent = (project.amountSpent + spentDelta).toBigDecimal(),
+            budgetLimit = (project.budgetLimit + limitDelta).toBigDecimal()
         )
 
         val nowEpoch = clock.now().toEpochMilli()
@@ -77,18 +81,18 @@ class TransactionController(
         val participants = ParticipantTable.selectAll().where { ParticipantTable.projectId eq project.id.orEmpty() }
             .mapNotNull { it[ParticipantTable.userId] }
 
-        participants.forEach { participantId ->
-            notificationService.sendNotification(
-                userId = participantId,
-                type = NotificationType.TRANSACTION_ADDED,
-                message = if (userId == participantId) {
-                    "Вы добавили транзакцию ${transactionEntitity.name} в проекте ${project.name}"
-                } else {
-                    "Пользователь ${participant.name} / ${participant.email} добавил транзакцию ${transactionEntitity.name} в проекте ${project.name}"
-                },
-                projectId = req.projectId
-            )
-        }
+        notifyAll(
+            participants = participants,
+            actorId = userId,
+            actorName = participant.name,
+            actorEmail = participant.email,
+            txName = transactionEntitity.name,
+            txAmount = transactionEntitity.amount,
+            action = "добавил",
+            project = project,
+            beforeSpent = beforeSpent,
+            afterSpent = newSpent
+        )
         transactionEntitity
     }
 
@@ -136,12 +140,29 @@ class TransactionController(
             throw AppException.Authorization("Нет прав на редактирование")
         }
 
-        val oldExp = if (oldTx.type == TransactionType.EXPENSE) oldTx.amount else 0.0
         val newType = req.type ?: oldTx.type
         val newAmount = req.amount ?: oldTx.amount
-        val newExpense = if (newType == TransactionType.EXPENSE) newAmount else 0.0
-        val updatedSpent = project.amountSpent - oldExp + newExpense
-        if (updatedSpent > project.budgetLimit) {
+
+        val wasExpense = oldTx.type == TransactionType.EXPENSE
+        val willExpense = newType == TransactionType.EXPENSE
+        val beforeSpent = project.amountSpent
+
+        val spentDelta = when {
+            wasExpense && willExpense -> newAmount - oldTx.amount
+            wasExpense && !willExpense -> -oldTx.amount
+            !wasExpense && willExpense -> newAmount
+            else -> 0.0
+        }
+
+        val limitDelta = when {
+            wasExpense && willExpense -> 0.0
+            wasExpense && !willExpense -> newAmount
+            !wasExpense && willExpense -> -oldTx.amount
+            else -> newAmount - oldTx.amount
+        }
+        val newSpent = project.amountSpent + spentDelta
+        val newLimit = project.budgetLimit + limitDelta
+        if (newSpent > newLimit) {
             throw AppException.InvalidProperty.Transaction("Сумма расходов превышает бюджет")
         }
 
@@ -154,27 +175,37 @@ class TransactionController(
             type = newType,
             images = req.images
         )
+
         transactionRepository.updateTransaction(updated)
-        project.id?.let { projectid ->
-            projectRepository.updateProjectAmounts(projectId = projectid, amountSpent = updatedSpent.toBigDecimal())
-        }
+        projectRepository.updateProjectAmounts(
+            projectId = project.id!!,
+            amountSpent = newSpent.toBigDecimal(),
+            budgetLimit = newLimit.toBigDecimal()
+        )
+
+        maybeNotifyLimit(
+            project = project,
+            amountSpent = newSpent,
+            participantRepo = participantRepository,
+            notificationService = notificationService
+        )
 
         auditLog.logAction(userId, "Обновил транзакцию '${updated.name}' в проекте ${oldTx.projectId}")
         val participants = ParticipantTable.selectAll().where { ParticipantTable.projectId eq project.id.orEmpty() }
             .mapNotNull { it[ParticipantTable.userId] }
 
-        participants.forEach { participantId ->
-            notificationService.sendNotification(
-                userId = participantId,
-                type = NotificationType.TRANSACTION_ADDED,
-                message = if (userId == participantId) {
-                    "Вы обновили транзакцию ${updated.name} в проекте ${project.name}"
-                } else {
-                    "Пользователь ${participant.name} / ${participant.email} обновил транзакцию ${updated.name} в проекте ${project.name}"
-                },
-                projectId = project.id
-            )
-        }
+        notifyAll(
+            participants,
+            actorId = userId,
+            actorName = participant.name,
+            actorEmail = participant.email,
+            txName = updated.name,
+            txAmount = updated.amount,
+            action = "обновил",
+            project = project,
+            beforeSpent = beforeSpent,
+            afterSpent = newSpent
+        )
         updated
     }
 
@@ -195,25 +226,96 @@ class TransactionController(
         }
 
         transactionRepository.deleteTransaction(txId)
-        val adjust = if (transactionEntity.type == TransactionType.EXPENSE) -transactionEntity.amount else 0.0
-        project.id?.let { projectId ->
-            projectRepository.updateProjectAmounts(
-                projectId = projectId,
-                amountSpent = (project.amountSpent + adjust).toBigDecimal()
-            )
-        }
+        val spentDelta = if (transactionEntity.type == TransactionType.EXPENSE)
+            -transactionEntity.amount else 0.0
+        val limitDelta = if (transactionEntity.type == TransactionType.INCOME)
+            -transactionEntity.amount else 0.0
 
-        auditLog.logAction(userId, "Удалил транзакцию '${transactionEntity.name}' в проекте ${transactionEntity.projectId}")
+        val newSpent = project.amountSpent + spentDelta
+        val newLimit = project.budgetLimit + limitDelta
+        projectRepository.updateProjectAmounts(
+            projectId = project.id!!,
+            amountSpent = newSpent.toBigDecimal(),
+            budgetLimit = newLimit.toBigDecimal()
+        )
+
+        maybeNotifyLimit(
+            project = project,
+            amountSpent = newSpent,
+            participantRepo = participantRepository,
+            notificationService = notificationService
+        )
+
+        auditLog.logAction(
+            userId,
+            "Удалил транзакцию '${transactionEntity.name}' в проекте ${transactionEntity.projectId}"
+        )
         val participants = ParticipantTable.selectAll().where { ParticipantTable.projectId eq project.id.orEmpty() }
             .mapNotNull { it[ParticipantTable.userId] }
 
-        participants.forEach { participantId ->
+        notifyAll(
+            participants,
+            actorId = userId,
+            actorName = participant.name,
+            actorEmail = participant.email,
+            txName = transactionEntity.name,
+            txAmount = transactionEntity.amount,
+            action = "удалил",
+            project = project,
+            beforeSpent = project.amountSpent,
+            afterSpent = newSpent
+        )
+    }
+
+    private fun money(v: Double) = "%,.2f ₽".format(v)
+    private fun pct(v: Double) = "%.1f%%".format(v)
+
+    private fun budgetLine(spentBefore: Double, spentAfter: Double, limit: Double): String {
+        val pb = if (limit == 0.0) 0.0 else (spentBefore / limit * 100)
+        val pa = if (limit == 0.0) 0.0 else (spentAfter / limit * 100)
+        return "${money(spentBefore)} (${pct(pb)}) -> ${money(spentAfter)} (${pct(pa)})"
+    }
+
+    private fun notifyAll(
+        participants: List<String>,
+        actorId: String,
+        actorName: String,
+        actorEmail: String,
+        txName: String,
+        txAmount: Double,
+        action: String,             // «добавил», «обновил», «удалил»
+        project: ProjectEntity,
+        beforeSpent: Double,
+        afterSpent: Double
+    ) {
+        val limit = project.budgetLimit
+        val remaining = limit - afterSpent
+        val projectInfo = "Проект «${project.name}» (лимит ${money(limit)})"
+
+        participants.forEach { uid ->
+            val header = if (uid == actorId) {
+                "Вы ${action}и транзакцию"
+            } else {
+                "Пользователь $actorName ($actorEmail) $action транзакцию"
+            }
+
+            val body = listOf(
+                "\"$txName\" — ${money(txAmount)}",
+                "Расходы: ${budgetLine(beforeSpent, afterSpent, limit)}",
+                "Осталось: ${money(remaining)}"
+            ).joinToString(separator = "\n")
+
             notificationService.sendNotification(
-                userId = participantId,
-                type = NotificationType.TRANSACTION_REMOVED,
-                message = "Пользователь ${participant.name} / ${participant.email} удалил транзакцию ${transactionEntity.name} в проекте ${project.name}",
-                projectId = transactionEntity.projectId
+                userId = uid,
+                type = when (action) {
+                    "добавил" -> NotificationType.TRANSACTION_ADDED
+                    "обновил" -> NotificationType.TRANSACTION_UPDATED
+                    else -> NotificationType.TRANSACTION_REMOVED
+                },
+                message = listOf(projectInfo, header, body).joinToString("\n"),
+                projectId = project.id
             )
         }
     }
+
 }

@@ -27,6 +27,7 @@ sealed class AppException(
         class EmailNotExist(details: String? = null) : InvalidProperty("Email does not exist", details)
         class Password(details: String? = null) : InvalidProperty("Password invalid", details)
         class Transaction(details: String? = null) : InvalidProperty("Transaction invalid", details)
+        class Project(details: String? = null) : InvalidProperty("Project invalid", details)
         class PasswordNotMatch(details: String? = null) : InvalidProperty("Password does not match", details)
     }
 

@@ -287,6 +287,8 @@ class AnalyticsController(
         val user = userRepository.getUserById(userId)
             ?: throw AppException.NotFound.User("Пользователь не найден")
 
+        val project = projectId?.let { projectRepository.getProjectById(it) }
+
         val analytics = if (projectId == null)
             getOverviewAnalytics(userId, filter)
         else
@@ -311,6 +313,7 @@ class AnalyticsController(
         }
 
         emailService.sendAnalyticsExportEmail(
+            topicName = project?.let { "проекта \"${project.name}\"" } ?: "\"Общая\"",
             toEmail = user.email,
             attachmentName = fileName,
             attachmentBytes = bytes,
