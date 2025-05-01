@@ -4,18 +4,18 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4bbd917-8929-44b4-afda-19b441d6e48e" name="Changes" comment="MYBUDGETBACKEND-15: add analytics export feature, fix project, fix token authorization">
-      <change afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/extensions/BudgetUtils.kt" afterDir="false" />
+    <list default="true" id="c4bbd917-8929-44b4-afda-19b441d6e48e" name="Changes" comment="MYBUDGETBACKEND-17: Edit notification template msg, add notifier budget limit, fix participant name update, fix budget limit and spent amount while changing/adding transaction, fix notifier when changing project budget limit">
+      <change afterPath="$PROJECT_DIR$/src/main/resources/db/migrations/V2__add_project_fields.sql" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/controller/analytics/AnalyticsController.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/controller/analytics/AnalyticsController.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/controller/project/ProjectController.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/controller/project/ProjectController.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/controller/transaction/TransactionController.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/controller/transaction/TransactionController.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/entities/notification/NotificationEntity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/entities/notification/NotificationEntity.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/extensions/Exceptions.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/extensions/Exceptions.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/repositories/ParticipantRepository.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/repositories/ParticipantRepository.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/repositories/SettingsRepository.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/repositories/SettingsRepository.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/services/EmailService.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/services/EmailService.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/services/EmailTemplates.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/services/EmailTemplates.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/database/ConfigureDataBase.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/database/ConfigureDataBase.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/entities/projects/ProjectEntity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/entities/projects/ProjectEntity.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/entities/projects/ProjectsTable.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/entities/projects/ProjectsTable.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/models/project/CreateProjectRequest.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/models/project/CreateProjectRequest.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/models/project/ProjectUpdateRequest.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/models/project/UpdateProjectRequest.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/models/project/UpdateProjectRequest.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/repositories/ProjectRepository.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/repositories/ProjectRepository.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/routing/ProjectRoute.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/routing/ProjectRoute.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -105,6 +105,7 @@
       <recent name="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/controller/user" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/main/resources/db" />
       <recent name="$PROJECT_DIR$/src/main/resources/fonts" />
       <recent name="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/entities/user" />
     </key>
@@ -249,7 +250,15 @@
       <option name="project" value="LOCAL" />
       <updated>1745192022822</updated>
     </task>
-    <option name="localTasksCounter" value="15" />
+    <task id="LOCAL-00015" summary="MYBUDGETBACKEND-17: Edit notification template msg, add notifier budget limit, fix participant name update, fix budget limit and spent amount while changing/adding transaction, fix notifier when changing project budget limit">
+      <option name="closed" value="true" />
+      <created>1745440282395</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1745440282395</updated>
+    </task>
+    <option name="localTasksCounter" value="16" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -278,7 +287,8 @@
     <MESSAGE value="MYBUDGETBACKEND-13: project, refresh-token and transaction fixes" />
     <MESSAGE value="MYBUDGETBACKEND-14: fix analytics, project, transaction and email sending template" />
     <MESSAGE value="MYBUDGETBACKEND-15: add analytics export feature, fix project, fix token authorization" />
-    <option name="LAST_COMMIT_MESSAGE" value="MYBUDGETBACKEND-15: add analytics export feature, fix project, fix token authorization" />
+    <MESSAGE value="MYBUDGETBACKEND-17: Edit notification template msg, add notifier budget limit, fix participant name update, fix budget limit and spent amount while changing/adding transaction, fix notifier when changing project budget limit" />
+    <option name="LAST_COMMIT_MESSAGE" value="MYBUDGETBACKEND-17: Edit notification template msg, add notifier budget limit, fix participant name update, fix budget limit and spent amount while changing/adding transaction, fix notifier when changing project budget limit" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -358,11 +368,6 @@
           <option name="timeStamp" value="54" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="kotlin-line">
-          <url>file://$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/routing/ProjectRoute.kt</url>
-          <line>201</line>
-          <option name="timeStamp" value="55" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="kotlin-line">
           <url>file://$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/routing/UserRoute.kt</url>
           <line>48</line>
           <option name="timeStamp" value="57" />
@@ -374,17 +379,17 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="kotlin-line">
           <url>file://$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/controller/project/ProjectController.kt</url>
-          <line>73</line>
+          <line>77</line>
           <option name="timeStamp" value="59" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="kotlin-line">
           <url>file://$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/controller/project/ProjectController.kt</url>
-          <line>75</line>
+          <line>79</line>
           <option name="timeStamp" value="60" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="kotlin-line">
           <url>file://$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/models/project/CreateProjectRequest.kt</url>
-          <line>18</line>
+          <line>20</line>
           <option name="timeStamp" value="62" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="kotlin-line">
@@ -437,7 +442,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="kotlin-line">
           <url>file://$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/controller/project/ProjectController.kt</url>
-          <line>305</line>
+          <line>292</line>
           <option name="timeStamp" value="79" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="kotlin-line">
@@ -457,12 +462,12 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="kotlin-line">
           <url>file://$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/controller/project/ProjectController.kt</url>
-          <line>311</line>
+          <line>298</line>
           <option name="timeStamp" value="83" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="kotlin-line">
           <url>file://$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/controller/project/ProjectController.kt</url>
-          <line>318</line>
+          <line>305</line>
           <option name="timeStamp" value="84" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="kotlin-line">
@@ -475,12 +480,12 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="kotlin-line">
           <url>file://$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/controller/project/ProjectController.kt</url>
-          <line>446</line>
+          <line>433</line>
           <option name="timeStamp" value="87" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="kotlin-line">
           <url>file://$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/controller/project/ProjectController.kt</url>
-          <line>458</line>
+          <line>445</line>
           <option name="timeStamp" value="88" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="kotlin-line">
@@ -495,7 +500,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="kotlin-line">
           <url>file://$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/controller/project/ProjectController.kt</url>
-          <line>286</line>
+          <line>273</line>
           <option name="timeStamp" value="92" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="kotlin-line">

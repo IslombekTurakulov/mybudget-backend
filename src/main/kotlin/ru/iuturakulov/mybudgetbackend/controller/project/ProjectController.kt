@@ -6,6 +6,8 @@ import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.update
+import ru.iuturakulov.mybudgetbackend.controller.user.DateTimeProvider
+import ru.iuturakulov.mybudgetbackend.controller.user.SystemDateTimeProvider
 import ru.iuturakulov.mybudgetbackend.entities.notification.NotificationTable
 import ru.iuturakulov.mybudgetbackend.entities.notification.NotificationType
 import ru.iuturakulov.mybudgetbackend.entities.participants.ParticipantEntity
@@ -14,6 +16,7 @@ import ru.iuturakulov.mybudgetbackend.entities.projects.ProjectEntity
 import ru.iuturakulov.mybudgetbackend.entities.projects.ProjectStatus
 import ru.iuturakulov.mybudgetbackend.entities.projects.ProjectsTable
 import ru.iuturakulov.mybudgetbackend.entities.transaction.TransactionsTable
+import ru.iuturakulov.mybudgetbackend.entities.user.UserTable
 import ru.iuturakulov.mybudgetbackend.extensions.AccessControl
 import ru.iuturakulov.mybudgetbackend.extensions.AppException
 import ru.iuturakulov.mybudgetbackend.extensions.AuditLogService
@@ -37,7 +40,8 @@ class ProjectController(
     private val accessControl: AccessControl,
     private val invitationService: InvitationService,
     private val notificationService: NotificationService,
-    private val auditLogService: AuditLogService
+    private val auditLogService: AuditLogService,
+    private val clock: DateTimeProvider = SystemDateTimeProvider()
 ) {
 
     /**
@@ -82,9 +86,11 @@ class ProjectController(
                 statement[description] = request.description
                 statement[budgetLimit] = request.budgetLimit.toBigDecimal()
                 statement[amountSpent] = 0.toBigDecimal()
+                statement[categoryIcon] = request.categoryIcon
+                statement[category] = request.category
                 statement[status] = ProjectStatus.ACTIVE
-                statement[createdAt] = System.currentTimeMillis()
-                statement[lastModified] = System.currentTimeMillis()
+                statement[createdAt] = clock.now().toEpochMilli()
+                statement[lastModified] = clock.now().toEpochMilli()
                 statement[ProjectsTable.ownerId] = ownerId
             }
 
@@ -95,22 +101,12 @@ class ProjectController(
                 insertStatement[name] = user.name
                 insertStatement[email] = user.email
                 insertStatement[role] = UserRole.OWNER
-                insertStatement[createdAt] = System.currentTimeMillis()
+                insertStatement[createdAt] = clock.now().toEpochMilli()
             }
 
             auditLogService.logAction(ownerId, "Создан проект: $generatedProjectId")
 
-            ProjectEntity(
-                id = generatedProjectId,
-                name = request.name,
-                description = request.description,
-                budgetLimit = request.budgetLimit,
-                amountSpent = 0.0,
-                status = ProjectStatus.ACTIVE,
-                createdAt = System.currentTimeMillis(),
-                lastModified = System.currentTimeMillis(),
-                ownerId = ownerId
-            )
+            projectRepository.getProjectById(generatedProjectId)!!
         }
     }
 
@@ -125,7 +121,7 @@ class ProjectController(
         val project = projectRepository.getProjectById(projectId)
             ?: throw AppException.NotFound.Project()
 
-        // восстановление архива
+        // восстановление из архива
         if (project.status == ProjectStatus.ARCHIVED &&
             request.status == ProjectStatus.ACTIVE
         ) {
@@ -140,19 +136,17 @@ class ProjectController(
         }
 
         request.budgetLimit?.let { newLimit ->
-            val spent = project.amountSpent
-            if (newLimit < spent) {
+            if (newLimit < project.amountSpent) {
                 throw AppException.InvalidProperty.Project(
-                    "Новый лимит (${newLimit.formatMoney()}) меньше уже потраченной " +
-                            "суммы (${spent.formatMoney()})"
+                    "Новый лимит (${newLimit.formatMoney()}) меньше уже потраченной суммы (${project.amountSpent.formatMoney()})"
                 )
             }
         }
 
         val updated = projectRepository.updateProject(projectId, request)
 
-        // при уменьшении лимита проверяем 90 %
-        request.budgetLimit?.let { newLimit ->
+        // оповещение при достижении 90%
+        request.budgetLimit?.let {
             maybeNotifyLimit(
                 project = updated,
                 amountSpent = updated.amountSpent,
@@ -161,7 +155,7 @@ class ProjectController(
             )
         }
 
-        auditLogService.logAction(userId, "Обновлен проект: $projectId")
+        auditLogService.logAction(userId, "Обновил проект $projectId")
         updated
     }
 
@@ -171,7 +165,7 @@ class ProjectController(
      * Архивировать проект (только владелец)
      */
     fun archiveProject(userId: String, projectId: String) = transaction {
-        val project = ProjectsTable.selectAll().where { ProjectsTable.id eq projectId }
+        val project = (ProjectsTable innerJoin UserTable).selectAll().where { ProjectsTable.id eq projectId }
             .map { ProjectEntity.fromRow(it) }
             .singleOrNull() ?: throw AppException.NotFound.Project("Проект не найден")
 
@@ -202,7 +196,7 @@ class ProjectController(
     }
 
     fun unarchiveProject(userId: String, projectId: String) = transaction {
-        val project = ProjectsTable.selectAll().where { ProjectsTable.id eq projectId }
+        val project = (ProjectsTable innerJoin UserTable).selectAll().where { ProjectsTable.id eq projectId }
             .map { ProjectEntity.fromRow(it) }
             .singleOrNull() ?: throw AppException.NotFound.Project("Проект не найден")
 
@@ -235,20 +229,14 @@ class ProjectController(
     /**
      * Удалить проект (только владелец)
      */
-    fun deleteProject(userId: String, projectId: String) = transaction {
-        val project = ProjectsTable.selectAll().where { ProjectsTable.id eq projectId }
+    fun deleteProject(userId: String, projectId: String, deleteForever: Boolean = false) = transaction {
+        val project = (ProjectsTable innerJoin UserTable).selectAll().where { ProjectsTable.id eq projectId }
             .map { ProjectEntity.fromRow(it) }
             .singleOrNull() ?: throw AppException.NotFound.Project("Проект не найден")
 
         if (project.ownerId != userId) {
             throw AppException.Authorization("Только владелец может удалить проект")
         }
-
-        NotificationTable.deleteWhere { NotificationTable.projectId eq projectId }
-
-        TransactionsTable.deleteWhere { TransactionsTable.projectId eq projectId }
-
-        ParticipantTable.deleteWhere { ParticipantTable.projectId eq projectId }
 
         ProjectsTable.update({ ProjectsTable.id eq projectId }) {
             it[status] = ProjectStatus.DELETED

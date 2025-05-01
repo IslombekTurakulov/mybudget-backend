@@ -42,7 +42,11 @@ object DatabaseConfig {
 
     private fun runFlyway(dataSource: DataSource) {
         try {
-            val flyway = Flyway.configure().dataSource(dataSource).load()
+            val flyway = Flyway
+                .configure()
+                .locations("classpath:db/migrations")
+                .dataSource(dataSource)
+                .load()
             flyway.migrate()
         } catch (e: FlywayException) {
             println("⚠ Ошибка миграции Flyway: ${e.message}")

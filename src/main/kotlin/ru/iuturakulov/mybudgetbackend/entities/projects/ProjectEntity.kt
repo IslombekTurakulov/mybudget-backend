@@ -1,9 +1,10 @@
 package ru.iuturakulov.mybudgetbackend.entities.projects
 
 import org.jetbrains.exposed.sql.ResultRow
+import ru.iuturakulov.mybudgetbackend.entities.user.UserTable
 
 data class ProjectEntity(
-    val id: String?,
+    val id: String,
     val name: String,
     val description: String?,
     val budgetLimit: Double,
@@ -11,19 +12,13 @@ data class ProjectEntity(
     val status: ProjectStatus,
     val createdAt: Long,
     val lastModified: Long,
-    val ownerId: String
+    val ownerId: String,
+    val ownerName: String,
+    val ownerEmail: String,
+    val category: String?,
+    val categoryIcon: String?
 ) {
     companion object {
-        fun fromRow(row: ResultRow) = ProjectEntity(
-            id = row[ProjectsTable.id],
-            name = row[ProjectsTable.name],
-            description = row[ProjectsTable.description],
-            budgetLimit = row[ProjectsTable.budgetLimit].toDouble(),
-            amountSpent = row[ProjectsTable.amountSpent].toDouble(),
-            status = row[ProjectsTable.status],
-            createdAt = row[ProjectsTable.createdAt],
-            lastModified = row[ProjectsTable.lastModified],
-            ownerId = row[ProjectsTable.ownerId]
-        )
+        fun fromRow(row: ResultRow) = ProjectsTable.fromRow(row)
     }
 }

@@ -1,7 +1,9 @@
 package ru.iuturakulov.mybudgetbackend.entities.projects
 
+import org.jetbrains.exposed.sql.ReferenceOption
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.Table
+import ru.iuturakulov.mybudgetbackend.entities.user.UserTable
 
 object ProjectsTable : Table("projects") {
     val id = varchar("id", 36) // UUID проекта
@@ -12,11 +14,12 @@ object ProjectsTable : Table("projects") {
     val status = enumerationByName("status", 10, ProjectStatus::class)
     val createdAt = long("created_at").default(System.currentTimeMillis())
     val lastModified = long("last_modified").default(System.currentTimeMillis())
-    val ownerId = varchar("owner_id", 50) // ID владельца проекта
+    val ownerId = reference("owner_id", UserTable.id, onDelete = ReferenceOption.CASCADE)
+    val category = varchar("category", 100).nullable()
+    val categoryIcon = varchar("category_icon", 10).nullable()
 
     override val primaryKey = PrimaryKey(id)
 
-    // Метод для преобразования строки из БД в `ProjectEntity`
     fun fromRow(row: ResultRow) = ProjectEntity(
         id = row[id],
         name = row[name],
@@ -26,6 +29,10 @@ object ProjectsTable : Table("projects") {
         status = row[status],
         createdAt = row[createdAt],
         lastModified = row[lastModified],
-        ownerId = row[ownerId]
+        ownerId = row[ownerId],
+        ownerName = row[UserTable.name],
+        ownerEmail = row[UserTable.email],
+        category = row[category],
+        categoryIcon = row[categoryIcon]
     )
 }

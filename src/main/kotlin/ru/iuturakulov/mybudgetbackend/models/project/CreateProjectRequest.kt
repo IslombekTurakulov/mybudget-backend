@@ -8,6 +8,8 @@ import org.valiktor.validate
 data class CreateProjectRequest(
     val name: String,
     val description: String,
+    val category: String?,
+    val categoryIcon: String,
     val budgetLimit: Double
 ) {
     fun validation() {

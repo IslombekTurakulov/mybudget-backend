@@ -199,7 +199,6 @@ fun Route.projectRoute(projectController: ProjectController, auditLogService: Au
 
                 try {
                     projectController.deleteProject(userId, projectId)
-                    auditLogService.logAction(userId, "Удалил проект: $projectId")
                     call.respond(HttpStatusCode.OK, "Проект успешно удален")
                 } catch (e: AppException.Authorization) {
                     call.respond(
