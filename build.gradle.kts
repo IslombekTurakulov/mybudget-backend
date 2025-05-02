@@ -66,6 +66,8 @@ dependencies {
     implementation("com.opencsv:opencsv:5.9")
     // PDF‑экспорт (iText 7)
     implementation("com.itextpdf:itext7-core:8.0.0")
+    implementation("com.google.zxing:core:3.5.1")
+    implementation("com.google.zxing:javase:3.5.1")
 
     implementation("org.jfree:jfreechart:1.5.0")
 }

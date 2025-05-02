@@ -97,7 +97,7 @@ fun Route.projectRoute(projectController: ProjectController, auditLogService: Au
                 val result = projectController.inviteParticipant(userId, projectId, requestBody)
                 if (result.success) {
                     auditLogService.logAction(userId, "Invited ${requestBody.email} to project: $projectId")
-                    call.respond(HttpStatusCode.OK, "Приглашение отправлено")
+                    call.respond(HttpStatusCode.OK, result)
                 } else {
                     call.respond(HttpStatusCode.Forbidden, result.message)
                 }

@@ -1,5 +1,8 @@
 package ru.iuturakulov.mybudgetbackend.services
 
+import com.google.zxing.BarcodeFormat
+import com.google.zxing.client.j2se.MatrixToImageWriter
+import com.google.zxing.qrcode.QRCodeWriter
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.deleteWhere
@@ -9,6 +12,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import ru.iuturakulov.mybudgetbackend.entities.invitation.InvitationEntity
 import ru.iuturakulov.mybudgetbackend.entities.invitation.InvitationTable
 import ru.iuturakulov.mybudgetbackend.models.UserRole
+import java.io.ByteArrayOutputStream
 import java.util.*
 
 class InvitationService {
@@ -34,7 +38,7 @@ class InvitationService {
         }
     }
 
-    fun generateInvitation(projectId: String, email: String, role: UserRole): String = transaction {
+    fun generateInvitation(projectId: String, email: String?, role: UserRole): String = transaction {
         val code = UUID.randomUUID().toString().substring(0, 8)
         InvitationTable.insert {
             it[InvitationTable.id] = UUID.randomUUID().toString()
@@ -57,5 +61,15 @@ class InvitationService {
             subject = "Приглашение в проект \"${projectName}\"",
             message = "Вы приглашены в проект. Код приглашения: $inviteCode"
         )
+    }
+
+    fun generateQrCodeBase64(text: String, size: Int = 250): String {
+        val deeplink = "mybudget://invite?code=$text"
+        val bitMatrix = QRCodeWriter().encode(deeplink, BarcodeFormat.QR_CODE, size, size)
+        val pngStream = ByteArrayOutputStream().also {
+            MatrixToImageWriter.writeToStream(bitMatrix, "PNG", it)
+        }
+        return Base64.getEncoder()
+            .encodeToString(pngStream.toByteArray())
     }
 }

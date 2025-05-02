@@ -7,12 +7,21 @@ import org.valiktor.validate
 import ru.iuturakulov.mybudgetbackend.models.UserRole
 
 data class InviteParticipantRequest(
-    val email: String,
+    val email: String?,
+    val type: InvitationType,
     val role: UserRole
 ) {
+
+    enum class InvitationType {
+        QR,
+        MANUAL;
+    }
+
     fun validation() {
         validate(this) {
-            validate(InviteParticipantRequest::email).isNotBlank().isEmail()
+            if (type == InvitationType.MANUAL) {
+                validate(InviteParticipantRequest::email).isNotBlank().isEmail()
+            }
             validate(InviteParticipantRequest::role).isNotNull()
         }
     }

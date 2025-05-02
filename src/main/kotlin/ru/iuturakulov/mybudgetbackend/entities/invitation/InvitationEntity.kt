@@ -6,7 +6,7 @@ import ru.iuturakulov.mybudgetbackend.models.UserRole
 data class InvitationEntity(
     val id: String,
     val projectId: String,
-    val email: String,
+    val email: String?,
     val code: String,
     val role: UserRole,
     val createdAt: Long

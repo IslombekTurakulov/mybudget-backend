@@ -260,51 +260,58 @@ class ProjectController(
     /**
      * Пригласить участника
      */
-    fun inviteParticipant(userId: String, projectId: String, request: InviteParticipantRequest): InviteResult {
-
+    fun inviteParticipant(
+        userId: String,
+        projectId: String,
+        request: InviteParticipantRequest
+    ): InviteResult {
         val project = projectRepository.getProjectById(projectId)
-            ?: return InviteResult(success = false, message = "Проект не найден")
+            ?: return InviteResult(false, "Проект не найден")
 
-        val user = UserRepository().getUserByEmail(request.email)
-            ?: throw AppException.NotFound.User("Пользователь не найден")
-
-        // TODO Проверяем права: владелец проекта или пользователь удаляет себя
-//        if (userId != user.id) {
-//            throw AppException.ActionNotAllowed("Вы не можете пригласить самого себя")
-//        }
+        val inviter = UserRepository().getUserById(userId)
+            ?: return InviteResult(false, "Приглашающий не найден")
 
         if (!projectRepository.isUserOwner(projectId, userId)) {
-            return InviteResult(
-                success = false,
-                message = "Только владелец может приглашать участников"
-            )
+            return InviteResult(false, "Только владелец может приглашать участников")
         }
 
-        if (invitationService.hasRecentInvitation(request.email, projectId)) {
-            return InviteResult(
-                success = false,
-                message = "Слишком много приглашений, попробуйте позже"
-            )
+        request.email?.let {
+            if (invitationService.hasRecentInvitation(it, projectId)) {
+                return InviteResult(false, "Слишком много приглашений, попробуйте позже")
+            }
         }
 
-        // TODO: не отправлять нотификацию и апдейтить текущую или отправлять одну такую же
-        val inviteCode = invitationService.generateInvitation(projectId, request.email, request.role)
-        invitationService.sendInvitationEmail(request.email, inviteCode, project.name)
-
-        auditLogService.logAction(userId, "Приглашен ${request.email} в проект $projectId")
-
-        // Отправляем уведомление
-        notificationService.sendNotification(
-            userId = user.id,
-            type = NotificationType.PROJECT_INVITE,
-            message = "Вас пригласили в проект \"${project.name}\"!. Для того, чтобы присоединиться к проекту, зайдите в вашу почту ${user.email} и поищите код приглашения.",
-            projectId = projectId
+        // Генерим код и сохраняем приглашение в БД
+        val inviteCode = invitationService.generateInvitation(
+            projectId = projectId,
+            email = if (request.type == InviteParticipantRequest.InvitationType.MANUAL) request.email else null,
+            role = request.role
         )
 
-        return InviteResult(
-            success = true,
-            message = "Приглашение отправлено"
-        )
+        auditLogService.logAction(userId, "Создано приглашение $inviteCode для проекта $projectId")
+        if (request.type == InviteParticipantRequest.InvitationType.MANUAL) {
+            val user = UserRepository().getUserByEmail(request.email!!)
+                ?: throw AppException.NotFound.User("Пользователь не найден")
+
+            notificationService.sendNotification(
+                userId = user.id,
+                type = NotificationType.PROJECT_INVITE,
+                message = "Вас пригласили в проект \"${project.name}\"!. Для того, чтобы присоединиться к проекту, зайдите в вашу почту ${user.email} и поищите код приглашения.",
+                projectId = projectId
+            )
+
+            invitationService.sendInvitationEmail(request.email, inviteCode, project.name)
+            return InviteResult(true, "Приглашение отправлено на почту ${request.email}")
+        } else {
+            // QR-тип — возвращаем Base64-строку PNG-изображения
+            val qrBase64 = invitationService.generateQrCodeBase64(inviteCode)
+            return InviteResult(
+                success = true,
+                message = "Сгенерирован QR-код для приглашения",
+                qrCodeBase64 = qrBase64,
+                inviteCode = inviteCode
+            )
+        }
     }
 
     /**

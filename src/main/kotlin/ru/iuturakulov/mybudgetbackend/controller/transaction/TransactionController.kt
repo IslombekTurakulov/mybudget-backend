@@ -56,7 +56,7 @@ class TransactionController(
 
         // обновляем проект за один вызов
         projectRepository.updateProjectAmounts(
-            projectId = project.id!!,
+            projectId = project.id,
             amountSpent = (project.amountSpent + spentDelta).toBigDecimal(),
             budgetLimit = (project.budgetLimit + limitDelta).toBigDecimal()
         )
@@ -162,6 +162,7 @@ class TransactionController(
         }
         val newSpent = project.amountSpent + spentDelta
         val newLimit = project.budgetLimit + limitDelta
+
         if (newSpent > newLimit) {
             throw AppException.InvalidProperty.Transaction("Сумма расходов превышает бюджет")
         }
