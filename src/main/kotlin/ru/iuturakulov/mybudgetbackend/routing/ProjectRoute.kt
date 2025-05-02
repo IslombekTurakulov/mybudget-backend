@@ -44,18 +44,22 @@ fun Route.projectRoute(projectController: ProjectController, auditLogService: Au
                 request { pathParameter<String>("inviteCode") { description = "Код приглашения" } }
                 apiResponse()
             }) {
-                val userId = call.principal<JwtTokenBody>()?.userId ?: return@post call.respondUnauthorized()
-                val inviteCode =
-                    call.parameters["inviteCode"] ?: return@post call.respondBadRequest("Invitation code is required")
+               try {
+                   val userId = call.principal<JwtTokenBody>()?.userId ?: return@post call.respondUnauthorized()
+                   val inviteCode =
+                       call.parameters["inviteCode"] ?: return@post call.respondBadRequest("Invitation code is required")
 
-                projectController.acceptInvitation(userId, inviteCode).let { result ->
-                    if (result) {
-                        auditLogService.logAction(userId, "Accepted invite to project: $inviteCode")
-                        call.respond(HttpStatusCode.OK, "Приглашение принято")
-                    } else {
-                        call.respond(HttpStatusCode.BadRequest, "Ошибка принятия приглашения")
-                    }
-                }
+                   projectController.acceptInvitation(userId, inviteCode).let { result ->
+                       if (result) {
+                           auditLogService.logAction(userId, "Accepted invite to project: $inviteCode")
+                           call.respond(HttpStatusCode.OK, "Приглашение принято")
+                       } else {
+                           call.respond(HttpStatusCode.BadRequest, "Ошибка принятия приглашения")
+                       }
+                   }
+               } catch (e: Exception) {
+                   call.respond(HttpStatusCode.InternalServerError, e.localizedMessage)
+               }
             }
 
             delete( "{projectId}/participants/{participantId}", {

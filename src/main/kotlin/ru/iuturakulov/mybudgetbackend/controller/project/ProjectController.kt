@@ -48,8 +48,12 @@ class ProjectController(
      * Получить список проектов пользователя
      */
     fun getUserProjects(userId: String): List<ProjectEntity> {
-        return projectRepository.getProjectsByUser(userId).sortedBy { project ->
-            project.createdAt
+        return projectRepository.getProjectsByUser(userId).map { project ->
+            if (project.ownerId == userId) {
+                project.copy(ownerName = "Вы")
+            } else {
+                project
+            }
         }
     }
 
@@ -455,7 +459,7 @@ class ProjectController(
             notificationService.sendNotification(
                 userId = participantId,
                 type = NotificationType.SYSTEM_ALERT,
-                message = "Вы были удалены из проекта $projectId",
+                message = "Вы были удалены из проекта \"${project.name}\"",
                 projectId = projectId
             )
         }
