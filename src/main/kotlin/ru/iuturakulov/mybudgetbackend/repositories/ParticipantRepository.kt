@@ -27,6 +27,13 @@ class ParticipantRepository {
         return@transaction participants.map { ParticipantTable.fromRow(it) }.firstOrNull()
     }
 
+    fun getParticipantByEmailAndProjectId(email: String, projectId: String): ParticipantEntity? = transaction {
+        val participants = ParticipantTable.selectAll().where {
+            (ParticipantTable.email eq email) and (ParticipantTable.projectId eq projectId)
+        }
+        return@transaction participants.map { ParticipantTable.fromRow(it) }.firstOrNull()
+    }
+
     fun getProjectOwnerId(projectId: String) = transaction {
         ParticipantTable.selectAll().where {
             (ParticipantTable.projectId eq projectId) and (ParticipantTable.role eq UserRole.OWNER)

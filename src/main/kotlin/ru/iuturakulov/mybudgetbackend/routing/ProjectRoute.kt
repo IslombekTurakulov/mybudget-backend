@@ -51,12 +51,13 @@ fun Route.projectRoute(projectController: ProjectController, auditLogService: Au
 
                    projectController.acceptInvitation(userId, inviteCode).let { result ->
                        if (result) {
-                           auditLogService.logAction(userId, "Accepted invite to project: $inviteCode")
                            call.respond(HttpStatusCode.OK, "Приглашение принято")
                        } else {
                            call.respond(HttpStatusCode.BadRequest, "Ошибка принятия приглашения")
                        }
                    }
+               } catch (e: AppException.AlreadyExists.User) {
+                   call.respond(HttpStatusCode.Accepted, e.localizedMessage)
                } catch (e: Exception) {
                    call.respond(HttpStatusCode.InternalServerError, e.localizedMessage)
                }

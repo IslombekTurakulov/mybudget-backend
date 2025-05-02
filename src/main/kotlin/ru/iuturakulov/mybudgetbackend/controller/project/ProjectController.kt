@@ -285,6 +285,12 @@ class ProjectController(
             }
         }
 
+        val participant = request.email?.let { participantRepository.getParticipantByEmailAndProjectId(it, projectId) }
+
+        if (participant != null) {
+            return InviteResult(true, "Пользователь \"${participant.name}, ${participant.email}\" уже существует в проекте!")
+        }
+
         // Генерим код и сохраняем приглашение в БД
         val inviteCode = invitationService.generateInvitation(
             projectId = projectId,
@@ -334,6 +340,12 @@ class ProjectController(
 
             val user = UserRepository().getUserById(userId)
                 ?: throw AppException.NotFound.User("Пользователь не найден")
+
+            val participantRequest = participantRepository.getParticipantByUserAndProjectId(userId, invitation.projectId)
+
+            if (participantRequest != null) {
+                throw AppException.AlreadyExists.User("Пользователь уже в проекте")
+            }
 
             // Добавляем участника в проект
             participantRepository.addParticipant(
