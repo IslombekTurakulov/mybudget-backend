@@ -45,7 +45,9 @@ class AnalyticsController(
             .filter { tx ->
                 (filter?.fromDate?.let { tx.date >= it } ?: true) &&
                         (filter?.toDate?.let { tx.date <= it } ?: true) &&
-                        (filter?.categories?.let { it.isEmpty() || it.contains(tx.category) } ?: true)
+                        (filter?.categories?.map {
+                            if (it.equals("Без категории", ignoreCase = true) || it.equals("No category", ignoreCase = true)) "" else it
+                        }?.let { it.isEmpty() || it.contains(tx.category) } ?: true)
             }
             .takeIf { it.isNotEmpty() }
             ?: return OverviewAnalyticsDto(

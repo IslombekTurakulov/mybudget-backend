@@ -99,6 +99,7 @@ class TransactionRepository {
 
         // категории
         filter?.categories
+            ?.map { if (it == "Без категории" || it == "No category") "" else it }
             .takeIf { it?.isNotEmpty() == true }
             ?.let { cats ->
                 transactions = transactions.andWhere { TransactionsTable.category inList cats!! }
