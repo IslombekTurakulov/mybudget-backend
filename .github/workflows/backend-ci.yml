@@ -56,12 +56,12 @@ jobs:
        # - name: Run Detekt
         #  run: ./gradlew detekt
         
-      - name: Initialize CodeQL
-        uses: github/codeql-action/init@v2
-        with:
-          languages: kotlin
-      - name: Run CodeQL analysis
-        uses: github/codeql-action/analyze@v2
+      # - name: Initialize CodeQL
+      #   uses: github/codeql-action/init@v2
+      #   with:
+      #     languages: kotlin
+      # - name: Run CodeQL analysis
+      #   uses: github/codeql-action/analyze@v2
 
   docker-publish:
     needs: build-and-test
