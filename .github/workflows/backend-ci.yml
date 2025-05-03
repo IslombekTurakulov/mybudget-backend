@@ -8,32 +8,35 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres:15
-        env:
-          POSTGRES_USER: ${{ secrets.PG_USER }}
-          POSTGRES_PASSWORD: ${{ secrets.PG_PASSWORD }}
-          POSTGRES_DB: ${{ secrets.PG_DATABASE }}
-        ports:
-          - 5433:5432
-        options: >-
-          --health-cmd "pg_isready -U ${{ secrets.PG_USER }} -d ${{ secrets.PG_DATABASE }} -p 5432"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
     env:
-      DATA_SOURCE_CLASS_NAME: org.postgresql.ds.PGSimpleDataSource
-      DATA_SOURCE_USER: ${{ secrets.PG_USER }}
-      DATA_SOURCE_PASSWORD: ${{ secrets.PG_PASSWORD }}
-      DATA_SOURCE_DATABASE: ${{ secrets.PG_DATABASE }}
-      DATA_SOURCE_SERVER: ${{ secrets.PG_HOST }}
-      DATA_SOURCE_PORT: ${{ secrets.PG_PORT }}
-
+      PG_USER:       ${{ secrets.PG_USER }}
+      PG_PASSWORD:   ${{ secrets.PG_PASSWORD }}
+      PG_DATABASE:   ${{ secrets.PG_DATABASE }}
+      PG_PORT:       ${{ secrets.PG_PORT }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Pull Postgres image
+        run: docker pull postgres:17
+
+      - name: Start Postgres container
+        run: |
+          docker run -d --name pg \
+            -e POSTGRES_USER="$PG_USER" \
+            -e POSTGRES_PASSWORD="$PG_PASSWORD" \
+            -e POSTGRES_DB="$PG_DATABASE" \
+            -p "$PG_PORT:5432" \
+            postgres:17
+
+      - name: Wait for Postgres
+        run: |
+          for i in {1..30}; do
+            pg_isready -h localhost -p "$PG_PORT" -U "$PG_USER" && exit 0
+            sleep 1
+          done
+          echo "Postgres did not start in time" >&2
+          exit 1
 
       # 2. Set up JDK 17
       - name: Set up JDK 17
