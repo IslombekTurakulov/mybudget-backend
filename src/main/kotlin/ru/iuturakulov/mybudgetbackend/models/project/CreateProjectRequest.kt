@@ -16,7 +16,7 @@ data class CreateProjectRequest(
         validate(this) {
             validate(CreateProjectRequest::name).isNotBlank().hasSize(1, 64)
             if (description.isNotBlank()) {
-                validate(CreateProjectRequest::description).hasSize(1, 255)
+                validate(CreateProjectRequest::description).hasSize(1, 1000)
             }
             validate(CreateProjectRequest::budgetLimit).isGreaterThan(0.0)
         }

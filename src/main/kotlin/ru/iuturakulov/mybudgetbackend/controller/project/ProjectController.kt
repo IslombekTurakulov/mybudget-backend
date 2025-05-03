@@ -1,21 +1,17 @@
 package ru.iuturakulov.mybudgetbackend.controller.project
 
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
-import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.update
 import ru.iuturakulov.mybudgetbackend.controller.user.DateTimeProvider
 import ru.iuturakulov.mybudgetbackend.controller.user.SystemDateTimeProvider
-import ru.iuturakulov.mybudgetbackend.entities.notification.NotificationTable
 import ru.iuturakulov.mybudgetbackend.entities.notification.NotificationType
 import ru.iuturakulov.mybudgetbackend.entities.participants.ParticipantEntity
 import ru.iuturakulov.mybudgetbackend.entities.participants.ParticipantTable
 import ru.iuturakulov.mybudgetbackend.entities.projects.ProjectEntity
 import ru.iuturakulov.mybudgetbackend.entities.projects.ProjectStatus
 import ru.iuturakulov.mybudgetbackend.entities.projects.ProjectsTable
-import ru.iuturakulov.mybudgetbackend.entities.transaction.TransactionsTable
 import ru.iuturakulov.mybudgetbackend.entities.user.UserTable
 import ru.iuturakulov.mybudgetbackend.extensions.AccessControl
 import ru.iuturakulov.mybudgetbackend.extensions.AppException
@@ -168,7 +164,7 @@ class ProjectController(
     /**
      * Архивировать проект (только владелец)
      */
-    fun archiveProject(userId: String, projectId: String) = transaction {
+    fun archiveProject(userId: String, projectId: String, request: UpdateProjectRequest) = transaction {
         val project = (ProjectsTable innerJoin UserTable).selectAll().where { ProjectsTable.id eq projectId }
             .map { ProjectEntity.fromRow(it) }
             .singleOrNull() ?: throw AppException.NotFound.Project("Проект не найден")
@@ -180,6 +176,8 @@ class ProjectController(
         ProjectsTable.update({ ProjectsTable.id eq projectId }) {
             it[status] = ProjectStatus.ARCHIVED
         }
+
+        projectRepository.updateProject(projectId, request)
 
         auditLogService.logAction(userId, "Архивировал проект: $projectId")
 

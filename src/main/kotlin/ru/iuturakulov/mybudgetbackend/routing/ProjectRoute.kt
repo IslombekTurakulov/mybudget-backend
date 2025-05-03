@@ -11,7 +11,6 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import ru.iuturakulov.mybudgetbackend.controller.project.ProjectController
 import ru.iuturakulov.mybudgetbackend.entities.projects.ProjectStatus
-import ru.iuturakulov.mybudgetbackend.extensions.ApiResponseState
 import ru.iuturakulov.mybudgetbackend.extensions.AppException
 import ru.iuturakulov.mybudgetbackend.extensions.AuditLogService
 import ru.iuturakulov.mybudgetbackend.extensions.RoutingExtensions.apiResponse
@@ -170,8 +169,9 @@ fun Route.projectRoute(projectController: ProjectController, auditLogService: Au
                 val requestBody = call.receive<UpdateProjectRequest>()
 
                 try {
+                    requestBody.validation()
                     val updatedProject = if (requestBody.status == ProjectStatus.ARCHIVED) {
-                        projectController.archiveProject(userId, projectId)
+                        projectController.archiveProject(userId, projectId, requestBody)
                     } else {
                         projectController.updateProject(userId, projectId, requestBody)
                     }
