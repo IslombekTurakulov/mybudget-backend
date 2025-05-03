@@ -1,11 +1,9 @@
-# .github/workflows/backend-ci.yml
 name: Backend CI/CD
 
 on:
   push:
-    branches: [ main, develop ]
-  pull_request:
-    branches: [ main, develop ]
+    branches: [main]            # собираем при пушах в main
+  workflow_dispatch:            # и вручную
 
 jobs:
   build-and-test:
