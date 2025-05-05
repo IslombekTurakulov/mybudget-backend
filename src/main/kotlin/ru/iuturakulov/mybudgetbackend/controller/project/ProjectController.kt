@@ -16,18 +16,21 @@ import ru.iuturakulov.mybudgetbackend.entities.user.UserTable
 import ru.iuturakulov.mybudgetbackend.extensions.AccessControl
 import ru.iuturakulov.mybudgetbackend.extensions.AppException
 import ru.iuturakulov.mybudgetbackend.extensions.AuditLogService
-import ru.iuturakulov.mybudgetbackend.extensions.BudgetUtils.maybeNotifyLimit
 import ru.iuturakulov.mybudgetbackend.models.InviteResult
 import ru.iuturakulov.mybudgetbackend.models.UserRole
 import ru.iuturakulov.mybudgetbackend.models.project.ChangeRoleRequest
 import ru.iuturakulov.mybudgetbackend.models.project.CreateProjectRequest
+import ru.iuturakulov.mybudgetbackend.models.fcm.InvitationPreferencesRequest
+import ru.iuturakulov.mybudgetbackend.models.fcm.InvitationPreferencesResponse
+import ru.iuturakulov.mybudgetbackend.models.fcm.NotificationContext
 import ru.iuturakulov.mybudgetbackend.models.project.InviteParticipantRequest
 import ru.iuturakulov.mybudgetbackend.models.project.UpdateProjectRequest
+import ru.iuturakulov.mybudgetbackend.repositories.FCMNotificationTableRepository
 import ru.iuturakulov.mybudgetbackend.repositories.ParticipantRepository
 import ru.iuturakulov.mybudgetbackend.repositories.ProjectRepository
 import ru.iuturakulov.mybudgetbackend.repositories.UserRepository
 import ru.iuturakulov.mybudgetbackend.services.InvitationService
-import ru.iuturakulov.mybudgetbackend.services.NotificationService
+import ru.iuturakulov.mybudgetbackend.services.NotificationManager
 import java.util.*
 
 class ProjectController(
@@ -35,8 +38,9 @@ class ProjectController(
     private val participantRepository: ParticipantRepository,
     private val accessControl: AccessControl,
     private val invitationService: InvitationService,
-    private val notificationService: NotificationService,
+    private val fcmNotificationTableRepository: FCMNotificationTableRepository,
     private val auditLogService: AuditLogService,
+    private val notificationManager: NotificationManager,
     private val clock: DateTimeProvider = SystemDateTimeProvider()
 ) {
 
@@ -145,16 +149,6 @@ class ProjectController(
 
         val updated = projectRepository.updateProject(projectId, request)
 
-        // оповещение при достижении 90%
-        request.budgetLimit?.let {
-            maybeNotifyLimit(
-                project = updated,
-                amountSpent = updated.amountSpent,
-                participantRepo = participantRepository,
-                notificationService = notificationService
-            )
-        }
-
         auditLogService.logAction(userId, "Обновил проект $projectId")
         updated
     }
@@ -173,6 +167,9 @@ class ProjectController(
             throw AppException.Authorization("Только владелец может архивировать проект")
         }
 
+        val owner = participantRepository.getParticipantByUserAndProjectId(userId, projectId)
+            ?: throw AppException.NotFound.User("Владелец не найден")
+
         ProjectsTable.update({ ProjectsTable.id eq projectId }) {
             it[status] = ProjectStatus.ARCHIVED
         }
@@ -181,17 +178,16 @@ class ProjectController(
 
         auditLogService.logAction(userId, "Архивировал проект: $projectId")
 
-        val participants = ParticipantTable.selectAll().where { ParticipantTable.projectId eq projectId }
-            .mapNotNull { it[ParticipantTable.userId] }
-
-        participants.forEach { participantId ->
-            notificationService.sendNotification(
-                userId = participantId,
-                type = NotificationType.SYSTEM_ALERT,
-                message = "Проект \"${project.name}\" был архивирован владельцем",
-                projectId = projectId
+        notificationManager.sendNotification(
+            type = NotificationType.PARTICIPANT_ROLE_CHANGE,
+            ctx = NotificationContext(
+                actor = owner.name,
+                actorId = owner.userId,
+                projectId = project.id,
+                projectName = project.name
             )
-        }
+        )
+
         project.copy(
             status = ProjectStatus.ARCHIVED
         )
@@ -206,23 +202,25 @@ class ProjectController(
             throw AppException.Authorization("Только владелец может разархивировать проект")
         }
 
+        val owner = participantRepository.getParticipantByUserAndProjectId(userId, projectId)
+            ?: throw AppException.NotFound.User("Владелец не найден")
+
         ProjectsTable.update({ ProjectsTable.id eq projectId }) {
             it[status] = ProjectStatus.ACTIVE
         }
 
         auditLogService.logAction(userId, "Зарархивировал проект: $projectId")
 
-        val participants = ParticipantTable.selectAll().where { ParticipantTable.projectId eq projectId }
-            .mapNotNull { it[ParticipantTable.userId] }
-
-        participants.forEach { participantId ->
-            notificationService.sendNotification(
-                userId = participantId,
-                type = NotificationType.SYSTEM_ALERT,
-                message = "Проект \"${project.name}\" был разархивирован владельцем",
-                projectId = projectId
+        notificationManager.sendNotification(
+            type = NotificationType.PROJECT_ARCHIVED,
+            ctx = NotificationContext(
+                actor = owner.name,
+                actorId = owner.userId,
+                projectId = project.id,
+                projectName = project.name
             )
-        }
+        )
+
         project.copy(
             status = ProjectStatus.ACTIVE
         )
@@ -236,6 +234,9 @@ class ProjectController(
             .map { ProjectEntity.fromRow(it) }
             .singleOrNull() ?: throw AppException.NotFound.Project("Проект не найден")
 
+        val participant = participantRepository.getParticipantByUserAndProjectId(userId, projectId)
+            ?: throw AppException.NotFound.User("Участник не найден")
+
         if (project.ownerId != userId) {
             throw AppException.Authorization("Только владелец может удалить проект")
         }
@@ -246,16 +247,15 @@ class ProjectController(
 
         auditLogService.logAction(userId, "Удалил проект: $projectId")
 
-        val participants = ParticipantTable.selectAll().where { ParticipantTable.projectId eq projectId }
-            .mapNotNull { it[ParticipantTable.userId] }
-        participants.forEach { participantId ->
-            notificationService.sendNotification(
-                userId = participantId,
-                type = NotificationType.SYSTEM_ALERT,
-                message = "Проект \"${project.name}\" был удален владельцем",
-                projectId = projectId
+        notificationManager.sendNotification(
+            type = NotificationType.PROJECT_REMOVED,
+            ctx = NotificationContext(
+                actor = participant.name,
+                actorId = participant.userId,
+                projectId = project.id,
+                projectName = project.name
             )
-        }
+        )
     }
 
 
@@ -301,11 +301,15 @@ class ProjectController(
             val user = UserRepository().getUserByEmail(request.email!!)
                 ?: throw AppException.NotFound.User("Пользователь не найден")
 
-            notificationService.sendNotification(
-                userId = user.id,
-                type = NotificationType.PROJECT_INVITE,
-                message = "Вас пригласили в проект \"${project.name}\"!. Для того, чтобы присоединиться к проекту, зайдите в вашу почту ${user.email} и поищите код приглашения.",
-                projectId = projectId
+            notificationManager.sendNotification(
+                type = NotificationType.PROJECT_INVITE_SEND,
+                ctx = NotificationContext(
+                    actor = inviter.name,
+                    actorId = inviter.id,
+                    projectId = project.id,
+                    projectName = project.name
+                ),
+                recipients = listOf(user.id)
             )
 
             invitationService.sendInvitationEmail(request.email, inviteCode, project.name)
@@ -366,11 +370,15 @@ class ProjectController(
             val project = projectRepository.getProjectById(invitation.projectId)
                 ?: throw AppException.NotFound.Project("Проект не найден")
 
-            notificationService.sendNotification(
-                userId = project.ownerId,
-                type = NotificationType.PROJECT_INVITE,
-                message = "Пользователь ${user.email} принял приглашение в проект \"${project.name}\"",
-                projectId = invitation.projectId
+            notificationManager.sendNotification(
+                type = NotificationType.PROJECT_INVITE_ACCEPT,
+                ctx = NotificationContext(
+                    actor = user.name,
+                    actorId = user.id,
+                    projectId = project.id,
+                    projectName = project.name
+                ),
+                recipients = listOf(project.ownerId)
             )
             return@transaction true
         }
@@ -387,6 +395,9 @@ class ProjectController(
                 throw AppException.Authorization("Только владелец может изменять роли участников")
             }
 
+            val owner = participantRepository.getParticipantByUserAndProjectId(userId, projectId)
+                ?: throw AppException.NotFound.User("Владелец не найден")
+
             // Находим участника
             val participant = participantRepository.getParticipantByUserAndProjectId(request.userId, projectId)
                 ?: throw AppException.NotFound.User("Участник не найден")
@@ -401,11 +412,15 @@ class ProjectController(
                 action = "Изменена роль пользователя ${request.userId} на ${request.role} в проекте $projectId"
             )
 
-            notificationService.sendNotification(
-                userId = request.userId,
-                type = NotificationType.ROLE_CHANGE,
-                message = "Ваша роль в проекте \"${project.name}\" изменена на ${request.role}",
-                projectId = projectId
+            notificationManager.sendNotification(
+                type = NotificationType.PARTICIPANT_ROLE_CHANGE,
+                ctx = NotificationContext(
+                    actor = owner.name,
+                    actorId = owner.userId,
+                    projectId = project.id,
+                    projectName = project.name
+                ),
+                recipients = listOf(request.userId)
             )
             return@transaction true
         }
@@ -462,15 +477,51 @@ class ProjectController(
                 throw AppException.Authorization("Вы не можете удалить этого участника")
             }
 
+            val owner = participantRepository.getParticipantByUserAndProjectId(userId, projectId)
+                ?: throw AppException.NotFound.User("Владелец не найден")
+
             participantRepository.removeParticipant(participantId = participantId, projectId = projectId)
 
             auditLogService.logAction(userId, "Удален участник $participantId из проекта $projectId")
 
-            notificationService.sendNotification(
-                userId = participantId,
-                type = NotificationType.SYSTEM_ALERT,
-                message = "Вы были удалены из проекта \"${project.name}\"",
-                projectId = projectId
+            notificationManager.sendNotification(
+                type = NotificationType.PARTICIPANT_REMOVED,
+                ctx = NotificationContext(
+                    actor = owner.name,
+                    actorId = owner.userId,
+                    projectId = project.id,
+                    projectName = project.name
+                ),
+                recipients = listOf(participantId)
+            )
+        }
+    }
+
+    fun getNotificationPreferencesParticipant(userId: String, projectId: String): InvitationPreferencesResponse {
+        return transaction {
+            val project = projectRepository.getProjectById(projectId)
+                ?: throw AppException.NotFound.Project()
+
+            val participant = participantRepository.getParticipantByUserAndProjectId(userId, projectId)
+                ?: throw AppException.NotFound.User("Участник не найден")
+
+            val types = fcmNotificationTableRepository.find(userId, projectId)
+            InvitationPreferencesResponse(types)
+        }
+    }
+
+    fun setNotificationPreferencesToParticipant(userId: String, projectId: String, request: InvitationPreferencesRequest) {
+        return transaction {
+            val project = projectRepository.getProjectById(projectId)
+                ?: throw AppException.NotFound.Project()
+
+            val participant = participantRepository.getParticipantByUserAndProjectId(userId, projectId)
+                ?: throw AppException.NotFound.User("Участник не найден")
+
+            fcmNotificationTableRepository.upsert(
+                userId = userId,
+                projectId = projectId,
+                types = request.types
             )
         }
     }

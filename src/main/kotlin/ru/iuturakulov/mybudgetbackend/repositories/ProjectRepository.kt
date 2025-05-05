@@ -32,6 +32,16 @@ class ProjectRepository(
             ?.let { ProjectsTable.fromRow(it) }
     }
 
+    fun getUserRoleInProject(userId: String, projectId: String): UserRole? {
+        return ParticipantTable
+            .selectAll().where {
+                (ParticipantTable.projectId eq projectId) and
+                        (ParticipantTable.userId eq userId)
+            }
+            .map { it[ParticipantTable.role] }
+            .firstOrNull()
+    }
+
     /**
      * Получить проекты, в которых участвует пользователь (включая данные владельца)
      */

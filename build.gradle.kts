@@ -70,6 +70,15 @@ dependencies {
     implementation("com.google.zxing:javase:3.5.1")
 
     implementation("org.jfree:jfreechart:1.5.0")
+
+    // firebase cloud messaging
+    // Google Auth for FCM
+    implementation("com.google.auth:google-auth-library-oauth2-http:1.23.0")
+
+    // Ktor HTTP client for FCM
+    implementation("io.ktor:ktor-client-core:2.3.4")
+    implementation("io.ktor:ktor-client-cio:2.3.4")
+    implementation("io.ktor:ktor-client-content-negotiation:2.3.4")
 }
 kotlin {
     jvmToolchain {

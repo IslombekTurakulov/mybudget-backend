@@ -10,7 +10,9 @@ import ru.iuturakulov.mybudgetbackend.controller.settings.SettingsController
 import ru.iuturakulov.mybudgetbackend.controller.transaction.TransactionController
 import ru.iuturakulov.mybudgetbackend.controller.user.UserController
 import ru.iuturakulov.mybudgetbackend.extensions.AuditLogService
+import ru.iuturakulov.mybudgetbackend.repositories.DeviceTokenRepository
 import ru.iuturakulov.mybudgetbackend.routing.analyticsRoute
+import ru.iuturakulov.mybudgetbackend.routing.deviceTokensRoute
 import ru.iuturakulov.mybudgetbackend.routing.notificationRoute
 import ru.iuturakulov.mybudgetbackend.routing.pingRoute
 import ru.iuturakulov.mybudgetbackend.routing.projectRoute
@@ -26,6 +28,7 @@ fun Application.configureRoutes() {
     val analyticsController: AnalyticsController by inject()
     val settingsController: SettingsController by inject()
     val auditLogService: AuditLogService by inject()
+    val deviceTokenRepository: DeviceTokenRepository by inject()
 
     routing {
         pingRoute()
@@ -35,5 +38,6 @@ fun Application.configureRoutes() {
         notificationRoute(notificationController = notificationController)
         analyticsRoute(analyticsController = analyticsController)
         settingsRoute(settingsController = settingsController)
+        deviceTokensRoute(deviceTokenRepository = deviceTokenRepository)
     }
 }

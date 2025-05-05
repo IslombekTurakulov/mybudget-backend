@@ -10,7 +10,9 @@ import org.jetbrains.exposed.sql.StdOutSqlLogger
 import org.jetbrains.exposed.sql.addLogger
 import org.jetbrains.exposed.sql.transactions.transaction
 import ru.iuturakulov.mybudgetbackend.entities.audit.AuditLogTable
+import ru.iuturakulov.mybudgetbackend.entities.fcm.DeviceTokens
 import ru.iuturakulov.mybudgetbackend.entities.invitation.InvitationTable
+import ru.iuturakulov.mybudgetbackend.entities.notification.FCMNotificationTable
 import ru.iuturakulov.mybudgetbackend.entities.notification.NotificationTable
 import ru.iuturakulov.mybudgetbackend.entities.participants.ParticipantTable
 import ru.iuturakulov.mybudgetbackend.entities.projects.ProjectsTable
@@ -27,6 +29,8 @@ fun configureDatabase() {
         create(TransactionsTable)
         create(ParticipantTable)
         create(NotificationTable)
+        create(DeviceTokens)
+        create(FCMNotificationTable)
         create(InvitationTable)
         create(AuditLogTable)
     }

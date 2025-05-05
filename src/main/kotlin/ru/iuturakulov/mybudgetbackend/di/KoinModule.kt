@@ -1,5 +1,7 @@
 package ru.iuturakulov.mybudgetbackend.di
 
+import com.typesafe.config.ConfigFactory
+import io.ktor.server.config.HoconApplicationConfig
 import org.koin.dsl.module
 import ru.iuturakulov.mybudgetbackend.controller.analytics.AnalyticsController
 import ru.iuturakulov.mybudgetbackend.controller.notification.NotificationController
@@ -11,6 +13,8 @@ import ru.iuturakulov.mybudgetbackend.extensions.AccessControl
 import ru.iuturakulov.mybudgetbackend.extensions.AuditLogService
 import ru.iuturakulov.mybudgetbackend.repositories.AnalyticsRepository
 import ru.iuturakulov.mybudgetbackend.repositories.AuditLogRepository
+import ru.iuturakulov.mybudgetbackend.repositories.DeviceTokenRepository
+import ru.iuturakulov.mybudgetbackend.repositories.FCMNotificationTableRepository
 import ru.iuturakulov.mybudgetbackend.repositories.NotificationRepository
 import ru.iuturakulov.mybudgetbackend.repositories.ParticipantRepository
 import ru.iuturakulov.mybudgetbackend.repositories.ProjectRepository
@@ -18,8 +22,11 @@ import ru.iuturakulov.mybudgetbackend.repositories.SettingsRepository
 import ru.iuturakulov.mybudgetbackend.repositories.TransactionRepository
 import ru.iuturakulov.mybudgetbackend.repositories.UserRepository
 import ru.iuturakulov.mybudgetbackend.services.EmailService
+import ru.iuturakulov.mybudgetbackend.services.FcmService
 import ru.iuturakulov.mybudgetbackend.services.InvitationService
-import ru.iuturakulov.mybudgetbackend.services.NotificationService
+import ru.iuturakulov.mybudgetbackend.services.NotificationGuard
+import ru.iuturakulov.mybudgetbackend.services.NotificationManager
+import ru.iuturakulov.mybudgetbackend.services.OverallNotificationService
 
 val repositoryModule = module {
     single { UserRepository() }
@@ -30,14 +37,39 @@ val repositoryModule = module {
     single { AuditLogRepository() }
     single { AnalyticsRepository() }
     single { SettingsRepository() }
+    single { FCMNotificationTableRepository() }
+    single { DeviceTokenRepository() }
 }
 
 val serviceModule = module {
-    single { NotificationService(get()) }
+    single { OverallNotificationService(get()) }
     single { AuditLogService(get()) }
     single { InvitationService() }
     single { EmailService() }
     single { AccessControl() }
+
+    single<FcmService> {
+        val env = HoconApplicationConfig(ConfigFactory.load("application.conf"))
+        val serviceAccountPath = env.property("ktor.firebase.serviceAccountPath").getString()
+        val projectId = env.property("ktor.firebase.projectId").getString()
+        FcmService(serviceAccountPath, projectId)
+    }
+
+    single {
+        NotificationGuard(
+            deviceRepo = get(),
+            projectRepo = get()
+        )
+    }
+
+    single {
+        NotificationManager(
+            deviceRepo = get(),
+            fcm = get(),
+            overallNotificationService = get(),
+            notificationGuard = get()
+        )
+    }
 }
 
 val controllerModule = module {
@@ -53,11 +85,14 @@ val controllerModule = module {
             participantRepository = get(),
             accessControl = get(),
             invitationService = get(),
-            notificationService = get(),
-            auditLogService = get()
+            fcmNotificationTableRepository = get(),
+            auditLogService = get(),
+            notificationManager = get(),
         )
     }
-    single { NotificationController(notificationService = get()) }
+
+    single { NotificationController(overallNotificationService = get()) }
+
     single {
         TransactionController(
             transactionRepository = get(),
@@ -65,9 +100,10 @@ val controllerModule = module {
             participantRepository = get(),
             accessControl = get(),
             auditLog = get(),
-            notificationService = get()
+            notificationManager = get()
         )
     }
+
     single {
         AnalyticsController(
             analyticsRepository = get(),
@@ -77,6 +113,7 @@ val controllerModule = module {
             emailService = get()
         )
     }
+
     single { SettingsController(settingsRepository = get()) }
 }
 

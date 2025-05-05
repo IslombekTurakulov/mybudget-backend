@@ -5,7 +5,7 @@ import ru.iuturakulov.mybudgetbackend.entities.notification.NotificationType
 import ru.iuturakulov.mybudgetbackend.repositories.NotificationRepository
 import java.util.*
 
-class NotificationService(private val notificationRepository: NotificationRepository) {
+class OverallNotificationService(private val notificationRepository: NotificationRepository) {
 
     fun sendNotification(userId: String, type: NotificationType, message: String, projectId: String? = null) {
         val notification = NotificationEntity(

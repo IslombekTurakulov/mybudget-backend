@@ -45,6 +45,7 @@ object LoggingPlugin {
                 val duration = call.processingTimeMillis().milliseconds
                 val remoteHost = call.request.origin.remoteHost
                 val userAgent = call.request.headers["User-Agent"] ?: "unknown"
+                val language = call.request.headers["X-Language"]
                 val contentType = call.request.contentType()?.toString() ?: "none"
                 val contentLength = call.request.contentLength() ?: 0
                 val requestId = call.callId
@@ -58,6 +59,7 @@ object LoggingPlugin {
                     "status": ${status.value},
                     "method": "$method",
                     "path": "$path",
+                    "language": "$language"
                     "queryParams": "$queryParams",
                     "remoteHost": "$remoteHost",
                     "userAgent": "$userAgent",

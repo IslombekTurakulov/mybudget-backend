@@ -19,6 +19,7 @@ import ru.iuturakulov.mybudgetbackend.extensions.RoutingExtensions.respondUnauth
 import ru.iuturakulov.mybudgetbackend.models.project.ChangeRoleRequest
 import ru.iuturakulov.mybudgetbackend.models.project.CreateProjectRequest
 import ru.iuturakulov.mybudgetbackend.models.project.InviteParticipantRequest
+import ru.iuturakulov.mybudgetbackend.models.fcm.InvitationPreferencesRequest
 import ru.iuturakulov.mybudgetbackend.models.project.UpdateProjectRequest
 import ru.iuturakulov.mybudgetbackend.models.user.body.JwtTokenBody
 
@@ -289,6 +290,50 @@ fun Route.projectRoute(projectController: ProjectController, auditLogService: Au
                         HttpStatusCode.InternalServerError,
                         e.localizedMessage
                     )
+                }
+            }
+
+            get("{projectId}/notifications/preferences", {
+                tags("Projects", "Notifications")
+                protected = true
+                summary = "Отправка типов уведомлений которые выбрал пользователь"
+                request {
+                    pathParameter<String>("projectId") { description = "ID проекта" }
+                }
+                apiResponse()
+            }) {
+                val userId = call.principal<JwtTokenBody>()?.userId ?: return@get call.respondUnauthorized()
+                val projectId =
+                    call.parameters["projectId"] ?: return@get call.respondBadRequest("Project ID is required")
+
+                try {
+                    val types = projectController.getNotificationPreferencesParticipant(userId, projectId)
+                    call.respond(HttpStatusCode.OK, types)
+                } catch (e: Exception) {
+                    call.respond(HttpStatusCode.InternalServerError, e.localizedMessage)
+                }
+            }
+
+            post("{projectId}/notifications/preferences", {
+                tags("Projects", "Notifications")
+                protected = true
+                summary = "Включение типов уведомлений которые нужны пользователю"
+                request {
+                    pathParameter<String>("projectId") { description = "ID проекта" }
+                    body<InvitationPreferencesRequest>()
+                }
+                apiResponse()
+            }) {
+                val userId = call.principal<JwtTokenBody>()?.userId ?: return@post call.respondUnauthorized()
+                val projectId =
+                    call.parameters["projectId"] ?: return@post call.respondBadRequest("Project ID is required")
+                val requestBody = call.receive<InvitationPreferencesRequest>()
+
+                try {
+                    projectController.setNotificationPreferencesToParticipant(userId, projectId, requestBody)
+                    call.respond(HttpStatusCode.OK, "Успешно изменили уведомление в проекте")
+                } catch (e: Exception) {
+                    call.respond(HttpStatusCode.InternalServerError, e.localizedMessage)
                 }
             }
         }

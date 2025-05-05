@@ -8,12 +8,11 @@ import ru.iuturakulov.mybudgetbackend.entities.user.UserTable
 object NotificationTable : Table("notifications") {
     val id = varchar("id", 36)
     val userId = reference("user_id", UserTable.id)
-    val type = enumerationByName("type", 32, NotificationType::class)
+    val type = enumerationByName("type", 64, NotificationType::class)
     val message = text("message")
     val projectId = reference("project_id", ProjectsTable.id).nullable()
     val createdAt = long("created_at").default(System.currentTimeMillis())
     val isRead = bool("is_read").default(false)
-
 
     override val primaryKey = PrimaryKey(id)
 
