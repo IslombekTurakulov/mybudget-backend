@@ -14,18 +14,20 @@ object NotificationPermissions {
             NotificationType.TRANSACTION_REMOVED,
             NotificationType.BUDGET_THRESHOLD,
             NotificationType.PROJECT_EDITED,
+            NotificationType.PROJECT_REMOVED,
             NotificationType.PROJECT_ARCHIVED,
             NotificationType.PROJECT_UNARCHIVED,
             NotificationType.PARTICIPANT_ROLE_CHANGE,
         ),
 
         UserRole.VIEWER to setOf(
-            NotificationType.PROJECT_INVITE_SEND,
-            NotificationType.PROJECT_INVITE_ACCEPT,
+            NotificationType.TRANSACTION_ADDED,
+            NotificationType.BUDGET_THRESHOLD,
+            NotificationType.PROJECT_EDITED,
+            NotificationType.PROJECT_REMOVED,
             NotificationType.PROJECT_ARCHIVED,
             NotificationType.PROJECT_UNARCHIVED,
-            NotificationType.BUDGET_THRESHOLD,
-            NotificationType.SYSTEM_ALERT
+            NotificationType.SYSTEM_ALERT,
         )
     )
 

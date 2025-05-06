@@ -17,6 +17,7 @@ import ru.iuturakulov.mybudgetbackend.entities.notification.NotificationTable
 import ru.iuturakulov.mybudgetbackend.entities.participants.ParticipantTable
 import ru.iuturakulov.mybudgetbackend.entities.projects.ProjectsTable
 import ru.iuturakulov.mybudgetbackend.entities.transaction.TransactionsTable
+import ru.iuturakulov.mybudgetbackend.entities.user.EmailVerificationTable
 import ru.iuturakulov.mybudgetbackend.entities.user.UserTable
 import javax.sql.DataSource
 
@@ -33,6 +34,7 @@ fun configureDatabase() {
         create(FCMNotificationTable)
         create(InvitationTable)
         create(AuditLogTable)
+        create(EmailVerificationTable)
     }
 }
 

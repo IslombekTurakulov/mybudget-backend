@@ -10,12 +10,12 @@ import org.valiktor.validate
 @Serializable
 data class VerifyEmailRequest(
     val email: String,
-    val verificationCode: String,
+    val code: String,
 ) {
     fun validation() {
         validate(this) {
             validate(VerifyEmailRequest::email).isNotBlank().isEmail().hasSize(5, 128)
-            validate(VerifyEmailRequest::verificationCode).isNotBlank().isNotNull()
+            validate(VerifyEmailRequest::code).isNotBlank().isNotNull()
         }
     }
 }

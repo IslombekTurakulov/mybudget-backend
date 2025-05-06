@@ -132,8 +132,8 @@ class ProjectController(
             return@transaction unarchiveProject(userId, projectId)
         }
 
-        val participant = participantRepository
-            .getParticipantByUserAndProjectId(userId, projectId)
+        val participant = participantRepository.getParticipantByUserAndProjectId(userId, projectId)
+            ?: throw AppException.Authorization("Вы не участник проекта")
 
         if (!accessControl.canEditProject(userId, project, participant)) {
             throw AppException.Authorization("Вы не можете редактировать этот проект")
@@ -150,6 +150,16 @@ class ProjectController(
         val updated = projectRepository.updateProject(projectId, request)
 
         auditLogService.logAction(userId, "Обновил проект $projectId")
+
+        notificationManager.sendNotification(
+            type = NotificationType.PROJECT_EDITED,
+            ctx = NotificationContext(
+                actor = participant.name,
+                actorId = participant.userId,
+                projectId = project.id,
+                projectName = project.name
+            )
+        )
         updated
     }
 

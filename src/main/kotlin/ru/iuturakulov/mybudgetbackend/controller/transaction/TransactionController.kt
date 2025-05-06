@@ -107,12 +107,12 @@ class TransactionController(
     fun getTransactionById(userId: String, projectId: String, txId: String): TransactionEntity {
         val project = projectRepository.getProjectById(projectId)
             ?: throw AppException.NotFound.Project("Проект не найден")
-        participantRepository.getParticipantByUserAndProjectId(userId, projectId)
+        val participant = participantRepository.getParticipantByUserAndProjectId(userId, projectId)
             ?: throw AppException.Authorization("Вы не участник проекта")
         if (!accessControl.canViewProject(
                 userId,
                 project,
-                participantRepository.getParticipantByUserAndProjectId(userId, projectId)!!
+                participant
             )
         ) {
             throw AppException.Authorization("Нет прав для просмотра")

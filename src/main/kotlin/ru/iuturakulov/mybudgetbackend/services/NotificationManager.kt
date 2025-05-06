@@ -44,23 +44,23 @@ class NotificationManager(
         val params = type.toParams(ctx)
 
         tokenWithLanguageCodes.forEach { (token, languageCode, userId) ->
-            scope.launch {
-                try {
-                    val isSelf = ctx.actorId != null && userId == ctx.actorId
+            try {
+                val isSelf = ctx.actorId != null && userId == ctx.actorId
 
-                    val bundle = ResourceBundle.getBundle("messages", Locale(languageCode), UTF8Control())
+                val bundle = ResourceBundle.getBundle("messages", Locale(languageCode), UTF8Control())
 
-                    val title = bundle.getString("${type.name}.title")
-                    val bodyKey = when {
-                        isSelf && bundle.containsKey("${type.name}.body.self") -> "${type.name}.body.self"
-                        !isSelf && bundle.containsKey("${type.name}.body.actor") -> "${type.name}.body.actor"
-                        else -> "${type.name}.body"
-                    }
+                val title = bundle.getString("${type.name}.title")
+                val bodyKey = when {
+                    isSelf && bundle.containsKey("${type.name}.body.self") -> "${type.name}.body.self"
+                    !isSelf && bundle.containsKey("${type.name}.body.actor") -> "${type.name}.body.actor"
+                    else -> "${type.name}.body"
+                }
 
-                    var body = bundle.getString(bodyKey)
-                    params.forEach { (k, v) -> body = body.replace("{$k}", v) }
+                var body = bundle.getString(bodyKey)
+                params.forEach { (k, v) -> body = body.replace("{$k}", v) }
 
-                    // Отправляем пуш только если это НЕ сам пользователь
+                // Отправляем пуш только если это НЕ сам пользователь
+                scope.launch {
                     if (!isSelf) {
                         fcm.send(
                             token = token,
@@ -72,17 +72,17 @@ class NotificationManager(
                             extra = params
                         )
                     }
-
-                    // А вот в overralNotification — всегда
-                    overallNotificationService.sendNotification(
-                        userId = userId,
-                        type = type,
-                        message = "$title\n$body",
-                    )
-
-                } catch (t: Throwable) {
-                    logger.error(t.localizedMessage) { "Failed to send notification of type $type" }
                 }
+
+                // А вот в overralNotification — всегда
+                overallNotificationService.sendNotification(
+                    userId = userId,
+                    type = type,
+                    message = "$title\n$body",
+                )
+
+            } catch (t: Throwable) {
+                logger.error(t.localizedMessage) { "Failed to send notification of type $type" }
             }
         }
     }

@@ -14,6 +14,7 @@ import ru.iuturakulov.mybudgetbackend.extensions.AuditLogService
 import ru.iuturakulov.mybudgetbackend.repositories.AnalyticsRepository
 import ru.iuturakulov.mybudgetbackend.repositories.AuditLogRepository
 import ru.iuturakulov.mybudgetbackend.repositories.DeviceTokenRepository
+import ru.iuturakulov.mybudgetbackend.repositories.EmailVerificationRepository
 import ru.iuturakulov.mybudgetbackend.repositories.FCMNotificationTableRepository
 import ru.iuturakulov.mybudgetbackend.repositories.NotificationRepository
 import ru.iuturakulov.mybudgetbackend.repositories.ParticipantRepository
@@ -27,6 +28,7 @@ import ru.iuturakulov.mybudgetbackend.services.InvitationService
 import ru.iuturakulov.mybudgetbackend.services.NotificationGuard
 import ru.iuturakulov.mybudgetbackend.services.NotificationManager
 import ru.iuturakulov.mybudgetbackend.services.OverallNotificationService
+import ru.iuturakulov.mybudgetbackend.services.VerifiedEmailCache
 
 val repositoryModule = module {
     single { UserRepository() }
@@ -39,6 +41,7 @@ val repositoryModule = module {
     single { SettingsRepository() }
     single { FCMNotificationTableRepository() }
     single { DeviceTokenRepository() }
+    single { EmailVerificationRepository() }
 }
 
 val serviceModule = module {
@@ -47,6 +50,8 @@ val serviceModule = module {
     single { InvitationService() }
     single { EmailService() }
     single { AccessControl() }
+
+    single { VerifiedEmailCache() }
 
     single<FcmService> {
         val env = HoconApplicationConfig(ConfigFactory.load("application.conf"))
@@ -75,8 +80,10 @@ val serviceModule = module {
 val controllerModule = module {
     single {
         UserController(
+            emailVerificationRepository = get(),
+            verifiedEmailsCache = get(),
             userRepo = get(),
-            emailService = get()
+            emailService = get(),
         )
     }
     single {

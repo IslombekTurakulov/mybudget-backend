@@ -5,7 +5,6 @@ import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.update
 import ru.iuturakulov.mybudgetbackend.config.JwtConfig
-import ru.iuturakulov.mybudgetbackend.config.TokensResponse
 import ru.iuturakulov.mybudgetbackend.database.DataBaseTransaction
 import ru.iuturakulov.mybudgetbackend.entities.user.UserEntity
 import ru.iuturakulov.mybudgetbackend.entities.user.UserTable
@@ -58,7 +57,6 @@ class UserRepository {
             it[email] = request.email.lowercase(Locale.getDefault())
             it[password] = hashedPassword
             it[name] = request.name
-            // TODO: verify email routing
             it[isEmailVerified] = true
             it[createdAt] = System.currentTimeMillis()
         }
@@ -83,11 +81,11 @@ class UserRepository {
             throw AppException.InvalidProperty.PasswordNotMatch("Неверный пароль")
         }
 
-//        if (!user.isEmailVerified) {
-//            throw AppException.Authentication("Email не подтвержден. Проверьте почту.")
-//        }
+        if (!user.isEmailVerified) {
+            throw AppException.Authentication("Email не подтвержден. Проверьте почту.")
+        }
 
-        val newAccessToken  = JwtConfig.generateToken(user.id)
+        val newAccessToken = JwtConfig.generateToken(user.id)
         val newRefreshToken = JwtConfig.generateToken(user.id)
 
         return LoginResponse(
@@ -141,6 +139,12 @@ class UserRepository {
     fun saveNewPasswordForUser(email: String, newPassword: String) = transaction {
         UserTable.update({ UserTable.email eq email.lowercase(Locale.getDefault()) }) {
             it[password] = newPassword
+        }
+    }
+
+    fun clearPasswordResetCode(email: String): Int = transaction {
+        UserTable.update({ UserTable.email eq email }) {
+            it[passwordResetCode] = null
         }
     }
 

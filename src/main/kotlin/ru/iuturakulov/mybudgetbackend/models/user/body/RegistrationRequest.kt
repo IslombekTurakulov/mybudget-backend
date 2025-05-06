@@ -11,7 +11,8 @@ import org.valiktor.validate
 data class RegistrationRequest(
     val name: String,
     val email: String,
-    val password: String
+    val password: String,
+    val code: String
 ) {
     fun validation() {
         validate(this) {

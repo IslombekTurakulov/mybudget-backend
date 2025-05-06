@@ -25,10 +25,12 @@ sealed class AppException(
     ) : BaseException(base, details) {
         class Email(details: String? = null) : InvalidProperty("Email invalid", details)
         class EmailNotExist(details: String? = null) : InvalidProperty("Email does not exist", details)
+        class EmailNotVerified(details: String? = null) : InvalidProperty("Email not verified", details)
         class Password(details: String? = null) : InvalidProperty("Password invalid", details)
         class Transaction(details: String? = null) : InvalidProperty("Transaction invalid", details)
         class Project(details: String? = null) : InvalidProperty("Project invalid", details)
         class PasswordNotMatch(details: String? = null) : InvalidProperty("Password does not match", details)
+        class PasswordResetCode(details: String? = null) : InvalidProperty("Password code does not match", details)
     }
 
     sealed class NotFound(

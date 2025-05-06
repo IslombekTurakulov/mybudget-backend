@@ -20,6 +20,8 @@ import ru.iuturakulov.mybudgetbackend.models.user.body.LoginRequest
 import ru.iuturakulov.mybudgetbackend.models.user.body.RefreshTokenRequest
 import ru.iuturakulov.mybudgetbackend.models.user.body.RegistrationRequest
 import ru.iuturakulov.mybudgetbackend.models.user.body.VerifyEmailRequest
+import ru.iuturakulov.mybudgetbackend.repositories.PreRegistrationEmailRequest
+import ru.iuturakulov.mybudgetbackend.repositories.validate
 
 fun Route.userRoute(userController: UserController) {
     route("auth") {
@@ -53,45 +55,62 @@ fun Route.userRoute(userController: UserController) {
             }
         }
 
-        post("register", {
+        post("request-register-code", {
             tags("User")
-            request { body<RegistrationRequest>() }
+            summary = "Отправка верификационного кода на почту перед регистрацией"
+            request {
+                body<PreRegistrationEmailRequest>()
+            }
             apiResponse()
         }) {
             try {
-                val requestBody = call.receive<RegistrationRequest>()
-                requestBody.validation()
-                val user = userController.register(requestBody)
-                call.respond(HttpStatusCode.Created, user)
-            } catch (e: AppException.AlreadyExists.Email) {
+                val body = call.receive<PreRegistrationEmailRequest>()
+                body.validate()
+                userController.sendVerificationCode(body.email)
+
+                call.respond(HttpStatusCode.OK, "Код отправлен на почту")
+            } catch (e: Exception) {
+                call.respond(HttpStatusCode.InternalServerError, "${e.localizedMessage}")
+            }
+        }
+
+        post("request-reset-password-code", {
+            tags("User")
+            summary = "Отправка верификационного кода на почту перед сбросом пароля"
+            request {
+                body<PreRegistrationEmailRequest>()
+            }
+            apiResponse()
+        }) {
+            try {
+                val body = call.receive<PreRegistrationEmailRequest>()
+                body.validate()
+                userController.sendPasswordResetCode(body.email)
+
+                call.respond(HttpStatusCode.OK, "Код отправлен на почту")
+            } catch (e: Exception) {
+                call.respond(HttpStatusCode.InternalServerError, "${e.localizedMessage}")
+            }
+        }
+
+        post("verify-email-registration", {
+            tags("User")
+            request {
+                body<RegistrationRequest>()
+            }
+            apiResponse()
+        }) {
+            try {
+                val emailRequest = call.receive<RegistrationRequest>()
+                emailRequest.validation()
+                val result = userController.verifyEmailCode(emailRequest)
+
+                call.respond(HttpStatusCode.OK, result)
+            }  catch (e: AppException.AlreadyExists.Email) {
                 call.respond(
                     HttpStatusCode.Conflict,
                     "Email уже используется"
                 )
-            } catch (e: Exception) {
-                call.respond(
-                    HttpStatusCode.BadRequest,
-                    "Ошибка при регистрации: ${e.localizedMessage}",
-                )
-            }
-        }
-
-        post("verify-email", {
-            tags("User")
-            request {
-                queryParameter<String>("email") { required = true }
-                queryParameter<String>("verificationCode") { required = true }
-            }
-            apiResponse()
-        }) {
-            try {
-                val (email, verificationCode) = call.requiredParameters("email", "verificationCode")
-                    ?: return@post call.respondBadRequest("Required params are invalid")
-                val emailRequest = VerifyEmailRequest(email, verificationCode)
-                emailRequest.validation()
-                val result = userController.verifyEmail(emailRequest)
-
-                call.respond(HttpStatusCode.OK, result)
             } catch (e: Exception) {
                 call.respond(
                     HttpStatusCode.InternalServerError,
@@ -100,21 +119,27 @@ fun Route.userRoute(userController: UserController) {
             }
         }
 
-        post("reset-password", {
+        post("verify-reset-code", {
             tags("User")
-            request { body<ForgetPasswordEmailRequest>() }
+            request {
+                body<VerifyEmailRequest>()
+            }
             apiResponse()
         }) {
             try {
-                val requestBody = call.receive<ForgetPasswordEmailRequest>()
-                requestBody.validation()
-                val verificationCode = userController.requestPasswordReset(requestBody)
+                val emailRequest = call.receive<VerifyEmailRequest>()
+                emailRequest.validation()
+                val result = userController.verifyPasswordResetCode(
+                    email = emailRequest.email,
+                    code = emailRequest.code
+                )
 
-                call.respond(verificationCode)
-            } catch (e: AppException.InvalidProperty.EmailNotExist) {
-                call.respond(HttpStatusCode.NotFound, "Email не найден")
+                call.respond(HttpStatusCode.OK, result)
             } catch (e: Exception) {
-                call.respond(HttpStatusCode.InternalServerError, "Ошибка при сбросе пароля")
+                call.respond(
+                    HttpStatusCode.InternalServerError,
+                    "Ошибка подтверждения email: ${e.localizedMessage}",
+                )
             }
         }
 
