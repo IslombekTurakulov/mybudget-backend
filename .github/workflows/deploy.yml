@@ -11,7 +11,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
+  IMAGE_NAME: ${{ github.repository_owner }}/mybudget-backend
 
 jobs:
   test:
@@ -156,7 +156,7 @@ jobs:
                     delay: 10s
 
               backend:
-                image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+                image: ghcr.io/islombekturakulov/mybudget-backend:latest
                 networks:
                   - backend
                   - public
@@ -233,7 +233,7 @@ jobs:
 
             echo "PG_USER=${{ secrets.PG_USER }}" > .env
             echo "PG_DATABASE=${{ secrets.PG_DATABASE }}" >> .env
-            echo "GITHUB_OWNER=$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')" >> .env
+            echo "GITHUB_OWNER=islombekturakulov" >> .env
             echo "TAG=${{ github.sha }}" >> .env
             echo "LETSENCRYPT_EMAIL=${{ secrets.LETSENCRYPT_EMAIL }}" >> .env
             

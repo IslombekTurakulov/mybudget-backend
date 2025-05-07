@@ -48,7 +48,7 @@ services:
         delay: 10s
 
   backend:
-    image: ghcr.io/${GITHUB_OWNER}/mybudget-backend:latest
+    image: ghcr.io/islombekturakulov/mybudget-backend:latest
     networks:
       - backend
       - public
