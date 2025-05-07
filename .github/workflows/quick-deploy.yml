@@ -100,9 +100,13 @@ jobs:
               exit 1
             fi
 
+            # Set variables from GitHub Actions context
+            GITHUB_OWNER="${{ github.repository_owner }}"
+            TAG="${{ github.event.inputs.image_tag }}"
+            echo "GITHUB_OWNER=$GITHUB_OWNER"
+            echo "TAG=$TAG"
+
             # Validate image tag and owner
-            GITHUB_OWNER=$(grep GITHUB_OWNER .env | cut -d'=' -f2)
-            TAG=$(grep TAG .env | cut -d'=' -f2)
             if [ -z "$GITHUB_OWNER" ]; then
               echo "Error: GITHUB_OWNER is required"
               exit 1
@@ -250,7 +254,7 @@ jobs:
                       - node.role == manager
 
               backend:
-                image: ghcr.io/\${GITHUB_OWNER}/mybudget-backend:\${TAG}
+                image: ghcr.io/${{ github.repository_owner }}/mybudget-backend:${{ github.event.inputs.image_tag }}
                 networks:
                   - backend
                   - public
