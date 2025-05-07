@@ -230,7 +230,7 @@ jobs:
 
             echo "PG_USER=${{ secrets.PG_USER }}" > .env
             echo "PG_DATABASE=${{ secrets.PG_DATABASE }}" >> .env
-            echo "GITHUB_OWNER=${{ github.repository_owner }}" >> .env
+            echo "GITHUB_OWNER=${{ github.repository_owner | lower }}" >> .env
             echo "TAG=${{ github.sha }}" >> .env
             echo "LETSENCRYPT_EMAIL=${{ secrets.LETSENCRYPT_EMAIL }}" >> .env
             
