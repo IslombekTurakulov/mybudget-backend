@@ -271,6 +271,7 @@ jobs:
                   SPRING_SECURITY_CORS_ALLOWED_METHODS: "GET,POST,PUT,DELETE,OPTIONS"
                   SPRING_SECURITY_CORS_ALLOWED_HEADERS: "*"
                   SPRING_SECURITY_CORS_ALLOW_CREDENTIALS: "true"
+                  LETSENCRYPT_EMAIL: "\${LETSENCRYPT_EMAIL}"
                 secrets:
                   - app_secret
                 labels:
