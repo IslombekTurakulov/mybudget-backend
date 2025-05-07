@@ -62,19 +62,19 @@ services:
 
   backend:
     image: ghcr.io/islombekturakulov/mybudget-backend:${TAG}
-    depends_on:
-      - database
     networks:
       - backend
       - public
+    depends_on:
+      - database
     environment:
       PG_USER: ${PG_USER}
       PG_PASSWORD: ${PG_PASSWORD}
       PG_DATABASE: ${PG_DATABASE}
-      SERVER_PORT: 8082
       DATABASE_URL: jdbc:postgresql://database:5432/${PG_DATABASE}
       JWT_SECRET: /run/secrets/app_secret
       SPRING_PROFILES_ACTIVE: prod
+      SERVER_PORT: 8082
       SPRING_SECURITY_CORS_ALLOWED_ORIGINS: "*"
       SPRING_SECURITY_CORS_ALLOWED_METHODS: "GET,POST,PUT,DELETE,OPTIONS"
       SPRING_SECURITY_CORS_ALLOWED_HEADERS: "*"
