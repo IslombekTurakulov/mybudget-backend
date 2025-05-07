@@ -138,7 +138,6 @@ services:
       - "--providers.docker.exposedByDefault=false"
       - "--entrypoints.web.address=:80"
       - "--entrypoints.websecure.address=:443"
-      - "--entrypoints.dashboard.address=:8080"
       - "--certificatesresolvers.leresolver.acme.email=${LETSENCRYPT_EMAIL}"
       - "--certificatesresolvers.leresolver.acme.storage=/letsencrypt/acme.json"
       - "--certificatesresolvers.leresolver.acme.httpchallenge.entrypoint=web"
@@ -154,7 +153,6 @@ services:
     ports:
       - "80:80"
       - "443:443"
-      - "8080:8080"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - letsencrypt:/letsencrypt
