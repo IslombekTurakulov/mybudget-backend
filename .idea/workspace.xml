@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4bbd917-8929-44b4-afda-19b441d6e48e" name="Changes" comment="MYBUDGETBACKEND-46: fix deploy.yml">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="c4bbd917-8929-44b4-afda-19b441d6e48e" name="Changes" comment="MYBUDGETBACKEND-47: fix deploy.yml add fast deploy" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -183,14 +181,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1737229814397</updated>
-    </task>
-    <task id="LOCAL-00002" summary="MYBUDGETBACKEND-3: Auth system, project and participant logic">
-      <option name="closed" value="true" />
-      <created>1739756833729</created>
-      <option name="number" value="00002" />
-      <option name="presentableId" value="LOCAL-00002" />
-      <option name="project" value="LOCAL" />
-      <updated>1739756833729</updated>
     </task>
     <task id="LOCAL-00003" summary="MYBUDGETBACKEND-4: Project, Transaction, Email and audit logging logic implemented">
       <option name="closed" value="true" />
@@ -576,7 +566,15 @@
       <option name="project" value="LOCAL" />
       <updated>1746595985397</updated>
     </task>
-    <option name="localTasksCounter" value="51" />
+    <task id="LOCAL-00051" summary="MYBUDGETBACKEND-47: fix deploy.yml add fast deploy">
+      <option name="closed" value="true" />
+      <created>1746596873321</created>
+      <option name="number" value="00051" />
+      <option name="presentableId" value="LOCAL-00051" />
+      <option name="project" value="LOCAL" />
+      <updated>1746596873321</updated>
+    </task>
+    <option name="localTasksCounter" value="52" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -591,8 +589,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="MYBUDGETBACKEND-24: add firebase notification feature using oauth 2.0 and admin sdk, unified notification services, add new params in table, utf8 control, add multilingual text support using properties" />
-    <MESSAGE value="MYBUDGETBACKEND-25: add verification by code feature, fix overallnotification handling, add new permissions to viewer and editor roles, add email ru/en localization" />
     <MESSAGE value="MYBUDGETBACKEND-26: add new param in analytics to view transaction details" />
     <MESSAGE value="MYBUDGETBACKEND-26: add projectid/projectname params in analytics to view transaction details" />
     <MESSAGE value="MYBUDGETBACKEND-27: update backend-ci.yml and add docker-compose.yml" />
@@ -616,7 +612,9 @@
     <MESSAGE value="MYBUDGETBACKEND-44: fix docker" />
     <MESSAGE value="MYBUDGETBACKEND-45: fix deploy.yml" />
     <MESSAGE value="MYBUDGETBACKEND-46: fix deploy.yml" />
-    <option name="LAST_COMMIT_MESSAGE" value="MYBUDGETBACKEND-46: fix deploy.yml" />
+    <MESSAGE value="MYBUDGETBACKEND-46: fix deploy.yml add fast deploy" />
+    <MESSAGE value="MYBUDGETBACKEND-47: fix deploy.yml add fast deploy" />
+    <option name="LAST_COMMIT_MESSAGE" value="MYBUDGETBACKEND-47: fix deploy.yml add fast deploy" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
