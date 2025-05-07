@@ -4,9 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4bbd917-8929-44b4-afda-19b441d6e48e" name="Changes" comment="MYBUDGETBACKEND-50: fix deploy">
-      <change beforePath="$PROJECT_DIR$/.github/workflows/deploy.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/deploy.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.github/workflows/quick-deploy.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/quick-deploy.yml" afterDir="false" />
+    <list default="true" id="c4bbd917-8929-44b4-afda-19b441d6e48e" name="Changes" comment="MYBUDGETBACKEND-52: fix docker-compose.yml">
+      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -184,30 +183,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1737229814397</updated>
-    </task>
-    <task id="LOCAL-00009" summary="MYBUDGETBACKEND-10: Project and transaction updates, added control over increasing the budget through a transaction, added feature to archive project">
-      <option name="closed" value="true" />
-      <created>1742780996594</created>
-      <option name="number" value="00009" />
-      <option name="presentableId" value="LOCAL-00009" />
-      <option name="project" value="LOCAL" />
-      <updated>1742780996594</updated>
-    </task>
-    <task id="LOCAL-00010" summary="MYBUDGETBACKEND-11: Transaction, Settings, Project fixes and updates">
-      <option name="closed" value="true" />
-      <created>1743384898513</created>
-      <option name="number" value="00010" />
-      <option name="presentableId" value="LOCAL-00010" />
-      <option name="project" value="LOCAL" />
-      <updated>1743384898513</updated>
-    </task>
-    <task id="LOCAL-00011" summary="MYBUDGETBACKEND-12: auth, settings, invitation, logging, analytics, project and transaction fixes">
-      <option name="closed" value="true" />
-      <created>1743902962253</created>
-      <option name="number" value="00011" />
-      <option name="presentableId" value="LOCAL-00011" />
-      <option name="project" value="LOCAL" />
-      <updated>1743902962253</updated>
     </task>
     <task id="LOCAL-00012" summary="MYBUDGETBACKEND-13: project, refresh-token and transaction fixes">
       <option name="closed" value="true" />
@@ -577,7 +552,31 @@
       <option name="project" value="LOCAL" />
       <updated>1746599603414</updated>
     </task>
-    <option name="localTasksCounter" value="58" />
+    <task id="LOCAL-00058" summary="MYBUDGETBACKEND-51: fix deploy">
+      <option name="closed" value="true" />
+      <created>1746599813982</created>
+      <option name="number" value="00058" />
+      <option name="presentableId" value="LOCAL-00058" />
+      <option name="project" value="LOCAL" />
+      <updated>1746599813982</updated>
+    </task>
+    <task id="LOCAL-00059" summary="MYBUDGETBACKEND-52: fix deploy">
+      <option name="closed" value="true" />
+      <created>1746599943378</created>
+      <option name="number" value="00059" />
+      <option name="presentableId" value="LOCAL-00059" />
+      <option name="project" value="LOCAL" />
+      <updated>1746599943378</updated>
+    </task>
+    <task id="LOCAL-00060" summary="MYBUDGETBACKEND-52: fix docker-compose.yml">
+      <option name="closed" value="true" />
+      <created>1746600068818</created>
+      <option name="number" value="00060" />
+      <option name="presentableId" value="LOCAL-00060" />
+      <option name="project" value="LOCAL" />
+      <updated>1746600068818</updated>
+    </task>
+    <option name="localTasksCounter" value="61" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -592,9 +591,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="MYBUDGETBACKEND-31: configured deploy to yandex cloud" />
-    <MESSAGE value="MYBUDGETBACKEND-32: fix docker caching" />
-    <MESSAGE value="MYBUDGETBACKEND-33: fix docker volumes" />
     <MESSAGE value="MYBUDGETBACKEND-34: fix deploy yml" />
     <MESSAGE value="MYBUDGETBACKEND-35: fix deploy yml" />
     <MESSAGE value="MYBUDGETBACKEND-36: fix deploy yml" />
@@ -617,7 +613,10 @@
     <MESSAGE value="MYBUDGETBACKEND-48: fix deploy" />
     <MESSAGE value="MYBUDGETBACKEND-49: Add README.md" />
     <MESSAGE value="MYBUDGETBACKEND-50: fix deploy" />
-    <option name="LAST_COMMIT_MESSAGE" value="MYBUDGETBACKEND-50: fix deploy" />
+    <MESSAGE value="MYBUDGETBACKEND-51: fix deploy" />
+    <MESSAGE value="MYBUDGETBACKEND-52: fix deploy" />
+    <MESSAGE value="MYBUDGETBACKEND-52: fix docker-compose.yml" />
+    <option name="LAST_COMMIT_MESSAGE" value="MYBUDGETBACKEND-52: fix docker-compose.yml" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
