@@ -8,10 +8,16 @@ on:
   pull_request:
     branches: [ main ]
   workflow_dispatch:
+    inputs:
+      deploy:
+        description: 'Deploy to server'
+        required: true
+        default: false
+        type: boolean
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository_owner }}/mybudget-backend
+  IMAGE_NAME: islombekturakulov/mybudget-backend
 
 jobs:
   test:
@@ -92,8 +98,9 @@ jobs:
     needs: build-and-push
     runs-on: ubuntu-latest
     environment: staging
-    if: github.event_name != 'pull_request'
-
+    if: |
+      github.event_name == 'workflow_dispatch' && inputs.deploy == true ||
+      startsWith(github.ref, 'refs/tags/v')
     steps:
       - name: Deploy to server
         uses: appleboy/ssh-action@v1.0.3

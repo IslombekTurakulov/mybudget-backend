@@ -46,4 +46,4 @@ bin/
 .DS_Store
 
 ### Scripts ###
-scripts/
+/scripts/

@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4bbd917-8929-44b4-afda-19b441d6e48e" name="Changes" comment="MYBUDGETBACKEND-37: fix deploy yml" />
+    <list default="true" id="c4bbd917-8929-44b4-afda-19b441d6e48e" name="Changes" comment="MYBUDGETBACKEND-38: fix deploy yml">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -486,7 +488,15 @@
       <option name="project" value="LOCAL" />
       <updated>1746589026724</updated>
     </task>
-    <option name="localTasksCounter" value="39" />
+    <task id="LOCAL-00039" summary="MYBUDGETBACKEND-38: fix deploy yml">
+      <option name="closed" value="true" />
+      <created>1746589401257</created>
+      <option name="number" value="00039" />
+      <option name="presentableId" value="LOCAL-00039" />
+      <option name="project" value="LOCAL" />
+      <updated>1746589401257</updated>
+    </task>
+    <option name="localTasksCounter" value="40" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -501,7 +511,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="MYBUDGETBACKEND-14: fix analytics, project, transaction and email sending template" />
     <MESSAGE value="MYBUDGETBACKEND-15: add analytics export feature, fix project, fix token authorization" />
     <MESSAGE value="MYBUDGETBACKEND-17: Edit notification template msg, add notifier budget limit, fix participant name update, fix budget limit and spent amount while changing/adding transaction, fix notifier when changing project budget limit" />
     <MESSAGE value="MYBUDGETBACKEND-18: add migration data, add new parameters in projects table" />
@@ -526,7 +535,8 @@
     <MESSAGE value="MYBUDGETBACKEND-35: fix deploy yml" />
     <MESSAGE value="MYBUDGETBACKEND-36: fix deploy yml" />
     <MESSAGE value="MYBUDGETBACKEND-37: fix deploy yml" />
-    <option name="LAST_COMMIT_MESSAGE" value="MYBUDGETBACKEND-37: fix deploy yml" />
+    <MESSAGE value="MYBUDGETBACKEND-38: fix deploy yml" />
+    <option name="LAST_COMMIT_MESSAGE" value="MYBUDGETBACKEND-38: fix deploy yml" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
