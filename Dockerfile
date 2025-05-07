@@ -6,5 +6,4 @@ RUN gradle build --no-daemon
 FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
 COPY --from=build /app/build/libs/*.jar app.jar
-EXPOSE ${SERVER_PORT:-8082}
 ENTRYPOINT ["java", "-jar", "app.jar"] 

@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4bbd917-8929-44b4-afda-19b441d6e48e" name="Changes" comment="MYBUDGETBACKEND-54: fix port in docker-compose.yml again">
-      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
-    </list>
+    <list default="true" id="c4bbd917-8929-44b4-afda-19b441d6e48e" name="Changes" comment="MYBUDGETBACKEND-54: fix dockerfile" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -183,14 +181,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1737229814397</updated>
-    </task>
-    <task id="LOCAL-00017" summary="MYBUDGETBACKEND-19: add new migration, add invite by qr code feature,">
-      <option name="closed" value="true" />
-      <created>1746156836417</created>
-      <option name="number" value="00017" />
-      <option name="presentableId" value="LOCAL-00017" />
-      <option name="project" value="LOCAL" />
-      <updated>1746156836417</updated>
     </task>
     <task id="LOCAL-00018" summary="MYBUDGETBACKEND-20: wrap accept invite route with try catch, fix project list mapping">
       <option name="closed" value="true" />
@@ -576,7 +566,15 @@
       <option name="project" value="LOCAL" />
       <updated>1746600710575</updated>
     </task>
-    <option name="localTasksCounter" value="66" />
+    <task id="LOCAL-00066" summary="MYBUDGETBACKEND-54: fix dockerfile">
+      <option name="closed" value="true" />
+      <created>1746601112894</created>
+      <option name="number" value="00066" />
+      <option name="presentableId" value="LOCAL-00066" />
+      <option name="project" value="LOCAL" />
+      <updated>1746601112894</updated>
+    </task>
+    <option name="localTasksCounter" value="67" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -591,7 +589,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="MYBUDGETBACKEND-37: fix deploy yml" />
     <MESSAGE value="MYBUDGETBACKEND-38: fix deploy yml" />
     <MESSAGE value="MYBUDGETBACKEND-39: fix gitignore, made deploy optional, fix lowercase deploy" />
     <MESSAGE value="MYBUDGETBACKEND-39: fix gitignore" />
@@ -616,7 +613,8 @@
     <MESSAGE value="MYBUDGETBACKEND-53: fix port in docker-compose.yml" />
     <MESSAGE value="MYBUDGETBACKEND-54: fix port in docker-compose.yml" />
     <MESSAGE value="MYBUDGETBACKEND-54: fix port in docker-compose.yml again" />
-    <option name="LAST_COMMIT_MESSAGE" value="MYBUDGETBACKEND-54: fix port in docker-compose.yml again" />
+    <MESSAGE value="MYBUDGETBACKEND-54: fix dockerfile" />
+    <option name="LAST_COMMIT_MESSAGE" value="MYBUDGETBACKEND-54: fix dockerfile" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
