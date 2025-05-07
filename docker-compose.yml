@@ -145,7 +145,7 @@ services:
       - "--metrics.prometheus=true"
       - "--api.dashboard=true"
       - "--api.insecure=true"
-      - "--providers.docker.network=backend_public"
+      - "--providers.docker.network=public"
       - "--providers.docker.watch=true"
       - "--providers.docker.swarmModeRefreshSeconds=15s"
     ports:
