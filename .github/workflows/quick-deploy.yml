@@ -231,8 +231,8 @@ jobs:
                 volumes:
                   - pg_data:/var/lib/postgresql/data
                 environment:
-                  POSTGRES_USER: "\${PG_USER}"
-                  POSTGRES_DB: "\${PG_DATABASE}"
+                  POSTGRES_USER: ${PG_USER}
+                  POSTGRES_DB: ${PG_DATABASE}
                   POSTGRES_PASSWORD_FILE: /run/secrets/pg_password
                 secrets:
                   - pg_password
@@ -272,9 +272,9 @@ jobs:
                 depends_on:
                   - database
                 environment:
-                  PG_USER: "\${PG_USER}"
-                  PG_PASSWORD: "\${PG_PASSWORD}"
-                  PG_DATABASE: "\${PG_DATABASE}"
+                  PG_USER: ${PG_USER}
+                  PG_PASSWORD: ${PG_PASSWORD}
+                  PG_DATABASE: ${PG_DATABASE}
                   DATABASE_URL: jdbc:postgresql://database:5432/\${PG_DATABASE}
                   JWT_SECRET: /run/secrets/app_secret
                   SPRING_PROFILES_ACTIVE: prod
