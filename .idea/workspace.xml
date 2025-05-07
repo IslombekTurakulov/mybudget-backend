@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4bbd917-8929-44b4-afda-19b441d6e48e" name="Changes" comment="MYBUDGETBACKEND-53: fix port in docker-compose.yml" />
+    <list default="true" id="c4bbd917-8929-44b4-afda-19b441d6e48e" name="Changes" comment="MYBUDGETBACKEND-54: fix port in docker-compose.yml again">
+      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -181,22 +183,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1737229814397</updated>
-    </task>
-    <task id="LOCAL-00015" summary="MYBUDGETBACKEND-17: Edit notification template msg, add notifier budget limit, fix participant name update, fix budget limit and spent amount while changing/adding transaction, fix notifier when changing project budget limit">
-      <option name="closed" value="true" />
-      <created>1745440282395</created>
-      <option name="number" value="00015" />
-      <option name="presentableId" value="LOCAL-00015" />
-      <option name="project" value="LOCAL" />
-      <updated>1745440282395</updated>
-    </task>
-    <task id="LOCAL-00016" summary="MYBUDGETBACKEND-18: add migration data, add new parameters in projects table">
-      <option name="closed" value="true" />
-      <created>1746070192706</created>
-      <option name="number" value="00016" />
-      <option name="presentableId" value="LOCAL-00016" />
-      <option name="project" value="LOCAL" />
-      <updated>1746070192706</updated>
     </task>
     <task id="LOCAL-00017" summary="MYBUDGETBACKEND-19: add new migration, add invite by qr code feature,">
       <option name="closed" value="true" />
@@ -574,7 +560,23 @@
       <option name="project" value="LOCAL" />
       <updated>1746600514006</updated>
     </task>
-    <option name="localTasksCounter" value="64" />
+    <task id="LOCAL-00064" summary="MYBUDGETBACKEND-54: fix port in docker-compose.yml">
+      <option name="closed" value="true" />
+      <created>1746600616876</created>
+      <option name="number" value="00064" />
+      <option name="presentableId" value="LOCAL-00064" />
+      <option name="project" value="LOCAL" />
+      <updated>1746600616876</updated>
+    </task>
+    <task id="LOCAL-00065" summary="MYBUDGETBACKEND-54: fix port in docker-compose.yml again">
+      <option name="closed" value="true" />
+      <created>1746600710575</created>
+      <option name="number" value="00065" />
+      <option name="presentableId" value="LOCAL-00065" />
+      <option name="project" value="LOCAL" />
+      <updated>1746600710575</updated>
+    </task>
+    <option name="localTasksCounter" value="66" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -589,8 +591,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="MYBUDGETBACKEND-35: fix deploy yml" />
-    <MESSAGE value="MYBUDGETBACKEND-36: fix deploy yml" />
     <MESSAGE value="MYBUDGETBACKEND-37: fix deploy yml" />
     <MESSAGE value="MYBUDGETBACKEND-38: fix deploy yml" />
     <MESSAGE value="MYBUDGETBACKEND-39: fix gitignore, made deploy optional, fix lowercase deploy" />
@@ -614,7 +614,9 @@
     <MESSAGE value="MYBUDGETBACKEND-52: fix deploy" />
     <MESSAGE value="MYBUDGETBACKEND-52: fix docker-compose.yml" />
     <MESSAGE value="MYBUDGETBACKEND-53: fix port in docker-compose.yml" />
-    <option name="LAST_COMMIT_MESSAGE" value="MYBUDGETBACKEND-53: fix port in docker-compose.yml" />
+    <MESSAGE value="MYBUDGETBACKEND-54: fix port in docker-compose.yml" />
+    <MESSAGE value="MYBUDGETBACKEND-54: fix port in docker-compose.yml again" />
+    <option name="LAST_COMMIT_MESSAGE" value="MYBUDGETBACKEND-54: fix port in docker-compose.yml again" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
