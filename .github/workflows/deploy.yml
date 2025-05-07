@@ -9,6 +9,11 @@ on:
     branches: [ main ]
   workflow_dispatch:
     inputs:
+      image_tag:
+        description: 'Image tag to deploy (defaults to ${{ github.ref_name }})'
+        required: false
+        default: ${{ github.ref_name }}
+        type: string
       deploy:
         description: 'Deploy to server'
         required: true

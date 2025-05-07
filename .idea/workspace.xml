@@ -4,10 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4bbd917-8929-44b4-afda-19b441d6e48e" name="Changes" comment="MYBUDGETBACKEND-54: fix pg volumes">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/Dockerfile" afterDir="false" />
-    </list>
+    <list default="true" id="c4bbd917-8929-44b4-afda-19b441d6e48e" name="Changes" comment="MYBUDGETBACKEND-55: fix dockerfile" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -64,6 +61,10 @@
     &quot;accountId&quot;: &quot;48602581-13ff-40bd-838d-eaed53754a9f&quot;
   }
 }</component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.ktor/ktor-server-core-jvm/3.0.3/de1e219a0680e4e028ad248d3cc646a8a16358b8/ktor-server-core-jvm-3.0.3-sources.jar!/jvmMain/io/ktor/server/config/HoconApplicationConfig.kt" root0="SKIP_INSPECTION" />
+    <setting file="jar://$USER_HOME$/Library/Java/JavaVirtualMachines/corretto-17.0.14/Contents/Home/lib/src.zip!/java.base/java/security/SecureClassLoader.java" root0="SKIP_INSPECTION" />
+  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 0
 }</component>
@@ -115,7 +116,7 @@
       <recent name="ru.iuturakulov.mybudgetbackend.models.fcm" />
     </key>
   </component>
-  <component name="RunManager" selected="Kotlin.ApplicationKt">
+  <component name="RunManager" selected="Docker.docker-compose.yml: Compose Deployment">
     <configuration name="ApplicationTest" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
@@ -172,13 +173,23 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="docker-compose.yml: Compose Deployment" type="docker-deploy" factoryName="docker-compose.yml" temporary="true" server-name="Docker">
+      <deployment type="docker-compose.yml">
+        <settings>
+          <option name="sourceFilePath" value="docker-compose.yml" />
+        </settings>
+      </deployment>
+      <method v="2" />
+    </configuration>
     <list>
+      <item itemvalue="Docker.docker-compose.yml: Compose Deployment" />
       <item itemvalue="Gradle.ApplicationTest" />
       <item itemvalue="Gradle.CategoryTest" />
       <item itemvalue="Kotlin.ApplicationKt" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Docker.docker-compose.yml: Compose Deployment" />
         <item itemvalue="Kotlin.ApplicationKt" />
         <item itemvalue="Gradle.ApplicationTest" />
         <item itemvalue="Gradle.CategoryTest" />
@@ -193,14 +204,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1737229814397</updated>
-    </task>
-    <task id="LOCAL-00036" summary="MYBUDGETBACKEND-35: fix deploy yml">
-      <option name="closed" value="true" />
-      <created>1746587041061</created>
-      <option name="number" value="00036" />
-      <option name="presentableId" value="LOCAL-00036" />
-      <option name="project" value="LOCAL" />
-      <updated>1746587041061</updated>
     </task>
     <task id="LOCAL-00037" summary="MYBUDGETBACKEND-36: fix deploy yml">
       <option name="closed" value="true" />
@@ -586,7 +589,15 @@
       <option name="project" value="LOCAL" />
       <updated>1746606463764</updated>
     </task>
-    <option name="localTasksCounter" value="85" />
+    <task id="LOCAL-00085" summary="MYBUDGETBACKEND-55: fix dockerfile">
+      <option name="closed" value="true" />
+      <created>1746639515634</created>
+      <option name="number" value="00085" />
+      <option name="presentableId" value="LOCAL-00085" />
+      <option name="project" value="LOCAL" />
+      <updated>1746639515634</updated>
+    </task>
+    <option name="localTasksCounter" value="86" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -601,7 +612,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="MYBUDGETBACKEND-40: fix docker swarm" />
     <MESSAGE value="MYBUDGETBACKEND-41: fix docker swarm" />
     <MESSAGE value="MYBUDGETBACKEND-42: fix docker compose and network" />
     <MESSAGE value="MYBUDGETBACKEND-43: optimizing ci/cd" />
@@ -626,7 +636,8 @@
     <MESSAGE value="MYBUDGETBACKEND-54: fix deploy ci" />
     <MESSAGE value="MYBUDGETBACKEND-54: split traefik" />
     <MESSAGE value="MYBUDGETBACKEND-54: fix pg volumes" />
-    <option name="LAST_COMMIT_MESSAGE" value="MYBUDGETBACKEND-54: fix pg volumes" />
+    <MESSAGE value="MYBUDGETBACKEND-55: fix dockerfile" />
+    <option name="LAST_COMMIT_MESSAGE" value="MYBUDGETBACKEND-55: fix dockerfile" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
