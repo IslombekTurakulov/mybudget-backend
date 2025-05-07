@@ -4,19 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4bbd917-8929-44b4-afda-19b441d6e48e" name="Changes" comment="MYBUDGETBACKEND-30: update secrets">
-      <change afterPath="$PROJECT_DIR$/.github/workflows/deploy.yml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/shelf/Changes.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/shelf/Changes/shelved.patch" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_05_05_2025,_03_19_[Changes]/shelved.patch" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_05_05_2025__03_19__Changes_.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Dockerfile" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/scripts/cleanup-yc-vm.sh" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/scripts/cloud-init.yml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/scripts/setup-server.sh" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/scripts/setup-yc-vm.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.github/workflows/backend-ci.yml" beforeDir="false" />
+    <list default="true" id="c4bbd917-8929-44b4-afda-19b441d6e48e" name="Changes" comment="MYBUDGETBACKEND-36: fix deploy yml">
+      <change beforePath="$PROJECT_DIR$/.github/workflows/deploy.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/deploy.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gradle/libs.versions.toml" beforeDir="false" afterPath="$PROJECT_DIR$/gradle/libs.versions.toml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -80,10 +72,12 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "Gradle.ApplicationTest.executor": "Run",
     "Gradle.Build MyBudget-backend.executor": "Run",
+    "Gradle.CategoryTest.executor": "Run",
     "Gradle.Download Sources.executor": "Run",
     "Kotlin.ApplicationKt (1).executor": "Run",
-    "Kotlin.ApplicationKt.executor": "Run",
+    "Kotlin.ApplicationKt.executor": "Debug",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
@@ -119,7 +113,55 @@
       <recent name="ru.iuturakulov.mybudgetbackend.models.fcm" />
     </key>
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Kotlin.ApplicationKt">
+    <configuration name="ApplicationTest" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" value="" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value=":test" />
+            <option value="--tests" />
+            <option value="&quot;ru.iuturakulov.mybudgetbackend.ApplicationTest&quot;" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>false</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <RunAsTest>true</RunAsTest>
+      <method v="2" />
+    </configuration>
+    <configuration name="CategoryTest" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" value="" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value=":test" />
+            <option value="--tests" />
+            <option value="&quot;ru.iuturakulov.mybudgetbackend.CategoryTest&quot;" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>false</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <RunAsTest>true</RunAsTest>
+      <method v="2" />
+    </configuration>
     <configuration name="ApplicationKt" type="JetRunConfigurationType" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="ru.iuturakulov.mybudgetbackend.ApplicationKt" />
       <module name="MyBudget-backend.main" />
@@ -131,6 +173,8 @@
     <recent_temporary>
       <list>
         <item itemvalue="Kotlin.ApplicationKt" />
+        <item itemvalue="Gradle.ApplicationTest" />
+        <item itemvalue="Gradle.CategoryTest" />
       </list>
     </recent_temporary>
   </component>
@@ -375,7 +419,71 @@
       <option name="project" value="LOCAL" />
       <updated>1746579075543</updated>
     </task>
-    <option name="localTasksCounter" value="30" />
+    <task id="LOCAL-00030" summary="MYBUDGETBACKEND-31: configured deploy to yandex cloud">
+      <option name="closed" value="true" />
+      <created>1746584814821</created>
+      <option name="number" value="00030" />
+      <option name="presentableId" value="LOCAL-00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1746584814821</updated>
+    </task>
+    <task id="LOCAL-00031" summary="MYBUDGETBACKEND-32: fix docker caching">
+      <option name="closed" value="true" />
+      <created>1746585166210</created>
+      <option name="number" value="00031" />
+      <option name="presentableId" value="LOCAL-00031" />
+      <option name="project" value="LOCAL" />
+      <updated>1746585166210</updated>
+    </task>
+    <task id="LOCAL-00032" summary="MYBUDGETBACKEND-32: fix docker caching">
+      <option name="closed" value="true" />
+      <created>1746585446622</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1746585446622</updated>
+    </task>
+    <task id="LOCAL-00033" summary="MYBUDGETBACKEND-33: fix docker volumes">
+      <option name="closed" value="true" />
+      <created>1746585944968</created>
+      <option name="number" value="00033" />
+      <option name="presentableId" value="LOCAL-00033" />
+      <option name="project" value="LOCAL" />
+      <updated>1746585944968</updated>
+    </task>
+    <task id="LOCAL-00034" summary="MYBUDGETBACKEND-34: fix deploy yml">
+      <option name="closed" value="true" />
+      <created>1746586542311</created>
+      <option name="number" value="00034" />
+      <option name="presentableId" value="LOCAL-00034" />
+      <option name="project" value="LOCAL" />
+      <updated>1746586542311</updated>
+    </task>
+    <task id="LOCAL-00035" summary="MYBUDGETBACKEND-35: fix deploy yml">
+      <option name="closed" value="true" />
+      <created>1746586973698</created>
+      <option name="number" value="00035" />
+      <option name="presentableId" value="LOCAL-00035" />
+      <option name="project" value="LOCAL" />
+      <updated>1746586973698</updated>
+    </task>
+    <task id="LOCAL-00036" summary="MYBUDGETBACKEND-35: fix deploy yml">
+      <option name="closed" value="true" />
+      <created>1746587041061</created>
+      <option name="number" value="00036" />
+      <option name="presentableId" value="LOCAL-00036" />
+      <option name="project" value="LOCAL" />
+      <updated>1746587041061</updated>
+    </task>
+    <task id="LOCAL-00037" summary="MYBUDGETBACKEND-36: fix deploy yml">
+      <option name="closed" value="true" />
+      <created>1746588153751</created>
+      <option name="number" value="00037" />
+      <option name="presentableId" value="LOCAL-00037" />
+      <option name="project" value="LOCAL" />
+      <updated>1746588153751</updated>
+    </task>
+    <option name="localTasksCounter" value="38" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -390,12 +498,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="MYBUDGETBACKEND-7: Project, transaction fixes" />
-    <MESSAGE value="MYBUDGETBACKEND-8: Transaction fixes" />
-    <MESSAGE value="MYBUDGETBACKEND-9: Transaction fixes" />
-    <MESSAGE value="MYBUDGETBACKEND-10: Project and transaction updates, added control over increasing the budget through a transaction, added feature to archive project" />
-    <MESSAGE value="MYBUDGETBACKEND-11: Transaction, Settings, Project fixes and updates" />
-    <MESSAGE value="MYBUDGETBACKEND-12: auth, settings, invitation, logging, analytics, project and transaction fixes" />
     <MESSAGE value="MYBUDGETBACKEND-13: project, refresh-token and transaction fixes" />
     <MESSAGE value="MYBUDGETBACKEND-14: fix analytics, project, transaction and email sending template" />
     <MESSAGE value="MYBUDGETBACKEND-15: add analytics export feature, fix project, fix token authorization" />
@@ -415,7 +517,13 @@
     <MESSAGE value="MYBUDGETBACKEND-28: update backend-ci.yml" />
     <MESSAGE value="MYBUDGETBACKEND-29: update secrets" />
     <MESSAGE value="MYBUDGETBACKEND-30: update secrets" />
-    <option name="LAST_COMMIT_MESSAGE" value="MYBUDGETBACKEND-30: update secrets" />
+    <MESSAGE value="MYBUDGETBACKEND-31: configured deploy to yandex cloud" />
+    <MESSAGE value="MYBUDGETBACKEND-32: fix docker caching" />
+    <MESSAGE value="MYBUDGETBACKEND-33: fix docker volumes" />
+    <MESSAGE value="MYBUDGETBACKEND-34: fix deploy yml" />
+    <MESSAGE value="MYBUDGETBACKEND-35: fix deploy yml" />
+    <MESSAGE value="MYBUDGETBACKEND-36: fix deploy yml" />
+    <option name="LAST_COMMIT_MESSAGE" value="MYBUDGETBACKEND-36: fix deploy yml" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
