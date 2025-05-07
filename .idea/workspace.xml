@@ -7,7 +7,8 @@
     <list default="true" id="c4bbd917-8929-44b4-afda-19b441d6e48e" name="Changes" comment="MYBUDGETBACKEND-55: fix dockerfile">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/Dockerfile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/database/ConfigureDataBase.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/database/ConfigureDataBase.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/application.conf" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.conf" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -194,14 +195,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1737229814397</updated>
-    </task>
-    <task id="LOCAL-00038" summary="MYBUDGETBACKEND-37: fix deploy yml">
-      <option name="closed" value="true" />
-      <created>1746589026724</created>
-      <option name="number" value="00038" />
-      <option name="presentableId" value="LOCAL-00038" />
-      <option name="project" value="LOCAL" />
-      <updated>1746589026724</updated>
     </task>
     <task id="LOCAL-00039" summary="MYBUDGETBACKEND-38: fix deploy yml">
       <option name="closed" value="true" />
@@ -587,7 +580,15 @@
       <option name="project" value="LOCAL" />
       <updated>1746624928548</updated>
     </task>
-    <option name="localTasksCounter" value="87" />
+    <task id="LOCAL-00087" summary="MYBUDGETBACKEND-55: fix dockerfile">
+      <option name="closed" value="true" />
+      <created>1746625614515</created>
+      <option name="number" value="00087" />
+      <option name="presentableId" value="LOCAL-00087" />
+      <option name="project" value="LOCAL" />
+      <updated>1746625614516</updated>
+    </task>
+    <option name="localTasksCounter" value="88" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -956,6 +957,11 @@
           <url>jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.ktor/ktor-server-core-jvm/3.0.3/de1e219a0680e4e028ad248d3cc646a8a16358b8/ktor-server-core-jvm-3.0.3-sources.jar!/jvmMain/io/ktor/server/config/HoconApplicationConfig.kt</url>
           <line>44</line>
           <option name="timeStamp" value="166" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="kotlin-line">
+          <url>file://$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/Application.kt</url>
+          <line>11</line>
+          <option name="timeStamp" value="167" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
