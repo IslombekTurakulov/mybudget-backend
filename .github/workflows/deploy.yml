@@ -126,6 +126,21 @@ jobs:
             sudo chown -R $USER:$USER /opt/mybudget/backend
             cd /opt/mybudget/backend
             
+            # Check Docker Swarm status
+            echo "Checking Docker Swarm status..."
+            docker info | grep Swarm
+            
+            # Check node status
+            echo "Checking node status..."
+            docker node ls
+            
+            # Clean up existing resources
+            echo "Cleaning up existing resources..."
+            docker stack rm backend || true
+            sleep 10
+            docker network rm backend_backend backend_public || true
+            sleep 5
+            
             # Create docker-compose.yml
             cat > docker-compose.yml << 'EOL'
             version: '3.9'
@@ -332,11 +347,16 @@ jobs:
             # Set proper permissions
             chmod 600 secrets/pg_password.txt secrets/app_jwt_secret.txt
             
-            # Login to GitHub Container Registry
+            # Login to GitHub Container Registry with proper authentication
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
             
+            # Verify login and pull the image
+            echo "Verifying image access..."
+            docker pull ghcr.io/islombekturakulov/mybudget-backend:latest
+            
             # Pull latest images and deploy
-            docker stack deploy -c docker-compose.yml backend
+            echo "Deploying stack..."
+            docker stack deploy -c docker-compose.yml backend --with-registry-auth
 
             # Wait for services to be ready
             echo "Waiting for services to be ready..."
@@ -348,9 +368,9 @@ jobs:
 
             # Check if all replicas are running
             echo "Checking replicas..."
-            docker service ps backend_backend --no-trunc
-            docker service ps backend_database --no-trunc
-            docker service ps backend_traefik --no-trunc
+            docker service ps backend_backend --no-trunc || true
+            docker service ps backend_database --no-trunc || true
+            docker service ps backend_traefik --no-trunc || true
 
             # Check network connectivity
             echo "Checking networks..."
@@ -358,13 +378,17 @@ jobs:
 
             # Check logs for any immediate issues
             echo "Checking service logs..."
-            docker service logs --tail 50 backend_backend
-            docker service logs --tail 50 backend_database
-            docker service logs --tail 50 backend_traefik
+            docker service logs --tail 50 backend_backend || true
+            docker service logs --tail 50 backend_database || true
+            docker service logs --tail 50 backend_traefik || true
+
+            # Check if ports are open
+            echo "Checking if ports are open..."
+            netstat -tulpn | grep -E '80|443' || true
 
             # Verify health endpoints
             echo "Verifying health endpoints..."
-            curl -f http://89.169.144.44/ping || echo "Backend health check failed"
+            curl -v http://89.169.144.44/ping || echo "Backend health check failed"
 
             # Check resource usage
             echo "Checking resource usage..."
@@ -372,4 +396,8 @@ jobs:
 
             # Final status
             echo "Deployment completed. Checking final status..."
-            docker stack services backend 
+            docker stack services backend
+
+            # Check Traefik configuration
+            echo "Checking Traefik configuration..."
+            docker service inspect backend_traefik || true 
