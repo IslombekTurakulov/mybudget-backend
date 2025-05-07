@@ -4,9 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4bbd917-8929-44b4-afda-19b441d6e48e" name="Changes" comment="MYBUDGETBACKEND-55: fix dockerfile">
+    <list default="true" id="c4bbd917-8929-44b4-afda-19b441d6e48e" name="Changes" comment="MYBUDGETBACKEND-56: fix dockerfile">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -208,14 +207,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1737229814397</updated>
-    </task>
-    <task id="LOCAL-00039" summary="MYBUDGETBACKEND-38: fix deploy yml">
-      <option name="closed" value="true" />
-      <created>1746589401257</created>
-      <option name="number" value="00039" />
-      <option name="presentableId" value="LOCAL-00039" />
-      <option name="project" value="LOCAL" />
-      <updated>1746589401257</updated>
     </task>
     <task id="LOCAL-00040" summary="MYBUDGETBACKEND-39: fix gitignore, made deploy optional, fix lowercase deploy">
       <option name="closed" value="true" />
@@ -601,7 +592,15 @@
       <option name="project" value="LOCAL" />
       <updated>1746640412313</updated>
     </task>
-    <option name="localTasksCounter" value="88" />
+    <task id="LOCAL-00088" summary="MYBUDGETBACKEND-56: fix dockerfile">
+      <option name="closed" value="true" />
+      <created>1746641012160</created>
+      <option name="number" value="00088" />
+      <option name="presentableId" value="LOCAL-00088" />
+      <option name="project" value="LOCAL" />
+      <updated>1746641012161</updated>
+    </task>
+    <option name="localTasksCounter" value="89" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -616,7 +615,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="MYBUDGETBACKEND-41: fix docker swarm" />
     <MESSAGE value="MYBUDGETBACKEND-42: fix docker compose and network" />
     <MESSAGE value="MYBUDGETBACKEND-43: optimizing ci/cd" />
     <MESSAGE value="MYBUDGETBACKEND-44: fix docker" />
@@ -641,7 +639,8 @@
     <MESSAGE value="MYBUDGETBACKEND-54: split traefik" />
     <MESSAGE value="MYBUDGETBACKEND-54: fix pg volumes" />
     <MESSAGE value="MYBUDGETBACKEND-55: fix dockerfile" />
-    <option name="LAST_COMMIT_MESSAGE" value="MYBUDGETBACKEND-55: fix dockerfile" />
+    <MESSAGE value="MYBUDGETBACKEND-56: fix dockerfile" />
+    <option name="LAST_COMMIT_MESSAGE" value="MYBUDGETBACKEND-56: fix dockerfile" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

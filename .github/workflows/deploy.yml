@@ -267,7 +267,7 @@ jobs:
             max_retries=5
             retry_count=0
             while [ $retry_count -lt $max_retries ]; do
-              if curl -fs http://89.169.144.44/ping; then
+              if curl -fs http://51.250.65.154/ping; then
                 echo "Health check passed"
                 break
               fi

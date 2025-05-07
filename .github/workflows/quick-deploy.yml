@@ -288,7 +288,7 @@ jobs:
                   - app_secret
                 labels:
                   - "traefik.enable=true"
-                  - "traefik.http.routers.backend.rule=Host(\'89.169.144.44\')"
+                  - "traefik.http.routers.backend.rule=Host(\'51.250.65.154\')"
                   - "traefik.http.routers.backend.entrypoints=web"
                   - "traefik.http.services.backend.loadbalancer.server.port=8082"
                   - "traefik.http.middlewares.cors.headers.accessControlAllowMethods=GET,POST,PUT,DELETE,OPTIONS"
@@ -379,7 +379,7 @@ jobs:
             retry_count=0
             while [ $retry_count -lt $max_retries ]; do
               echo "Attempt $((retry_count + 1)) of $max_retries"
-              if curl -v http://89.169.144.44/ping; then
+              if curl -v http://51.250.65.154/ping; then
                 echo "Health check passed"
                 break
               fi
