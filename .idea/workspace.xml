@@ -4,9 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4bbd917-8929-44b4-afda-19b441d6e48e" name="Changes" comment="MYBUDGETBACKEND-54: fix pg volumes">
+    <list default="true" id="c4bbd917-8929-44b4-afda-19b441d6e48e" name="Changes" comment="MYBUDGETBACKEND-55: fix dockerfile">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/Dockerfile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/database/ConfigureDataBase.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/database/ConfigureDataBase.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -193,14 +194,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1737229814397</updated>
-    </task>
-    <task id="LOCAL-00037" summary="MYBUDGETBACKEND-36: fix deploy yml">
-      <option name="closed" value="true" />
-      <created>1746588153751</created>
-      <option name="number" value="00037" />
-      <option name="presentableId" value="LOCAL-00037" />
-      <option name="project" value="LOCAL" />
-      <updated>1746588153751</updated>
     </task>
     <task id="LOCAL-00038" summary="MYBUDGETBACKEND-37: fix deploy yml">
       <option name="closed" value="true" />
@@ -586,7 +579,15 @@
       <option name="project" value="LOCAL" />
       <updated>1746608906176</updated>
     </task>
-    <option name="localTasksCounter" value="86" />
+    <task id="LOCAL-00086" summary="MYBUDGETBACKEND-55: fix dockerfile">
+      <option name="closed" value="true" />
+      <created>1746624928548</created>
+      <option name="number" value="00086" />
+      <option name="presentableId" value="LOCAL-00086" />
+      <option name="project" value="LOCAL" />
+      <updated>1746624928548</updated>
+    </task>
+    <option name="localTasksCounter" value="87" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -601,7 +602,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="MYBUDGETBACKEND-40: fix docker swarm" />
     <MESSAGE value="MYBUDGETBACKEND-41: fix docker swarm" />
     <MESSAGE value="MYBUDGETBACKEND-42: fix docker compose and network" />
     <MESSAGE value="MYBUDGETBACKEND-43: optimizing ci/cd" />
@@ -626,7 +626,8 @@
     <MESSAGE value="MYBUDGETBACKEND-54: fix deploy ci" />
     <MESSAGE value="MYBUDGETBACKEND-54: split traefik" />
     <MESSAGE value="MYBUDGETBACKEND-54: fix pg volumes" />
-    <option name="LAST_COMMIT_MESSAGE" value="MYBUDGETBACKEND-54: fix pg volumes" />
+    <MESSAGE value="MYBUDGETBACKEND-55: fix dockerfile" />
+    <option name="LAST_COMMIT_MESSAGE" value="MYBUDGETBACKEND-55: fix dockerfile" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -950,6 +951,11 @@
           <url>file://$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/routing/UserRoute.kt</url>
           <line>131</line>
           <option name="timeStamp" value="162" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="kotlin-line">
+          <url>jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.ktor/ktor-server-core-jvm/3.0.3/de1e219a0680e4e028ad248d3cc646a8a16358b8/ktor-server-core-jvm-3.0.3-sources.jar!/jvmMain/io/ktor/server/config/HoconApplicationConfig.kt</url>
+          <line>44</line>
+          <option name="timeStamp" value="166" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
