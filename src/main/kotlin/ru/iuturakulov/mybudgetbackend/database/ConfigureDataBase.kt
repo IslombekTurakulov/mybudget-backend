@@ -40,7 +40,7 @@ fun configureDatabase() {
 
 object DatabaseConfig {
     fun initDB() {
-        val config = HikariConfig("hikari.properties")
+        val config = HikariConfig("/hikari.properties")
         val dataSource = HikariDataSource(config)
         runFlyway(dataSource)
         Database.connect(dataSource)
