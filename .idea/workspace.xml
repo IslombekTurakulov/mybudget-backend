@@ -182,22 +182,6 @@
       <option name="presentableId" value="Default" />
       <updated>1737229814397</updated>
     </task>
-    <task id="LOCAL-00033" summary="MYBUDGETBACKEND-33: fix docker volumes">
-      <option name="closed" value="true" />
-      <created>1746585944968</created>
-      <option name="number" value="00033" />
-      <option name="presentableId" value="LOCAL-00033" />
-      <option name="project" value="LOCAL" />
-      <updated>1746585944968</updated>
-    </task>
-    <task id="LOCAL-00034" summary="MYBUDGETBACKEND-34: fix deploy yml">
-      <option name="closed" value="true" />
-      <created>1746586542311</created>
-      <option name="number" value="00034" />
-      <option name="presentableId" value="LOCAL-00034" />
-      <option name="project" value="LOCAL" />
-      <updated>1746586542311</updated>
-    </task>
     <task id="LOCAL-00035" summary="MYBUDGETBACKEND-35: fix deploy yml">
       <option name="closed" value="true" />
       <created>1746586973698</created>
@@ -574,7 +558,23 @@
       <option name="project" value="LOCAL" />
       <updated>1746605702340</updated>
     </task>
-    <option name="localTasksCounter" value="82" />
+    <task id="LOCAL-00082" summary="MYBUDGETBACKEND-54: fix pg volumes">
+      <option name="closed" value="true" />
+      <created>1746605782441</created>
+      <option name="number" value="00082" />
+      <option name="presentableId" value="LOCAL-00082" />
+      <option name="project" value="LOCAL" />
+      <updated>1746605782441</updated>
+    </task>
+    <task id="LOCAL-00083" summary="MYBUDGETBACKEND-54: fix pg volumes">
+      <option name="closed" value="true" />
+      <created>1746606325069</created>
+      <option name="number" value="00083" />
+      <option name="presentableId" value="LOCAL-00083" />
+      <option name="project" value="LOCAL" />
+      <updated>1746606325069</updated>
+    </task>
+    <option name="localTasksCounter" value="84" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
