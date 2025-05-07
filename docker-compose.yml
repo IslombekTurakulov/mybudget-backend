@@ -29,96 +29,50 @@ services:
       POSTGRES_PASSWORD_FILE: /run/secrets/pg_password
     secrets:
       - pg_password
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${PG_USER} -d ${PG_DATABASE}"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
     deploy:
       replicas: 1
       restart_policy:
         condition: on-failure
-        max_attempts: 3
-      resources:
-        limits:
-          cpus: '0.5'
-          memory: 512M
-      update_config:
-        parallelism: 1
-        delay: 10s
 
   backend:
     image: ghcr.io/islombekturakulov/mybudget-backend:latest
     networks:
       - backend
       - public
-    depends_on:
-      database:
-        condition: service_healthy
     environment:
-      DATABASE_URL: jdbc:postgresql://database:5432/${PG_DATABASE}
-      JWT_SECRET: /run/secrets/app_secret
+      - DATABASE_URL=jdbc:postgresql://database:5432/${PG_DATABASE}
+      - PG_USER=${PG_USER}
+      - PG_DATABASE=${PG_DATABASE}
+      - PG_PASSWORD_FILE=/run/secrets/pg_password
+      - JWT_SECRET_FILE=/run/secrets/app_secret
     secrets:
+      - pg_password
       - app_secret
-    ports:
-      - target: 8080
-        published: 8080
-        protocol: tcp
-        mode: host
-    healthcheck:
-      test: ["CMD-SHELL","curl -f http://localhost:8080/health || exit 1"]
-      interval: 30s
-      timeout: 5s
-      retries: 3
     deploy:
-      mode: replicated
-      replicas: 2
+      replicas: 1
       restart_policy:
         condition: on-failure
-      resources:
-        limits:
-          cpus: '1.0'
-          memory: 1G
-      update_config:
-        parallelism: 1
-        delay: 15s
-      rollback_config:
-        parallelism: 1
-        delay: 15s
-    logging:
-      driver: json-file
-      options:
-        max-size: "10m"
-        max-file: "3"
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.backend.entrypoints=web"
+        - "traefik.http.services.backend.loadbalancer.server.port=8080"
 
   traefik:
     image: traefik:v2.11
     networks:
       - public
-      - backend
-    command:
-      - "--providers.docker=true"
-      - "--providers.docker.swarmMode=false"
-      - "--providers.docker.exposedByDefault=false"
-      - "--entrypoints.web.address=:80"
-      - "--entrypoints.websecure.address=:443"
-      - "--certificatesresolvers.leresolver.acme.email=${LETSENCRYPT_EMAIL}"
-      - "--certificatesresolvers.leresolver.acme.storage=/letsencrypt/acme.json"
-      - "--certificatesresolvers.leresolver.acme.httpchallenge.entrypoint=web"
     ports:
       - "80:80"
-      - "443:443"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - letsencrypt:/letsencrypt
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.swarmMode=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
     deploy:
-      mode: global
       placement:
         constraints:
           - node.role == manager
-    logging:
-      driver: json-file
-      options:
-        max-size: "5m"
-        max-file: "5"
 
