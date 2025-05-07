@@ -239,6 +239,7 @@ jobs:
                   - "traefik.http.middlewares.cors.headers.accessControlAllowCredentials=true"
                   - "traefik.http.middlewares.cors.headers.accessControlMaxAge=100"
                   - "traefik.http.routers.backend.middlewares=cors"
+                  - "traefik.http.services.backend.loadbalancer.passHostHeader=true"
                 healthcheck:
                   test: ["CMD-SHELL", "curl -f http://localhost:8080/ping || exit 1"]
                   interval: 30s
@@ -288,13 +289,19 @@ jobs:
                   - "--certificatesresolvers.leresolver.acme.email=${LETSENCRYPT_EMAIL}"
                   - "--certificatesresolvers.leresolver.acme.storage=/letsencrypt/acme.json"
                   - "--certificatesresolvers.leresolver.acme.httpchallenge.entrypoint=web"
-                  - "--log.level=DEBUG"
+                  - "--log.level=INFO"
                   - "--accesslog=true"
                   - "--accesslog.filepath=/var/log/traefik/access.log"
                   - "--metrics.prometheus=true"
+                  - "--api.dashboard=true"
+                  - "--api.insecure=true"
+                  - "--providers.docker.network=backend_public"
+                  - "--providers.docker.watch=true"
+                  - "--providers.docker.swarmModeRefreshSeconds=15s"
                 ports:
                   - "80:80"
                   - "443:443"
+                  - "8080:8080"
                 volumes:
                   - /var/run/docker.sock:/var/run/docker.sock:ro
                   - letsencrypt:/letsencrypt
