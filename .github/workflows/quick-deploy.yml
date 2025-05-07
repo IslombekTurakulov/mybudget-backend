@@ -31,17 +31,43 @@ jobs:
             
             # Check Docker Swarm status
             echo "Checking Docker Swarm status..."
-            docker info | grep Swarm
+            if ! docker info | grep -q "Swarm: active"; then
+              echo "Initializing Docker Swarm..."
+              docker swarm init
+            fi
             
             # Check node status
             echo "Checking node status..."
-            docker node ls
+            if ! docker node ls | grep -q "Ready"; then
+              echo "Error: No nodes are ready"
+              exit 1
+            fi
             
             # Clean up existing resources
             echo "Cleaning up existing resources..."
             docker stack rm backend || true
             sleep 10
-            docker network rm backend_backend backend_public || true
+            
+            # Remove all stopped containers
+            echo "Removing stopped containers..."
+            docker container prune -f
+            
+            # Remove unused networks
+            echo "Removing unused networks..."
+            docker network prune -f
+            
+            # Remove unused volumes
+            echo "Removing unused volumes..."
+            docker volume prune -f
+            
+            # Remove unused images
+            echo "Removing unused images..."
+            docker image prune -f
+            
+            # Create networks if they don't exist
+            echo "Creating networks..."
+            docker network create --driver overlay --attachable backend_backend || true
+            docker network create --driver overlay --attachable backend_public || true
             sleep 5
             
             # Create .env file
@@ -70,12 +96,8 @@ jobs:
             # Set proper permissions
             chmod 600 secrets/pg_password.txt secrets/app_jwt_secret.txt
             
-            # Login to GitHub Container Registry with proper authentication
+            # Login to GitHub Container Registry
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-            
-            # Verify login and pull the image
-            echo "Verifying image access..."
-            docker pull ghcr.io/islombekturakulov/mybudget-backend:${{ github.event.inputs.image_tag }}
             
             # Copy docker-compose.yml from repository
             cp /opt/mybudget/backend/docker-compose.yml .
@@ -83,31 +105,31 @@ jobs:
             # Pull latest images and deploy
             echo "Deploying stack..."
             docker stack deploy -c docker-compose.yml backend --with-registry-auth
-
+            
             # Wait for services to be ready
             echo "Waiting for services to be ready..."
             sleep 30
-
+            
             # Check service status
             echo "Checking service status..."
             docker service ls
-
+            
             # Check if all replicas are running
             echo "Checking replicas..."
             docker service ps backend_backend --no-trunc || true
             docker service ps backend_database --no-trunc || true
             docker service ps backend_traefik --no-trunc || true
-
+            
             # Check network connectivity
             echo "Checking networks..."
             docker network ls | grep backend
-
+            
             # Check logs for any immediate issues
             echo "Checking service logs..."
             docker service logs --tail 50 backend_backend || true
             docker service logs --tail 50 backend_database || true
             docker service logs --tail 50 backend_traefik || true
-
+            
             # Check if ports are open
             echo "Checking if ports are open..."
             if command -v netstat &> /dev/null; then
@@ -115,15 +137,30 @@ jobs:
             else
               echo "netstat not available, skipping port check"
             fi
-
+            
             # Verify health endpoints
             echo "Verifying health endpoints..."
-            curl -v http://89.169.144.44/ping || echo "Backend health check failed"
-
+            max_retries=5
+            retry_count=0
+            while [ $retry_count -lt $max_retries ]; do
+              if curl -f http://89.169.144.44/ping; then
+                echo "Health check passed"
+                break
+              fi
+              retry_count=$((retry_count + 1))
+              echo "Health check attempt $retry_count failed, retrying..."
+              sleep 10
+            done
+            
+            if [ $retry_count -eq $max_retries ]; then
+              echo "Error: Health check failed after $max_retries attempts"
+              exit 1
+            fi
+            
             # Check resource usage
             echo "Checking resource usage..."
             docker stats --no-stream
-
+            
             # Final status
             echo "Deployment completed. Checking final status..."
             docker stack services backend 

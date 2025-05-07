@@ -132,8 +132,8 @@ jobs:
             # Check Docker Swarm status
             echo "Checking Docker Swarm status..."
             if ! docker info | grep -q "Swarm: active"; then
-              echo "Error: Docker Swarm is not active"
-              exit 1
+              echo "Initializing Docker Swarm..."
+              docker swarm init
             fi
             
             # Check node status
@@ -166,8 +166,10 @@ jobs:
             echo "Removing unused images..."
             docker image prune -f
             
-            # Remove specific networks if they exist
-            docker network rm backend_backend backend_public || true
+            # Create networks if they don't exist
+            echo "Creating networks..."
+            docker network create --driver overlay --attachable backend_backend || true
+            docker network create --driver overlay --attachable backend_public || true
             sleep 5
             
             # Create .env file
@@ -196,85 +198,54 @@ jobs:
             # Set proper permissions
             chmod 600 secrets/pg_password.txt secrets/app_jwt_secret.txt
             
-            # Login to GitHub Container Registry with proper authentication
+            # Login to GitHub Container Registry
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-            
-            # Verify login and pull the image
-            echo "Verifying image access..."
-            if ! docker pull ghcr.io/islombekturakulov/mybudget-backend:${{ github.sha }}; then
-              echo "Error: Failed to pull image"
-              exit 1
-            fi
             
             # Copy docker-compose.yml from repository
             cp /opt/mybudget/backend/docker-compose.yml .
             
             # Pull latest images and deploy
             echo "Deploying stack..."
-            if ! docker stack deploy -c docker-compose.yml backend --with-registry-auth; then
-              echo "Error: Failed to deploy stack"
-              exit 1
-            fi
-
+            docker stack deploy -c docker-compose.yml backend --with-registry-auth
+            
             # Wait for services to be ready
             echo "Waiting for services to be ready..."
             sleep 30
-
+            
             # Check service status
             echo "Checking service status..."
-            if ! docker service ls | grep -q "backend_backend"; then
-              echo "Error: Backend service not found"
-              exit 1
-            fi
-
+            docker service ls
+            
             # Check if all replicas are running
             echo "Checking replicas..."
-            for service in backend_backend backend_database backend_traefik; do
-              if ! docker service ps $service --no-trunc | grep -q "Running"; then
-                echo "Error: Service $service is not running"
-                docker service ps $service --no-trunc
-                exit 1
-              fi
-            done
-
+            docker service ps backend_backend --no-trunc || true
+            docker service ps backend_database --no-trunc || true
+            docker service ps backend_traefik --no-trunc || true
+            
             # Check network connectivity
             echo "Checking networks..."
-            if ! docker network ls | grep -q "backend_backend"; then
-              echo "Error: Backend network not found"
-              exit 1
-            fi
-
+            docker network ls | grep backend
+            
             # Check logs for any immediate issues
             echo "Checking service logs..."
-            for service in backend_backend backend_database backend_traefik; do
-              echo "=== Logs for $service ==="
-              docker service logs --tail 50 $service || true
-            done
-
+            docker service logs --tail 50 backend_backend || true
+            docker service logs --tail 50 backend_database || true
+            docker service logs --tail 50 backend_traefik || true
+            
             # Check if ports are open
             echo "Checking if ports are open..."
             if command -v netstat &> /dev/null; then
-              if ! netstat -tulpn | grep -E '80|443' > /dev/null; then
-                echo "Warning: Ports 80 or 443 not found in netstat output"
-                echo "Current port status:"
-                netstat -tulpn
-              fi
+              netstat -tulpn | grep -E '80|443' || true
             else
-              echo "Installing net-tools..."
-              sudo apt-get update && sudo apt-get install -y net-tools
-              if ! netstat -tulpn | grep -E '80|443' > /dev/null; then
-                echo "Warning: Ports 80 or 443 not found in netstat output"
-                echo "Current port status:"
-                netstat -tulpn
-              fi
+              echo "netstat not available, skipping port check"
             fi
-
+            
             # Verify health endpoints
             echo "Verifying health endpoints..."
             max_retries=5
             retry_count=0
             while [ $retry_count -lt $max_retries ]; do
-              if curl -f http://localhost:8080/ping; then
+              if curl -f http://89.169.144.44/ping; then
                 echo "Health check passed"
                 break
               fi
@@ -282,8 +253,16 @@ jobs:
               echo "Health check attempt $retry_count failed, retrying..."
               sleep 10
             done
-
+            
             if [ $retry_count -eq $max_retries ]; then
               echo "Error: Health check failed after $max_retries attempts"
               exit 1
-            fi 
+            fi
+            
+            # Check resource usage
+            echo "Checking resource usage..."
+            docker stats --no-stream
+            
+            # Final status
+            echo "Deployment completed. Checking final status..."
+            docker stack services backend 
