@@ -83,11 +83,17 @@ jobs:
             # Create .env file
             cat > .env << EOL
             PG_USER=${{ secrets.PG_USER }}
+            PG_PASSWORD=${{ secrets.PG_PASSWORD }}
             PG_DATABASE=${{ secrets.PG_DATABASE }}
             GITHUB_OWNER=islombekturakulov
-            TAG=latest
+            TAG=${{ github.event.inputs.image_tag }}
             LETSENCRYPT_EMAIL=${{ secrets.LETSENCRYPT_EMAIL }}
             EOL
+
+            # Export DB variables for backend
+            export PG_USER="${{ secrets.PG_USER }}"
+            export PG_PASSWORD="${{ secrets.PG_PASSWORD }}"
+            export PG_DATABASE="${{ secrets.PG_DATABASE }}"
 
             # Echo variables for debug
             echo "GITHUB_OWNER=$(grep GITHUB_OWNER .env | cut -d'=' -f2)"
