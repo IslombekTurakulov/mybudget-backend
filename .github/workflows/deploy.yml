@@ -131,16 +131,42 @@ jobs:
             
             # Check Docker Swarm status
             echo "Checking Docker Swarm status..."
-            docker info | grep Swarm
+            if ! docker info | grep -q "Swarm: active"; then
+              echo "Error: Docker Swarm is not active"
+              exit 1
+            fi
             
             # Check node status
             echo "Checking node status..."
-            docker node ls
+            if ! docker node ls | grep -q "Ready"; then
+              echo "Error: No nodes are ready"
+              exit 1
+            fi
             
             # Clean up existing resources
             echo "Cleaning up existing resources..."
+            
+            # Remove existing stack
             docker stack rm backend || true
             sleep 10
+            
+            # Remove all stopped containers
+            echo "Removing stopped containers..."
+            docker container prune -f
+            
+            # Remove unused networks
+            echo "Removing unused networks..."
+            docker network prune -f
+            
+            # Remove unused volumes
+            echo "Removing unused volumes..."
+            docker volume prune -f
+            
+            # Remove unused images
+            echo "Removing unused images..."
+            docker image prune -f
+            
+            # Remove specific networks if they exist
             docker network rm backend_backend backend_public || true
             sleep 5
             
@@ -175,14 +201,20 @@ jobs:
             
             # Verify login and pull the image
             echo "Verifying image access..."
-            docker pull ghcr.io/islombekturakulov/mybudget-backend:${{ github.sha }}
+            if ! docker pull ghcr.io/islombekturakulov/mybudget-backend:${{ github.sha }}; then
+              echo "Error: Failed to pull image"
+              exit 1
+            fi
             
             # Copy docker-compose.yml from repository
             cp /opt/mybudget/backend/docker-compose.yml .
             
             # Pull latest images and deploy
             echo "Deploying stack..."
-            docker stack deploy -c docker-compose.yml backend --with-registry-auth
+            if ! docker stack deploy -c docker-compose.yml backend --with-registry-auth; then
+              echo "Error: Failed to deploy stack"
+              exit 1
+            fi
 
             # Wait for services to be ready
             echo "Waiting for services to be ready..."
@@ -190,40 +222,68 @@ jobs:
 
             # Check service status
             echo "Checking service status..."
-            docker service ls
+            if ! docker service ls | grep -q "backend_backend"; then
+              echo "Error: Backend service not found"
+              exit 1
+            fi
 
             # Check if all replicas are running
             echo "Checking replicas..."
-            docker service ps backend_backend --no-trunc || true
-            docker service ps backend_database --no-trunc || true
-            docker service ps backend_traefik --no-trunc || true
+            for service in backend_backend backend_database backend_traefik; do
+              if ! docker service ps $service --no-trunc | grep -q "Running"; then
+                echo "Error: Service $service is not running"
+                docker service ps $service --no-trunc
+                exit 1
+              fi
+            done
 
             # Check network connectivity
             echo "Checking networks..."
-            docker network ls | grep backend
+            if ! docker network ls | grep -q "backend_backend"; then
+              echo "Error: Backend network not found"
+              exit 1
+            fi
 
             # Check logs for any immediate issues
             echo "Checking service logs..."
-            docker service logs --tail 50 backend_backend || true
-            docker service logs --tail 50 backend_database || true
-            docker service logs --tail 50 backend_traefik || true
+            for service in backend_backend backend_database backend_traefik; do
+              echo "=== Logs for $service ==="
+              docker service logs --tail 50 $service || true
+            done
 
             # Check if ports are open
             echo "Checking if ports are open..."
             if command -v netstat &> /dev/null; then
-              netstat -tulpn | grep -E '80|443' || true
+              if ! netstat -tulpn | grep -E '80|443' > /dev/null; then
+                echo "Warning: Ports 80 or 443 not found in netstat output"
+                echo "Current port status:"
+                netstat -tulpn
+              fi
             else
-              echo "netstat not available, skipping port check"
+              echo "Installing net-tools..."
+              sudo apt-get update && sudo apt-get install -y net-tools
+              if ! netstat -tulpn | grep -E '80|443' > /dev/null; then
+                echo "Warning: Ports 80 or 443 not found in netstat output"
+                echo "Current port status:"
+                netstat -tulpn
+              fi
             fi
 
             # Verify health endpoints
             echo "Verifying health endpoints..."
-            curl -v http://89.169.144.44/ping || echo "Backend health check failed"
+            max_retries=5
+            retry_count=0
+            while [ $retry_count -lt $max_retries ]; do
+              if curl -f http://localhost:8080/ping; then
+                echo "Health check passed"
+                break
+              fi
+              retry_count=$((retry_count + 1))
+              echo "Health check attempt $retry_count failed, retrying..."
+              sleep 10
+            done
 
-            # Check resource usage
-            echo "Checking resource usage..."
-            docker stats --no-stream
-
-            # Final status
-            echo "Deployment completed. Checking final status..."
-            docker stack services backend 
+            if [ $retry_count -eq $max_retries ]; then
+              echo "Error: Health check failed after $max_retries attempts"
+              exit 1
+            fi 
