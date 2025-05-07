@@ -122,8 +122,10 @@ jobs:
             networks:
               backend:
                 driver: overlay
+                attachable: true
               public:
                 driver: overlay
+                attachable: true
 
             volumes:
               pg_data:
@@ -256,5 +258,4 @@ jobs:
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
             
             # Pull latest images and deploy
-            docker-compose pull
-            docker-compose up -d 
+            docker stack deploy -c docker-compose.yml backend 
