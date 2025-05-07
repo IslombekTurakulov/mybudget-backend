@@ -1,0 +1,10 @@
+#cloud-config
+users:
+  - name: ubuntu
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    shell: /bin/bash
+    ssh_authorized_keys:
+      - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQChgTkgu26s6cjKKjZro05C1wtgzE5OtVIygEWzDMd/v69phzLqRtdhm4HJd0U2ZOeJL0AFurSuatJYwHo0WZvUDFpXd1UqjYsrROIzQTY8QptO7xCo1WTp6pVDKIj80rLhuqyQ6CpzMek23ORacwKXbb9itS4pH9ttLZpoKA8X3kDjhDiYk1S1orPEeSrL81E8FtLGLATK29NYdEvQh12cResCHMHe+9eukykrC/zArNmpn00Dx/lHAN02I06XCYgjjPfR64UwxSmmdt/z6RULjyykF1PD+UgAOjeDA4GbeL2r9OpeabEzCarhBaNzD/VNairJGYeKc72oCwQiUCr7hI9024KER1oYu8NeyRT/f4bv0b7KaLjrWm1HPir+KcF7hjU9Zt4lQQEa7ez6fgiNjq2w5xgfhJSA2zoTcybfHNsYiuu+KqS84dC2DqAv/EqoKBY5tugpmp07Whz5dX1BAEOaFEQuuHGiSz2I29J5gTyiYtPhTwDXvb0T3AcuBeWBXHf2a+E3AbXUXExSOJ/lMZdYxLqopBwVOMG62Wv541895aYmbuI6HQLVD3v/uFlvJwu36+w0CCUtjP7uNw+Nf7EJELxwWWbazSjks31JdOtMNtnR2Goy6iR/2z3bkqQ4Msly+mNRSbvNHIUKS5i+HbG2CVdawldkt8l+p3BNCw== iuturakulov@Islombeks-MacBook-Pro.local
+
+package_update: true
+package_upgrade: true

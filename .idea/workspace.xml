@@ -4,8 +4,19 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4bbd917-8929-44b4-afda-19b441d6e48e" name="Changes" comment="MYBUDGETBACKEND-29: update secrets">
-      <change beforePath="$PROJECT_DIR$/.github/workflows/backend-ci.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/backend-ci.yml" afterDir="false" />
+    <list default="true" id="c4bbd917-8929-44b4-afda-19b441d6e48e" name="Changes" comment="MYBUDGETBACKEND-30: update secrets">
+      <change afterPath="$PROJECT_DIR$/.github/workflows/deploy.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/shelf/Changes.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/shelf/Changes/shelved.patch" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_05_05_2025,_03_19_[Changes]/shelved.patch" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_05_05_2025__03_19__Changes_.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Dockerfile" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/scripts/cleanup-yc-vm.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/scripts/cloud-init.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/scripts/setup-server.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/scripts/setup-yc-vm.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.github/workflows/backend-ci.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -356,7 +367,15 @@
       <option name="project" value="LOCAL" />
       <updated>1746578783887</updated>
     </task>
-    <option name="localTasksCounter" value="29" />
+    <task id="LOCAL-00029" summary="MYBUDGETBACKEND-30: update secrets">
+      <option name="closed" value="true" />
+      <created>1746579075543</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1746579075543</updated>
+    </task>
+    <option name="localTasksCounter" value="30" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -371,7 +390,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="MYBUDGETBACKEND-6: Project, transaction, auth, database and call response fixes" />
     <MESSAGE value="MYBUDGETBACKEND-7: Project, transaction fixes" />
     <MESSAGE value="MYBUDGETBACKEND-8: Transaction fixes" />
     <MESSAGE value="MYBUDGETBACKEND-9: Transaction fixes" />
@@ -396,7 +414,8 @@
     <MESSAGE value="MYBUDGETBACKEND-27: update backend-ci.yml and add docker-compose.yml" />
     <MESSAGE value="MYBUDGETBACKEND-28: update backend-ci.yml" />
     <MESSAGE value="MYBUDGETBACKEND-29: update secrets" />
-    <option name="LAST_COMMIT_MESSAGE" value="MYBUDGETBACKEND-29: update secrets" />
+    <MESSAGE value="MYBUDGETBACKEND-30: update secrets" />
+    <option name="LAST_COMMIT_MESSAGE" value="MYBUDGETBACKEND-30: update secrets" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
