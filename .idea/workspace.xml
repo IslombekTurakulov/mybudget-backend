@@ -182,14 +182,6 @@
       <option name="presentableId" value="Default" />
       <updated>1737229814397</updated>
     </task>
-    <task id="LOCAL-00026" summary="MYBUDGETBACKEND-27: update backend-ci.yml and add docker-compose.yml">
-      <option name="closed" value="true" />
-      <created>1746578502216</created>
-      <option name="number" value="00026" />
-      <option name="presentableId" value="LOCAL-00026" />
-      <option name="project" value="LOCAL" />
-      <updated>1746578502216</updated>
-    </task>
     <task id="LOCAL-00027" summary="MYBUDGETBACKEND-28: update backend-ci.yml">
       <option name="closed" value="true" />
       <created>1746578576493</created>
@@ -574,7 +566,15 @@
       <option name="project" value="LOCAL" />
       <updated>1746603639295</updated>
     </task>
-    <option name="localTasksCounter" value="75" />
+    <task id="LOCAL-00075" summary="MYBUDGETBACKEND-54: fix pg volumes">
+      <option name="closed" value="true" />
+      <created>1746603819475</created>
+      <option name="number" value="00075" />
+      <option name="presentableId" value="LOCAL-00075" />
+      <option name="project" value="LOCAL" />
+      <updated>1746603819475</updated>
+    </task>
+    <option name="localTasksCounter" value="76" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">

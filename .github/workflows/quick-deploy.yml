@@ -88,18 +88,27 @@ jobs:
             TAG=${{ github.event.inputs.image_tag }}
             LETSENCRYPT_EMAIL=${{ secrets.LETSENCRYPT_EMAIL }}
             EOL
-            
+
+            # Echo variables for debug
+            echo "GITHUB_OWNER=$(grep GITHUB_OWNER .env | cut -d'=' -f2)"
+            echo "TAG=$(grep TAG .env | cut -d'=' -f2)"
+
             # Verify environment variables
             echo "Verifying environment variables..."
             if [ -z "${{ secrets.PG_USER }}" ] || [ -z "${{ secrets.PG_DATABASE }}" ] || [ -z "${{ secrets.PG_PASSWORD }}" ] || [ -z "${{ secrets.JWT_SECRET }}" ]; then
               echo "Error: Missing required environment variables"
               exit 1
             fi
-            
-            # Validate image tag
-            echo "Validating image tag..."
-            if [ -z "${{ github.event.inputs.image_tag }}" ]; then
-              echo "Error: Image tag is required"
+
+            # Validate image tag and owner
+            GITHUB_OWNER=$(grep GITHUB_OWNER .env | cut -d'=' -f2)
+            TAG=$(grep TAG .env | cut -d'=' -f2)
+            if [ -z "$GITHUB_OWNER" ]; then
+              echo "Error: GITHUB_OWNER is required"
+              exit 1
+            fi
+            if [ -z "$TAG" ]; then
+              echo "Error: TAG is required"
               exit 1
             fi
             
@@ -213,7 +222,7 @@ jobs:
                 secrets:
                   - pg_password
                 healthcheck:
-                  test: ["CMD-SHELL", "pg_isready -U \${PG_USER} -d \${PG_DATABASE}"]
+                  test: ["CMD-SHELL", "pg_isready -U $$(printenv POSTGRES_USER) -d $$(printenv POSTGRES_DB)"]
                   interval: 10s
                   timeout: 5s
                   retries: 5
