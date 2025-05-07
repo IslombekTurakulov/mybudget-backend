@@ -8,9 +8,9 @@ secrets:
 
 networks:
   backend:
-    driver: overlay
+    driver: bridge
   public:
-    driver: overlay
+    driver: bridge
 
 volumes:
   pg_data:
@@ -98,7 +98,7 @@ services:
       - backend
     command:
       - "--providers.docker=true"
-      - "--providers.docker.swarmMode=true"
+      - "--providers.docker.swarmMode=false"
       - "--providers.docker.exposedByDefault=false"
       - "--entrypoints.web.address=:80"
       - "--entrypoints.websecure.address=:443"
