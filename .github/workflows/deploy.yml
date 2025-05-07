@@ -121,18 +121,21 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
+            # Create directory if it doesn't exist
+            sudo mkdir -p /opt/mybudget/backend
+            sudo chown -R $USER:$USER /opt/mybudget/backend
             cd /opt/mybudget/backend
             
-            # Copy docker-compose.yml
+            # Create docker-compose.yml
             cat > docker-compose.yml << 'EOL'
             version: '3.9'
-
+            
             secrets:
               pg_password:
                 file: ./secrets/pg_password.txt
               app_secret:
                 file: ./secrets/app_jwt_secret.txt
-
+            
             networks:
               backend:
                 driver: overlay
@@ -140,12 +143,12 @@ jobs:
               public:
                 driver: overlay
                 attachable: true
-
+            
             volumes:
               pg_data:
               letsencrypt:
               traefik_logs:
-
+            
             services:
               database:
                 image: postgres:17-alpine
@@ -186,7 +189,7 @@ jobs:
                   placement:
                     constraints:
                       - node.role == manager
-
+            
               backend:
                 image: ghcr.io/islombekturakulov/mybudget-backend:latest
                 networks:
@@ -197,6 +200,12 @@ jobs:
                 environment:
                   DATABASE_URL: jdbc:postgresql://database:5432/${PG_DATABASE}
                   JWT_SECRET: /run/secrets/app_secret
+                  SPRING_PROFILES_ACTIVE: prod
+                  SERVER_PORT: 8080
+                  SPRING_SECURITY_CORS_ALLOWED_ORIGINS: "*"
+                  SPRING_SECURITY_CORS_ALLOWED_METHODS: "GET,POST,PUT,DELETE,OPTIONS"
+                  SPRING_SECURITY_CORS_ALLOWED_HEADERS: "*"
+                  SPRING_SECURITY_CORS_ALLOW_CREDENTIALS: "true"
                 secrets:
                   - app_secret
                 ports:
@@ -204,8 +213,19 @@ jobs:
                     published: 8080
                     protocol: tcp
                     mode: host
+                labels:
+                  - "traefik.enable=true"
+                  - "traefik.http.routers.backend.rule=Host(`89.169.144.44`)"
+                  - "traefik.http.routers.backend.entrypoints=web"
+                  - "traefik.http.services.backend.loadbalancer.server.port=8080"
+                  - "traefik.http.middlewares.cors.headers.accessControlAllowMethods=GET,POST,PUT,DELETE,OPTIONS"
+                  - "traefik.http.middlewares.cors.headers.accessControlAllowOriginList=*"
+                  - "traefik.http.middlewares.cors.headers.accessControlAllowHeaders=*"
+                  - "traefik.http.middlewares.cors.headers.accessControlAllowCredentials=true"
+                  - "traefik.http.middlewares.cors.headers.accessControlMaxAge=100"
+                  - "traefik.http.routers.backend.middlewares=cors"
                 healthcheck:
-                  test: ["CMD-SHELL", "curl -f http://localhost:8080/health || exit 1"]
+                  test: ["CMD-SHELL", "curl -f http://localhost:8080/ping || exit 1"]
                   interval: 30s
                   timeout: 5s
                   retries: 3
@@ -238,7 +258,7 @@ jobs:
                   options:
                     max-size: "10m"
                     max-file: "3"
-
+            
               traefik:
                 image: traefik:v2.11
                 networks:
@@ -253,7 +273,7 @@ jobs:
                   - "--certificatesresolvers.leresolver.acme.email=${LETSENCRYPT_EMAIL}"
                   - "--certificatesresolvers.leresolver.acme.storage=/letsencrypt/acme.json"
                   - "--certificatesresolvers.leresolver.acme.httpchallenge.entrypoint=web"
-                  - "--log.level=INFO"
+                  - "--log.level=DEBUG"
                   - "--accesslog=true"
                   - "--accesslog.filepath=/var/log/traefik/access.log"
                   - "--metrics.prometheus=true"
@@ -291,17 +311,16 @@ jobs:
                   options:
                     max-size: "5m"
                     max-file: "5"
-
-            volumes:
-              pg_data:
-              letsencrypt:
-              traefik_logs:
-
-            echo "PG_USER=${{ secrets.PG_USER }}" > .env
-            echo "PG_DATABASE=${{ secrets.PG_DATABASE }}" >> .env
-            echo "GITHUB_OWNER=islombekturakulov" >> .env
-            echo "TAG=${{ github.sha }}" >> .env
-            echo "LETSENCRYPT_EMAIL=${{ secrets.LETSENCRYPT_EMAIL }}" >> .env
+            EOL
+            
+            # Create .env file
+            cat > .env << EOL
+            PG_USER=${{ secrets.PG_USER }}
+            PG_DATABASE=${{ secrets.PG_DATABASE }}
+            GITHUB_OWNER=islombekturakulov
+            TAG=${{ github.sha }}
+            LETSENCRYPT_EMAIL=${{ secrets.LETSENCRYPT_EMAIL }}
+            EOL
             
             # Create secrets directory if it doesn't exist
             mkdir -p secrets
@@ -317,4 +336,40 @@ jobs:
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
             
             # Pull latest images and deploy
-            docker stack deploy -c docker-compose.yml backend 
+            docker stack deploy -c docker-compose.yml backend
+
+            # Wait for services to be ready
+            echo "Waiting for services to be ready..."
+            sleep 30
+
+            # Check service status
+            echo "Checking service status..."
+            docker service ls
+
+            # Check if all replicas are running
+            echo "Checking replicas..."
+            docker service ps backend_backend --no-trunc
+            docker service ps backend_database --no-trunc
+            docker service ps backend_traefik --no-trunc
+
+            # Check network connectivity
+            echo "Checking networks..."
+            docker network ls | grep backend
+
+            # Check logs for any immediate issues
+            echo "Checking service logs..."
+            docker service logs --tail 50 backend_backend
+            docker service logs --tail 50 backend_database
+            docker service logs --tail 50 backend_traefik
+
+            # Verify health endpoints
+            echo "Verifying health endpoints..."
+            curl -f http://89.169.144.44/ping || echo "Backend health check failed"
+
+            # Check resource usage
+            echo "Checking resource usage..."
+            docker stats --no-stream
+
+            # Final status
+            echo "Deployment completed. Checking final status..."
+            docker stack services backend 

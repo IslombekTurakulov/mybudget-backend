@@ -4,8 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4bbd917-8929-44b4-afda-19b441d6e48e" name="Changes" comment="MYBUDGETBACKEND-43: optimizing ci/cd">
+    <list default="true" id="c4bbd917-8929-44b4-afda-19b441d6e48e" name="Changes" comment="MYBUDGETBACKEND-44: fix docker">
       <change beforePath="$PROJECT_DIR$/.github/workflows/deploy.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/deploy.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -552,7 +553,23 @@
       <option name="project" value="LOCAL" />
       <updated>1746593456696</updated>
     </task>
-    <option name="localTasksCounter" value="47" />
+    <task id="LOCAL-00047" summary="MYBUDGETBACKEND-44: fix docker">
+      <option name="closed" value="true" />
+      <created>1746593832183</created>
+      <option name="number" value="00047" />
+      <option name="presentableId" value="LOCAL-00047" />
+      <option name="project" value="LOCAL" />
+      <updated>1746593832183</updated>
+    </task>
+    <task id="LOCAL-00048" summary="MYBUDGETBACKEND-44: fix docker">
+      <option name="closed" value="true" />
+      <created>1746593835621</created>
+      <option name="number" value="00048" />
+      <option name="presentableId" value="LOCAL-00048" />
+      <option name="project" value="LOCAL" />
+      <updated>1746593835621</updated>
+    </task>
+    <option name="localTasksCounter" value="49" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -567,7 +584,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="MYBUDGETBACKEND-22: fix mapping empty category [not good]" />
     <MESSAGE value="MYBUDGETBACKEND-23: fix project archive/unarchive states, add validation params in update project request" />
     <MESSAGE value="Create backend-ci.yml" />
     <MESSAGE value="MYBUDGETBACKEND-24: add firebase notification feature using oauth 2.0 and admin sdk, unified notification services, add new params in table, utf8 control, add multilingual text support using properties" />
@@ -592,7 +608,8 @@
     <MESSAGE value="MYBUDGETBACKEND-41: fix docker swarm" />
     <MESSAGE value="MYBUDGETBACKEND-42: fix docker compose and network" />
     <MESSAGE value="MYBUDGETBACKEND-43: optimizing ci/cd" />
-    <option name="LAST_COMMIT_MESSAGE" value="MYBUDGETBACKEND-43: optimizing ci/cd" />
+    <MESSAGE value="MYBUDGETBACKEND-44: fix docker" />
+    <option name="LAST_COMMIT_MESSAGE" value="MYBUDGETBACKEND-44: fix docker" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
