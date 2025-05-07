@@ -29,6 +29,7 @@ services:
     environment:
       POSTGRES_USER: ${PG_USER}
       POSTGRES_DB: ${PG_DATABASE}
+      TAG: ${TAG}
       POSTGRES_PASSWORD_FILE: /run/secrets/pg_password
     secrets:
       - pg_password
@@ -71,6 +72,7 @@ services:
       PG_USER: ${PG_USER}
       PG_PASSWORD: ${PG_PASSWORD}
       PG_DATABASE: ${PG_DATABASE}
+      TAG: ${TAG}
       DATABASE_URL: jdbc:postgresql://database:5432/${PG_DATABASE}
       JWT_SECRET: /run/secrets/app_secret
       SPRING_PROFILES_ACTIVE: prod
@@ -85,7 +87,7 @@ services:
       - app_secret
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.backend.rule=Host(`89.169.144.44`)"
+      - "traefik.http.routers.backend.rule=Host('89.169.144.44')"
       - "traefik.http.routers.backend.entrypoints=web"
       - "traefik.http.services.backend.loadbalancer.server.port=8082"
       - "traefik.http.middlewares.cors.headers.accessControlAllowMethods=GET,POST,PUT,DELETE,OPTIONS"

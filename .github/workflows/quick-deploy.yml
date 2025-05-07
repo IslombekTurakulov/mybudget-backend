@@ -288,7 +288,7 @@ jobs:
                   - app_secret
                 labels:
                   - "traefik.enable=true"
-                  - "traefik.http.routers.backend.rule=Host(\`89.169.144.44\`)"
+                  - "traefik.http.routers.backend.rule=Host(\'89.169.144.44\')"
                   - "traefik.http.routers.backend.entrypoints=web"
                   - "traefik.http.services.backend.loadbalancer.server.port=8082"
                   - "traefik.http.middlewares.cors.headers.accessControlAllowMethods=GET,POST,PUT,DELETE,OPTIONS"
