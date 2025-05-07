@@ -5,6 +5,7 @@ import ru.iuturakulov.mybudgetbackend.models.transaction.TransactionType
 data class TransactionEntity(
     val id: String,
     val projectId: String,
+    val projectName: String?,
     val userId: String,
     val userName: String,
     val name: String,

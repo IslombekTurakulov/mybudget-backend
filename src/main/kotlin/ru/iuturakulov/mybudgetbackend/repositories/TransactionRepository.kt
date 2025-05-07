@@ -8,6 +8,7 @@ import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.update
+import ru.iuturakulov.mybudgetbackend.entities.projects.ProjectsTable
 import ru.iuturakulov.mybudgetbackend.entities.transaction.TransactionEntity
 import ru.iuturakulov.mybudgetbackend.entities.transaction.TransactionsTable
 import ru.iuturakulov.mybudgetbackend.models.analytics.AnalyticsFilter
@@ -55,10 +56,10 @@ class TransactionRepository {
     }
 
     fun getTransactionsByUser(userId: String): List<TransactionEntity> = transaction {
-        TransactionsTable
+        (TransactionsTable innerJoin ProjectsTable)
             .selectAll().where { TransactionsTable.userId eq userId }
             .orderBy(TransactionsTable.date to SortOrder.ASC)
-            .map(TransactionsTable::fromRow)
+            .map { TransactionsTable.fromRow(it, withProjectName = true) }
     }
 
     fun updateTransaction(tx: TransactionEntity): Boolean = transaction {

@@ -21,6 +21,8 @@ data class OverviewCategoryStats(
 
 data class TransactionInfo(
     val id: String,
+    val projectId: String,
+    val projectName: String?,
     val name: String,
     val amount: Double,
     val date: String,

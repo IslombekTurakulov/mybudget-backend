@@ -71,7 +71,8 @@ class TransactionController(
                 categoryIcon = req.categoryIcon,
                 date = nowEpoch,
                 type = req.type ?: TransactionType.INCOME,
-                images = req.images
+                images = req.images,
+                projectName = project.name
             )
             transactionRepository.addTransaction(transactionEntitity)
 

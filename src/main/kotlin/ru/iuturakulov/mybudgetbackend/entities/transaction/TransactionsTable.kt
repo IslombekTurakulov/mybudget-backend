@@ -26,9 +26,10 @@ object TransactionsTable : Table("transactions") {
     override val primaryKey = PrimaryKey(id)
 
     // Функция маппинга строки результата базы данных в TransactionEntity.
-    fun fromRow(row: ResultRow) = TransactionEntity(
+    fun fromRow(row: ResultRow, withProjectName: Boolean = false) = TransactionEntity(
         id = row[id],
         projectId = row[projectId],
+        projectName = if (withProjectName) row[ProjectsTable.name] else null,
         userId = row[userId],
         userName = row[userName],
         name = row[name],

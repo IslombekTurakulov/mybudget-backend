@@ -77,6 +77,8 @@ class AnalyticsController(
                 val txInfos = list.map { tx ->
                     TransactionInfo(
                         id = tx.id,
+                        projectId = tx.projectId,
+                        projectName = tx.projectName,
                         name = tx.name,
                         amount = tx.amount,
                         date = Instant.ofEpochMilli(tx.date)
@@ -197,6 +199,8 @@ class AnalyticsController(
                 val txInfos = list.map { tx ->
                     TransactionInfo(
                         id = tx.id,
+                        projectId = tx.projectId,
+                        projectName = null,
                         name = tx.name,
                         amount = tx.amount,
                         date = Instant.ofEpochMilli(tx.date)
