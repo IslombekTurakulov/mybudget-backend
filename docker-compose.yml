@@ -71,22 +71,20 @@ services:
       DATABASE_URL: jdbc:postgresql://database:5432/${PG_DATABASE}
       JWT_SECRET: /run/secrets/app_secret
       SPRING_PROFILES_ACTIVE: prod
-      SERVER_PORT: 8080
+      SERVER_PORT: 8081
       SPRING_SECURITY_CORS_ALLOWED_ORIGINS: "*"
       SPRING_SECURITY_CORS_ALLOWED_METHODS: "GET,POST,PUT,DELETE,OPTIONS"
       SPRING_SECURITY_CORS_ALLOWED_HEADERS: "*"
       SPRING_SECURITY_CORS_ALLOW_CREDENTIALS: "true"
     expose:
-      - "8080"
-    ports:
-      - "127.0.0.1:8080:8080"
+      - "8081"
     secrets:
       - app_secret
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.backend.rule=Host(`89.169.144.44`)"
       - "traefik.http.routers.backend.entrypoints=web"
-      - "traefik.http.services.backend.loadbalancer.server.port=8080"
+      - "traefik.http.services.backend.loadbalancer.server.port=8081"
       - "traefik.http.middlewares.cors.headers.accessControlAllowMethods=GET,POST,PUT,DELETE,OPTIONS"
       - "traefik.http.middlewares.cors.headers.accessControlAllowOriginList=*"
       - "traefik.http.middlewares.cors.headers.accessControlAllowHeaders=*"
@@ -95,7 +93,7 @@ services:
       - "traefik.http.routers.backend.middlewares=cors"
       - "traefik.http.services.backend.loadbalancer.passHostHeader=true"
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8080/ping || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://localhost:8081/ping || exit 1"]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -152,9 +150,13 @@ services:
       - "--providers.docker.network=public"
       - "--providers.docker.watch=true"
       - "--providers.docker.swarmModeRefreshSeconds=15s"
+      - "--api.dashboard=true"
+      - "--api.insecure=false"
+      - "--api.debug=false"
     ports:
       - "80:80"
       - "443:443"
+      - "8080:8080"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - letsencrypt:/letsencrypt
