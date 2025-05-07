@@ -96,6 +96,13 @@ jobs:
               exit 1
             fi
             
+            # Validate image tag
+            echo "Validating image tag..."
+            if [ -z "${{ github.event.inputs.image_tag }}" ]; then
+              echo "Error: Image tag is required"
+              exit 1
+            fi
+            
             # Create secrets directory if it doesn't exist
             mkdir -p secrets
             
@@ -200,13 +207,13 @@ jobs:
                 volumes:
                   - pg_data:/var/lib/postgresql/data
                 environment:
-                  POSTGRES_USER: \${PG_USER}
-                  POSTGRES_DB: \${PG_DATABASE}
+                  POSTGRES_USER: "\${PG_USER}"
+                  POSTGRES_DB: "\${PG_DATABASE}"
                   POSTGRES_PASSWORD_FILE: /run/secrets/pg_password
                 secrets:
                   - pg_password
                 healthcheck:
-                  test: ["CMD-SHELL", "pg_isready -U \$POSTGRES_USER -d \$POSTGRES_DB"]
+                  test: ["CMD-SHELL", "pg_isready -U \${PG_USER} -d \${PG_DATABASE}"]
                   interval: 10s
                   timeout: 5s
                   retries: 5
@@ -234,7 +241,7 @@ jobs:
                       - node.role == manager
 
               backend:
-                image: ghcr.io/islombekturakulov/mybudget-backend:\${TAG}
+                image: ghcr.io/\${GITHUB_OWNER}/mybudget-backend:\${TAG}
                 networks:
                   - backend
                   - public
@@ -295,6 +302,10 @@ jobs:
                     max-size: "10m"
                     max-file: "3"
             EOL
+            
+            # Verify docker-compose.yml
+            echo "Verifying docker-compose.yml..."
+            docker-compose config
             
             # Pull latest images and deploy
             echo "Deploying stack..."

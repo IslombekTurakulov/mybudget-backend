@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4bbd917-8929-44b4-afda-19b441d6e48e" name="Changes" comment="MYBUDGETBACKEND-54: split traefik">
-      <change beforePath="$PROJECT_DIR$/.github/workflows/quick-deploy.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/quick-deploy.yml" afterDir="false" />
-    </list>
+    <list default="true" id="c4bbd917-8929-44b4-afda-19b441d6e48e" name="Changes" comment="MYBUDGETBACKEND-54: fix pg volumes" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -183,30 +181,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1737229814397</updated>
-    </task>
-    <task id="LOCAL-00023" summary="MYBUDGETBACKEND-24: add firebase notification feature using oauth 2.0 and admin sdk, unified notification services, add new params in table, utf8 control, add multilingual text support using properties">
-      <option name="closed" value="true" />
-      <created>1746404391065</created>
-      <option name="number" value="00023" />
-      <option name="presentableId" value="LOCAL-00023" />
-      <option name="project" value="LOCAL" />
-      <updated>1746404391065</updated>
-    </task>
-    <task id="LOCAL-00024" summary="MYBUDGETBACKEND-25: add verification by code feature, fix overallnotification handling, add new permissions to viewer and editor roles, add email ru/en localization">
-      <option name="closed" value="true" />
-      <created>1746506826670</created>
-      <option name="number" value="00024" />
-      <option name="presentableId" value="LOCAL-00024" />
-      <option name="project" value="LOCAL" />
-      <updated>1746506826670</updated>
-    </task>
-    <task id="LOCAL-00025" summary="MYBUDGETBACKEND-26: add projectid/projectname params in analytics to view transaction details">
-      <option name="closed" value="true" />
-      <created>1746577566247</created>
-      <option name="number" value="00025" />
-      <option name="presentableId" value="LOCAL-00025" />
-      <option name="project" value="LOCAL" />
-      <updated>1746577566247</updated>
     </task>
     <task id="LOCAL-00026" summary="MYBUDGETBACKEND-27: update backend-ci.yml and add docker-compose.yml">
       <option name="closed" value="true" />
@@ -576,7 +550,31 @@
       <option name="project" value="LOCAL" />
       <updated>1746603015731</updated>
     </task>
-    <option name="localTasksCounter" value="72" />
+    <task id="LOCAL-00072" summary="MYBUDGETBACKEND-54: fix pg volumes">
+      <option name="closed" value="true" />
+      <created>1746603330224</created>
+      <option name="number" value="00072" />
+      <option name="presentableId" value="LOCAL-00072" />
+      <option name="project" value="LOCAL" />
+      <updated>1746603330224</updated>
+    </task>
+    <task id="LOCAL-00073" summary="MYBUDGETBACKEND-54: fix pg volumes">
+      <option name="closed" value="true" />
+      <created>1746603457362</created>
+      <option name="number" value="00073" />
+      <option name="presentableId" value="LOCAL-00073" />
+      <option name="project" value="LOCAL" />
+      <updated>1746603457362</updated>
+    </task>
+    <task id="LOCAL-00074" summary="MYBUDGETBACKEND-54: fix pg volumes">
+      <option name="closed" value="true" />
+      <created>1746603639295</created>
+      <option name="number" value="00074" />
+      <option name="presentableId" value="LOCAL-00074" />
+      <option name="project" value="LOCAL" />
+      <updated>1746603639295</updated>
+    </task>
+    <option name="localTasksCounter" value="75" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -591,7 +589,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="MYBUDGETBACKEND-39: fix gitignore" />
     <MESSAGE value="MYBUDGETBACKEND-40: fix docker swarm" />
     <MESSAGE value="MYBUDGETBACKEND-41: fix docker swarm" />
     <MESSAGE value="MYBUDGETBACKEND-42: fix docker compose and network" />
@@ -616,7 +613,8 @@
     <MESSAGE value="MYBUDGETBACKEND-54: fix dockerfile" />
     <MESSAGE value="MYBUDGETBACKEND-54: fix deploy ci" />
     <MESSAGE value="MYBUDGETBACKEND-54: split traefik" />
-    <option name="LAST_COMMIT_MESSAGE" value="MYBUDGETBACKEND-54: split traefik" />
+    <MESSAGE value="MYBUDGETBACKEND-54: fix pg volumes" />
+    <option name="LAST_COMMIT_MESSAGE" value="MYBUDGETBACKEND-54: fix pg volumes" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
