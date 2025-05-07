@@ -60,6 +60,11 @@ jobs:
             echo "Removing unused volumes..."
             docker volume prune -f
             
+            # Remove PostgreSQL volume specifically
+            echo "Removing PostgreSQL volume..."
+            docker volume rm backend_pg_data || true
+            docker volume rm backend_traefik_pg_data || true
+            
             # Remove unused images
             echo "Removing unused images..."
             docker image prune -f
@@ -102,6 +107,8 @@ jobs:
             # Create docker-compose.yml with correct configuration
             cat > docker-compose.yml << EOL
             version: '3.9'
+
+            name: backend
 
             secrets:
               pg_password:
@@ -349,4 +356,4 @@ jobs:
             
             # Final status
             echo "Deployment completed. Checking final status..."
-            docker stack services backend 
+            docker stack services backend

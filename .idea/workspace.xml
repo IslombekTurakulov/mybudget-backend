@@ -4,8 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4bbd917-8929-44b4-afda-19b441d6e48e" name="Changes" comment="MYBUDGETBACKEND-54: fix deploy ci">
-      <change afterPath="$PROJECT_DIR$/traefik-compose.yml" afterDir="false" />
+    <list default="true" id="c4bbd917-8929-44b4-afda-19b441d6e48e" name="Changes" comment="MYBUDGETBACKEND-54: split traefik">
+      <change beforePath="$PROJECT_DIR$/.github/workflows/quick-deploy.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/quick-deploy.yml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -183,14 +183,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1737229814397</updated>
-    </task>
-    <task id="LOCAL-00022" summary="Create backend-ci.yml">
-      <option name="closed" value="true" />
-      <created>1746290226311</created>
-      <option name="number" value="00022" />
-      <option name="presentableId" value="LOCAL-00022" />
-      <option name="project" value="LOCAL" />
-      <updated>1746290226311</updated>
     </task>
     <task id="LOCAL-00023" summary="MYBUDGETBACKEND-24: add firebase notification feature using oauth 2.0 and admin sdk, unified notification services, add new params in table, utf8 control, add multilingual text support using properties">
       <option name="closed" value="true" />
@@ -576,7 +568,15 @@
       <option name="project" value="LOCAL" />
       <updated>1746602727061</updated>
     </task>
-    <option name="localTasksCounter" value="71" />
+    <task id="LOCAL-00071" summary="MYBUDGETBACKEND-54: split traefik">
+      <option name="closed" value="true" />
+      <created>1746603015731</created>
+      <option name="number" value="00071" />
+      <option name="presentableId" value="LOCAL-00071" />
+      <option name="project" value="LOCAL" />
+      <updated>1746603015731</updated>
+    </task>
+    <option name="localTasksCounter" value="72" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -591,7 +591,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="MYBUDGETBACKEND-39: fix gitignore, made deploy optional, fix lowercase deploy" />
     <MESSAGE value="MYBUDGETBACKEND-39: fix gitignore" />
     <MESSAGE value="MYBUDGETBACKEND-40: fix docker swarm" />
     <MESSAGE value="MYBUDGETBACKEND-41: fix docker swarm" />
@@ -616,7 +615,8 @@
     <MESSAGE value="MYBUDGETBACKEND-54: fix port in docker-compose.yml again" />
     <MESSAGE value="MYBUDGETBACKEND-54: fix dockerfile" />
     <MESSAGE value="MYBUDGETBACKEND-54: fix deploy ci" />
-    <option name="LAST_COMMIT_MESSAGE" value="MYBUDGETBACKEND-54: fix deploy ci" />
+    <MESSAGE value="MYBUDGETBACKEND-54: split traefik" />
+    <option name="LAST_COMMIT_MESSAGE" value="MYBUDGETBACKEND-54: split traefik" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
