@@ -13,23 +13,27 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+
+    env:
+      PG_USER: ${{secrets.PG_USER}}
+      PG_PASSWORD: ${{secrets.PG_PASSWORD}}
+      PG_DATABASE: ${{secrets.PG_DATABASE}}
+      DATABASE_URL: jdbc:postgresql://localhost:5432/${{secrets.PG_DATABASE}}
+
     services:
       postgres:
         image: postgres:17
         env:
-          POSTGRES_USER: ${{ secrets.PG_USER }}
-          POSTGRES_PASSWORD: ${{ secrets.PG_PASSWORD }}
-          POSTGRES_DB: ${{ secrets.PG_DATABASE }}
+          POSTGRES_USER: $PG_USER
+          POSTGRES_PASSWORD: $PG_PASSWORD
+          POSTGRES_DB: $PG_DATABASE
         ports:
           - 5432:5432
         options: >-
-          --health-cmd "pg_isready -U ${{ secrets.PG_USER }}"
+          --health-cmd "pg_isready -U $PG_USER"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-
-    env:
-      DATABASE_URL: jdbc:postgresql://localhost:5432/${{ secrets.PG_DATABASE }}
 
     steps:
       - name: Checkout code
@@ -50,7 +54,7 @@ jobs:
 
       - name: Wait for Postgres
         run: |
-          until pg_isready -h localhost -p 5432 -U ${{ secrets.PG_USER }}; do
+          until pg_isready -h localhost -p 5432 -U "$PG_USER"; do
             echo "Waiting for Postgres..."
             sleep 2
           done
