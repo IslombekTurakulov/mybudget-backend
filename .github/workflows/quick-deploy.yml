@@ -50,7 +50,10 @@ jobs:
             
             # Force remove all containers
             echo "Force removing all containers..."
-            docker rm -f $(docker ps -aq) || true
+            CONTAINERS=$(docker ps -aq)
+            if [ -n "$CONTAINERS" ]; then
+              docker rm -f $CONTAINERS
+            fi
             sleep 5
             
             # Remove all stopped containers

@@ -182,14 +182,6 @@
       <option name="presentableId" value="Default" />
       <updated>1737229814397</updated>
     </task>
-    <task id="LOCAL-00032" summary="MYBUDGETBACKEND-32: fix docker caching">
-      <option name="closed" value="true" />
-      <created>1746585446622</created>
-      <option name="number" value="00032" />
-      <option name="presentableId" value="LOCAL-00032" />
-      <option name="project" value="LOCAL" />
-      <updated>1746585446622</updated>
-    </task>
     <task id="LOCAL-00033" summary="MYBUDGETBACKEND-33: fix docker volumes">
       <option name="closed" value="true" />
       <created>1746585944968</created>
@@ -574,7 +566,15 @@
       <option name="project" value="LOCAL" />
       <updated>1746604642736</updated>
     </task>
-    <option name="localTasksCounter" value="81" />
+    <task id="LOCAL-00081" summary="MYBUDGETBACKEND-54: fix pg volumes">
+      <option name="closed" value="true" />
+      <created>1746605702340</created>
+      <option name="number" value="00081" />
+      <option name="presentableId" value="LOCAL-00081" />
+      <option name="project" value="LOCAL" />
+      <updated>1746605702340</updated>
+    </task>
+    <option name="localTasksCounter" value="82" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
