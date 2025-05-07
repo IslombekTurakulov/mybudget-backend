@@ -102,13 +102,15 @@ jobs:
 
             # Set variables from GitHub Actions context
             GITHUB_OWNER="${{ github.repository_owner }}"
+            GITHUB_OWNER_LC=$(echo "$GITHUB_OWNER" | tr '[:upper:]' '[:lower:]')
             TAG="${{ github.event.inputs.image_tag }}"
             echo "GITHUB_OWNER=$GITHUB_OWNER"
+            echo "GITHUB_OWNER_LC=$GITHUB_OWNER_LC"
             echo "TAG=$TAG"
 
             # Validate image tag and owner
-            if [ -z "$GITHUB_OWNER" ]; then
-              echo "Error: GITHUB_OWNER is required"
+            if [ -z "$GITHUB_OWNER_LC" ]; then
+              echo "Error: GITHUB_OWNER_LC is required"
               exit 1
             fi
             if [ -z "$TAG" ]; then
@@ -254,7 +256,7 @@ jobs:
                       - node.role == manager
 
               backend:
-                image: ghcr.io/${{ github.repository_owner }}/mybudget-backend:${{ github.event.inputs.image_tag }}
+                image: ghcr.io/${GITHUB_OWNER_LC}/mybudget-backend:${TAG}
                 networks:
                   - backend
                   - public
