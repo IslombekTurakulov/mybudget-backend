@@ -244,6 +244,9 @@ jobs:
             # Set proper permissions
             chmod 600 secrets/pg_password.txt secrets/app_jwt_secret.txt
             
+            # Login to GitHub Container Registry
+            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+            
             # Pull latest images and deploy
             docker-compose pull
             docker-compose up -d 
