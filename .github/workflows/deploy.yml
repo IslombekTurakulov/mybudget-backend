@@ -201,12 +201,6 @@ jobs:
             # Login to GitHub Container Registry
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
             
-            # Copy docker-compose.yml from repository
-            cp /opt/mybudget/backend/docker-compose.yml docker-compose.yml || {
-              echo "Error: Failed to copy docker-compose.yml"
-              exit 1
-            }
-            
             # Verify docker-compose.yml exists
             if [ ! -f "docker-compose.yml" ]; then
               echo "Error: docker-compose.yml not found"
