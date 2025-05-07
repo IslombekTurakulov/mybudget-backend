@@ -124,6 +124,8 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
+            set -euo pipefail
+            
             # Create directory if it doesn't exist
             sudo mkdir -p /opt/mybudget/backend
             sudo chown -R $USER:$USER /opt/mybudget/backend
@@ -173,13 +175,22 @@ jobs:
             sleep 5
             
             # Create .env file
-            cat > .env << EOL
+            cat > .env <<-EOL
             PG_USER=${{ secrets.PG_USER }}
             PG_DATABASE=${{ secrets.PG_DATABASE }}
+            PG_PASSWORD=${{ secrets.PG_PASSWORD }}
+            JWT_SECRET=${{ secrets.JWT_SECRET }}
             GITHUB_OWNER=islombekturakulov
-            TAG=${{ github.sha }}
+            TAG=${{ github.event.inputs.image_tag }}
             LETSENCRYPT_EMAIL=${{ secrets.LETSENCRYPT_EMAIL }}
             EOL
+            
+            chmod 600 .env
+            
+            echo "Exporting environment variables…"
+            set -o allexport
+            source .env
+            set +o allexport
             
             # Verify environment variables
             echo "Verifying environment variables..."
@@ -248,7 +259,7 @@ jobs:
             max_retries=5
             retry_count=0
             while [ $retry_count -lt $max_retries ]; do
-              if curl -f http://89.169.144.44/ping; then
+              if curl -fs http://89.169.144.44/ping; then
                 echo "Health check passed"
                 break
               fi
