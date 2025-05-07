@@ -4,11 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4bbd917-8929-44b4-afda-19b441d6e48e" name="Changes" comment="MYBUDGETBACKEND-54: fix dockerfile">
-      <change beforePath="$PROJECT_DIR$/.github/workflows/deploy.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/deploy.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
-    </list>
+    <list default="true" id="c4bbd917-8929-44b4-afda-19b441d6e48e" name="Changes" comment="MYBUDGETBACKEND-54: fix deploy ci" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -185,14 +181,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1737229814397</updated>
-    </task>
-    <task id="LOCAL-00019" summary="MYBUDGETBACKEND-21: Disallow to generate or accept invitation if participant in project already exist">
-      <option name="closed" value="true" />
-      <created>1746219500179</created>
-      <option name="number" value="00019" />
-      <option name="presentableId" value="LOCAL-00019" />
-      <option name="project" value="LOCAL" />
-      <updated>1746219500179</updated>
     </task>
     <task id="LOCAL-00020" summary="MYBUDGETBACKEND-22: fix mapping empty category [not good]">
       <option name="closed" value="true" />
@@ -578,7 +566,15 @@
       <option name="project" value="LOCAL" />
       <updated>1746601373007</updated>
     </task>
-    <option name="localTasksCounter" value="68" />
+    <task id="LOCAL-00068" summary="MYBUDGETBACKEND-54: fix deploy ci">
+      <option name="closed" value="true" />
+      <created>1746601982305</created>
+      <option name="number" value="00068" />
+      <option name="presentableId" value="LOCAL-00068" />
+      <option name="project" value="LOCAL" />
+      <updated>1746601982305</updated>
+    </task>
+    <option name="localTasksCounter" value="69" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -593,7 +589,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="MYBUDGETBACKEND-38: fix deploy yml" />
     <MESSAGE value="MYBUDGETBACKEND-39: fix gitignore, made deploy optional, fix lowercase deploy" />
     <MESSAGE value="MYBUDGETBACKEND-39: fix gitignore" />
     <MESSAGE value="MYBUDGETBACKEND-40: fix docker swarm" />
@@ -618,7 +613,8 @@
     <MESSAGE value="MYBUDGETBACKEND-54: fix port in docker-compose.yml" />
     <MESSAGE value="MYBUDGETBACKEND-54: fix port in docker-compose.yml again" />
     <MESSAGE value="MYBUDGETBACKEND-54: fix dockerfile" />
-    <option name="LAST_COMMIT_MESSAGE" value="MYBUDGETBACKEND-54: fix dockerfile" />
+    <MESSAGE value="MYBUDGETBACKEND-54: fix deploy ci" />
+    <option name="LAST_COMMIT_MESSAGE" value="MYBUDGETBACKEND-54: fix deploy ci" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

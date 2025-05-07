@@ -33,7 +33,7 @@ services:
     secrets:
       - pg_password
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${PG_USER} -d ${PG_DATABASE}"]
+      test: ["CMD-SHELL", "pg_isready -U $POSTGRES_USER -d $POSTGRES_DB"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -118,9 +118,6 @@ services:
         parallelism: 1
         delay: 15s
         order: start-first
-      placement:
-        constraints:
-          - node.role == manager
     logging:
       driver: json-file
       options:
