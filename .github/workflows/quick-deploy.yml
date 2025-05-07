@@ -85,7 +85,7 @@ jobs:
             PG_USER=${{ secrets.PG_USER }}
             PG_DATABASE=${{ secrets.PG_DATABASE }}
             GITHUB_OWNER=islombekturakulov
-            TAG=${{ github.event.inputs.image_tag }}
+            TAG=latest
             LETSENCRYPT_EMAIL=${{ secrets.LETSENCRYPT_EMAIL }}
             EOL
 
