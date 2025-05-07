@@ -48,6 +48,11 @@ jobs:
             docker stack rm backend || true
             sleep 10
             
+            # Force remove all containers
+            echo "Force removing all containers..."
+            docker rm -f $(docker ps -aq) || true
+            sleep 5
+            
             # Remove all stopped containers
             echo "Removing stopped containers..."
             docker container prune -f
@@ -107,8 +112,6 @@ jobs:
             # Create docker-compose.yml with correct configuration
             cat > docker-compose.yml << EOL
             version: '3.9'
-
-            name: backend
 
             secrets:
               pg_password:
@@ -303,25 +306,27 @@ jobs:
             echo "Waiting for services to be ready..."
             sleep 30
             
-            # Check service status
+            # Check service status with more details
             echo "Checking service status..."
             docker service ls
             
-            # Check if all replicas are running
-            echo "Checking replicas..."
-            docker service ps backend_backend --no-trunc || true
-            docker service ps backend_database --no-trunc || true
-            docker service ps backend_traefik --no-trunc || true
+            # Check stack status
+            echo "Checking stack status..."
+            docker stack ps backend --no-trunc
+            
+            # Check if all replicas are running with more detailed output
+            echo "Checking replicas with detailed status..."
+            for service in backend_backend backend_database backend_traefik; do
+              echo "Checking service: $service"
+              docker service ps $service --no-trunc || echo "Service $service not found"
+              echo "Service logs for $service:"
+              docker service logs $service --tail 50 || echo "No logs available for $service"
+              echo "----------------------------------------"
+            done
             
             # Check network connectivity
             echo "Checking networks..."
             docker network ls | grep backend
-            
-            # Check logs for any immediate issues
-            echo "Checking service logs..."
-            docker service logs --tail 50 backend_backend || true
-            docker service logs --tail 50 backend_database || true
-            docker service logs --tail 50 backend_traefik || true
             
             # Check if ports are open
             echo "Checking if ports are open..."
@@ -331,12 +336,13 @@ jobs:
               echo "netstat not available, skipping port check"
             fi
             
-            # Verify health endpoints
+            # Verify health endpoints with more detailed output
             echo "Verifying health endpoints..."
             max_retries=5
             retry_count=0
             while [ $retry_count -lt $max_retries ]; do
-              if curl -f http://89.169.144.44/ping; then
+              echo "Attempt $((retry_count + 1)) of $max_retries"
+              if curl -v http://89.169.144.44/ping; then
                 echo "Health check passed"
                 break
               fi
@@ -347,6 +353,9 @@ jobs:
             
             if [ $retry_count -eq $max_retries ]; then
               echo "Error: Health check failed after $max_retries attempts"
+              echo "Checking service status one more time..."
+              docker service ls
+              docker stack ps backend --no-trunc
               exit 1
             fi
             
@@ -354,6 +363,15 @@ jobs:
             echo "Checking resource usage..."
             docker stats --no-stream
             
-            # Final status
+            # Final status with detailed information
             echo "Deployment completed. Checking final status..."
+            echo "Stack services:"
             docker stack services backend
+            echo "Stack tasks:"
+            docker stack ps backend --no-trunc
+            echo "Service logs:"
+            for service in backend_backend backend_database backend_traefik; do
+              echo "Logs for $service:"
+              docker service logs $service --tail 50 || echo "No logs available for $service"
+              echo "----------------------------------------"
+            done
