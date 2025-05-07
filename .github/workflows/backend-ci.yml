@@ -14,19 +14,20 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
 
+    # 1) Подставляем секреты в переменные окружения job
     env:
-      PG_USER: ${{secrets.PG_USER}}
-      PG_PASSWORD: ${{secrets.PG_PASSWORD}}
-      PG_DATABASE: ${{secrets.PG_DATABASE}}
-      DATABASE_URL: jdbc:postgresql://localhost:5432/${{secrets.PG_DATABASE}}
+      PG_USER:       ${{ secrets.PG_USER }}
+      PG_PASSWORD:   ${{ secrets.PG_PASSWORD }}
+      PG_DATABASE:   ${{ secrets.PG_DATABASE }}
+      DATABASE_URL:  jdbc:postgresql://localhost:5432/${{ secrets.PG_DATABASE }}
 
     services:
       postgres:
         image: postgres:17
         env:
-          POSTGRES_USER: $PG_USER
+          POSTGRES_USER:     $PG_USER
           POSTGRES_PASSWORD: $PG_PASSWORD
-          POSTGRES_DB: $PG_DATABASE
+          POSTGRES_DB:       $PG_DATABASE
         ports:
           - 5432:5432
         options: >-
