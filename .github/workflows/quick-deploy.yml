@@ -99,11 +99,194 @@ jobs:
             # Login to GitHub Container Registry
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
             
-            # Verify docker-compose.yml exists
-            if [ ! -f "docker-compose.yml" ]; then
-              echo "Error: docker-compose.yml not found"
-              exit 1
-            fi
+            # Create docker-compose.yml with correct configuration
+            cat > docker-compose.yml << EOL
+            version: '3.9'
+
+            secrets:
+              pg_password:
+                file: ./secrets/pg_password.txt
+              app_secret:
+                file: ./secrets/app_jwt_secret.txt
+
+            networks:
+              backend:
+                driver: overlay
+                attachable: true
+              public:
+                driver: overlay
+                attachable: true
+
+            volumes:
+              pg_data:
+              letsencrypt:
+              traefik_logs:
+
+            services:
+              database:
+                image: postgres:17-alpine
+                networks:
+                  - backend
+                volumes:
+                  - pg_data:/var/lib/postgresql/data
+                environment:
+                  POSTGRES_USER: \${PG_USER}
+                  POSTGRES_DB: \${PG_DATABASE}
+                  POSTGRES_PASSWORD_FILE: /run/secrets/pg_password
+                secrets:
+                  - pg_password
+                healthcheck:
+                  test: ["CMD-SHELL", "pg_isready -U \$POSTGRES_USER -d \$POSTGRES_DB"]
+                  interval: 10s
+                  timeout: 5s
+                  retries: 5
+                  start_period: 30s
+                deploy:
+                  replicas: 1
+                  restart_policy:
+                    condition: on-failure
+                    max_attempts: 3
+                    window: 120s
+                  resources:
+                    limits:
+                      cpus: '0.5'
+                      memory: 512M
+                  update_config:
+                    parallelism: 1
+                    delay: 10s
+                    order: start-first
+                  rollback_config:
+                    parallelism: 1
+                    delay: 10s
+                    order: start-first
+                  placement:
+                    constraints:
+                      - node.role == manager
+
+              backend:
+                image: ghcr.io/islombekturakulov/mybudget-backend:\${TAG}
+                networks:
+                  - backend
+                  - public
+                depends_on:
+                  - database
+                environment:
+                  DATABASE_URL: jdbc:postgresql://database:5432/\${PG_DATABASE}
+                  JWT_SECRET: /run/secrets/app_secret
+                  SPRING_PROFILES_ACTIVE: prod
+                  SERVER_PORT: 8082
+                  SPRING_SECURITY_CORS_ALLOWED_ORIGINS: "*"
+                  SPRING_SECURITY_CORS_ALLOWED_METHODS: "GET,POST,PUT,DELETE,OPTIONS"
+                  SPRING_SECURITY_CORS_ALLOWED_HEADERS: "*"
+                  SPRING_SECURITY_CORS_ALLOW_CREDENTIALS: "true"
+                expose:
+                  - "8082"
+                secrets:
+                  - app_secret
+                labels:
+                  - "traefik.enable=true"
+                  - "traefik.http.routers.backend.rule=Host(\`89.169.144.44\`)"
+                  - "traefik.http.routers.backend.entrypoints=web"
+                  - "traefik.http.services.backend.loadbalancer.server.port=8082"
+                  - "traefik.http.middlewares.cors.headers.accessControlAllowMethods=GET,POST,PUT,DELETE,OPTIONS"
+                  - "traefik.http.middlewares.cors.headers.accessControlAllowOriginList=*"
+                  - "traefik.http.middlewares.cors.headers.accessControlAllowHeaders=*"
+                  - "traefik.http.middlewares.cors.headers.accessControlAllowCredentials=true"
+                  - "traefik.http.middlewares.cors.headers.accessControlMaxAge=100"
+                  - "traefik.http.routers.backend.middlewares=cors"
+                  - "traefik.http.services.backend.loadbalancer.passHostHeader=true"
+                healthcheck:
+                  test: ["CMD-SHELL", "curl -f http://localhost:8082/ping || exit 1"]
+                  interval: 30s
+                  timeout: 5s
+                  retries: 3
+                  start_period: 40s
+                deploy:
+                  mode: replicated
+                  replicas: 2
+                  restart_policy:
+                    condition: on-failure
+                    max_attempts: 3
+                    window: 120s
+                  resources:
+                    limits:
+                      cpus: '1.0'
+                      memory: 1G
+                  update_config:
+                    parallelism: 1
+                    delay: 15s
+                    order: start-first
+                    failure_action: rollback
+                  rollback_config:
+                    parallelism: 1
+                    delay: 15s
+                    order: start-first
+                logging:
+                  driver: json-file
+                  options:
+                    max-size: "10m"
+                    max-file: "3"
+
+              traefik:
+                image: traefik:v2.11
+                networks:
+                  - public
+                  - backend
+                command:
+                  - "--providers.docker=true"
+                  - "--providers.docker.swarmMode=true"
+                  - "--providers.docker.exposedByDefault=false"
+                  - "--entrypoints.web.address=:80"
+                  - "--entrypoints.websecure.address=:443"
+                  - "--entrypoints.dashboard.address=:8081"
+                  - "--certificatesresolvers.leresolver.acme.email=\${LETSENCRYPT_EMAIL}"
+                  - "--certificatesresolvers.leresolver.acme.storage=/letsencrypt/acme.json"
+                  - "--certificatesresolvers.leresolver.acme.httpchallenge.entrypoint=web"
+                  - "--log.level=INFO"
+                  - "--accesslog=true"
+                  - "--accesslog.filepath=/var/log/traefik/access.log"
+                  - "--metrics.prometheus=true"
+                  - "--api.dashboard=true"
+                  - "--api.insecure=true"
+                  - "--providers.docker.network=public"
+                  - "--providers.docker.watch=true"
+                  - "--providers.docker.swarmModeRefreshSeconds=15s"
+                ports:
+                  - "80:80"
+                  - "443:443"
+                  - "8081:8081"
+                volumes:
+                  - /var/run/docker.sock:/var/run/docker.sock:ro
+                  - letsencrypt:/letsencrypt
+                  - traefik_logs:/var/log/traefik
+                healthcheck:
+                  test: ["CMD", "traefik", "healthcheck"]
+                  interval: 30s
+                  timeout: 5s
+                  retries: 3
+                deploy:
+                  mode: global
+                  placement:
+                    constraints:
+                      - node.role == manager
+                  restart_policy:
+                    condition: on-failure
+                    max_attempts: 3
+                    window: 120s
+                  update_config:
+                    parallelism: 1
+                    delay: 10s
+                    order: start-first
+                  rollback_config:
+                    parallelism: 1
+                    delay: 10s
+                    order: start-first
+                logging:
+                  driver: json-file
+                  options:
+                    max-size: "5m"
+                    max-file: "5"
+            EOL
             
             # Pull latest images and deploy
             echo "Deploying stack..."
