@@ -148,6 +148,8 @@ services:
       - "--providers.docker.network=public"
       - "--providers.docker.watch=true"
       - "--providers.docker.swarmModeRefreshSeconds=15s"
+      - "--entrypoints.web.http.redirections.entryPoint.to=:80"
+      - "--entrypoints.web.http.redirections.entryPoint.scheme=http"
     ports:
       - "80:80"
       - "443:443"
@@ -183,3 +185,9 @@ services:
       options:
         max-size: "5m"
         max-file: "5"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.dashboard.rule=Host(`89.169.144.44`) && PathPrefix(`/dashboard`)"
+      - "traefik.http.routers.dashboard.service=api@internal"
+      - "traefik.http.routers.dashboard.entrypoints=dashboard"
+      - "traefik.http.services.dashboard.loadbalancer.server.port=8081"
