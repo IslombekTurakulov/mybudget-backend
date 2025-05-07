@@ -10,9 +10,9 @@ on:
   workflow_dispatch:
     inputs:
       image_tag:
-        description: 'Image tag to deploy (defaults to ${{ github.ref_name }})'
+        description: 'Image tag to deploy (leave blank to use the Git tag)'
         required: false
-        default: ${{ github.ref_name }}
+        default: ''
         type: string
       deploy:
         description: 'Deploy to server'
@@ -124,6 +124,9 @@ jobs:
 
       - name: Deploy to server
         uses: appleboy/ssh-action@v1.0.3
+        env:
+          INPUT_IMAGE_TAG: ${{ github.event.inputs.image_tag }}
+          REF_NAME: ${{ github.ref_name }}
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
@@ -186,7 +189,7 @@ jobs:
             PG_PASSWORD=${{ secrets.PG_PASSWORD }}
             JWT_SECRET=${{ secrets.JWT_SECRET }}
             GITHUB_OWNER=islombekturakulov
-            TAG=${{ github.event.inputs.image_tag }}
+            TAG=${INPUT_IMAGE_TAG:-$REF_NAME}
             LETSENCRYPT_EMAIL=${{ secrets.LETSENCRYPT_EMAIL }}
             EOL
             
