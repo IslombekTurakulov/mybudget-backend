@@ -133,110 +133,6 @@ jobs:
               traefik_logs:
 
             services:
-              database:
-                image: postgres:17-alpine
-                networks:
-                  - backend
-                volumes:
-                  - pg_data:/var/lib/postgresql/data
-                environment:
-                  POSTGRES_USER: \${PG_USER}
-                  POSTGRES_DB: \${PG_DATABASE}
-                  POSTGRES_PASSWORD_FILE: /run/secrets/pg_password
-                secrets:
-                  - pg_password
-                healthcheck:
-                  test: ["CMD-SHELL", "pg_isready -U \$POSTGRES_USER -d \$POSTGRES_DB"]
-                  interval: 10s
-                  timeout: 5s
-                  retries: 5
-                  start_period: 30s
-                deploy:
-                  replicas: 1
-                  restart_policy:
-                    condition: on-failure
-                    max_attempts: 3
-                    window: 120s
-                  resources:
-                    limits:
-                      cpus: '0.5'
-                      memory: 512M
-                  update_config:
-                    parallelism: 1
-                    delay: 10s
-                    order: start-first
-                  rollback_config:
-                    parallelism: 1
-                    delay: 10s
-                    order: start-first
-                  placement:
-                    constraints:
-                      - node.role == manager
-
-              backend:
-                image: ghcr.io/islombekturakulov/mybudget-backend:\${TAG}
-                networks:
-                  - backend
-                  - public
-                depends_on:
-                  - database
-                environment:
-                  DATABASE_URL: jdbc:postgresql://database:5432/\${PG_DATABASE}
-                  JWT_SECRET: /run/secrets/app_secret
-                  SPRING_PROFILES_ACTIVE: prod
-                  SERVER_PORT: 8082
-                  SPRING_SECURITY_CORS_ALLOWED_ORIGINS: "*"
-                  SPRING_SECURITY_CORS_ALLOWED_METHODS: "GET,POST,PUT,DELETE,OPTIONS"
-                  SPRING_SECURITY_CORS_ALLOWED_HEADERS: "*"
-                  SPRING_SECURITY_CORS_ALLOW_CREDENTIALS: "true"
-                expose:
-                  - "8082"
-                secrets:
-                  - app_secret
-                labels:
-                  - "traefik.enable=true"
-                  - "traefik.http.routers.backend.rule=Host(\`89.169.144.44\`)"
-                  - "traefik.http.routers.backend.entrypoints=web"
-                  - "traefik.http.services.backend.loadbalancer.server.port=8082"
-                  - "traefik.http.middlewares.cors.headers.accessControlAllowMethods=GET,POST,PUT,DELETE,OPTIONS"
-                  - "traefik.http.middlewares.cors.headers.accessControlAllowOriginList=*"
-                  - "traefik.http.middlewares.cors.headers.accessControlAllowHeaders=*"
-                  - "traefik.http.middlewares.cors.headers.accessControlAllowCredentials=true"
-                  - "traefik.http.middlewares.cors.headers.accessControlMaxAge=100"
-                  - "traefik.http.routers.backend.middlewares=cors"
-                  - "traefik.http.services.backend.loadbalancer.passHostHeader=true"
-                healthcheck:
-                  test: ["CMD-SHELL", "curl -f http://localhost:8082/ping || exit 1"]
-                  interval: 30s
-                  timeout: 5s
-                  retries: 3
-                  start_period: 40s
-                deploy:
-                  mode: replicated
-                  replicas: 2
-                  restart_policy:
-                    condition: on-failure
-                    max_attempts: 3
-                    window: 120s
-                  resources:
-                    limits:
-                      cpus: '1.0'
-                      memory: 1G
-                  update_config:
-                    parallelism: 1
-                    delay: 15s
-                    order: start-first
-                    failure_action: rollback
-                  rollback_config:
-                    parallelism: 1
-                    delay: 15s
-                    order: start-first
-                logging:
-                  driver: json-file
-                  options:
-                    max-size: "10m"
-                    max-file: "3"
-
               traefik:
                 image: traefik:v2.11
                 networks:
@@ -296,6 +192,108 @@ jobs:
                   options:
                     max-size: "5m"
                     max-file: "5"
+
+              database:
+                image: postgres:17-alpine
+                networks:
+                  - backend
+                volumes:
+                  - pg_data:/var/lib/postgresql/data
+                environment:
+                  POSTGRES_USER: \${PG_USER}
+                  POSTGRES_DB: \${PG_DATABASE}
+                  POSTGRES_PASSWORD_FILE: /run/secrets/pg_password
+                secrets:
+                  - pg_password
+                healthcheck:
+                  test: ["CMD-SHELL", "pg_isready -U \$POSTGRES_USER -d \$POSTGRES_DB"]
+                  interval: 10s
+                  timeout: 5s
+                  retries: 5
+                  start_period: 30s
+                deploy:
+                  replicas: 1
+                  restart_policy:
+                    condition: on-failure
+                    max_attempts: 3
+                    window: 120s
+                  resources:
+                    limits:
+                      cpus: '0.5'
+                      memory: 512M
+                  update_config:
+                    parallelism: 1
+                    delay: 10s
+                    order: start-first
+                  rollback_config:
+                    parallelism: 1
+                    delay: 10s
+                    order: start-first
+                  placement:
+                    constraints:
+                      - node.role == manager
+
+              backend:
+                image: ghcr.io/islombekturakulov/mybudget-backend:\${TAG}
+                networks:
+                  - backend
+                  - public
+                depends_on:
+                  - database
+                environment:
+                  DATABASE_URL: jdbc:postgresql://database:5432/\${PG_DATABASE}
+                  JWT_SECRET: /run/secrets/app_secret
+                  SPRING_PROFILES_ACTIVE: prod
+                  SERVER_PORT: 8082
+                  SPRING_SECURITY_CORS_ALLOWED_ORIGINS: "*"
+                  SPRING_SECURITY_CORS_ALLOWED_METHODS: "GET,POST,PUT,DELETE,OPTIONS"
+                  SPRING_SECURITY_CORS_ALLOWED_HEADERS: "*"
+                  SPRING_SECURITY_CORS_ALLOW_CREDENTIALS: "true"
+                secrets:
+                  - app_secret
+                labels:
+                  - "traefik.enable=true"
+                  - "traefik.http.routers.backend.rule=Host(\`89.169.144.44\`)"
+                  - "traefik.http.routers.backend.entrypoints=web"
+                  - "traefik.http.services.backend.loadbalancer.server.port=8082"
+                  - "traefik.http.middlewares.cors.headers.accessControlAllowMethods=GET,POST,PUT,DELETE,OPTIONS"
+                  - "traefik.http.middlewares.cors.headers.accessControlAllowOriginList=*"
+                  - "traefik.http.middlewares.cors.headers.accessControlAllowHeaders=*"
+                  - "traefik.http.middlewares.cors.headers.accessControlAllowCredentials=true"
+                  - "traefik.http.middlewares.cors.headers.accessControlMaxAge=100"
+                  - "traefik.http.routers.backend.middlewares=cors"
+                  - "traefik.http.services.backend.loadbalancer.passHostHeader=true"
+                healthcheck:
+                  test: ["CMD-SHELL", "curl -f http://localhost:8082/ping || exit 1"]
+                  interval: 30s
+                  timeout: 5s
+                  retries: 3
+                  start_period: 40s
+                deploy:
+                  mode: replicated
+                  replicas: 2
+                  restart_policy:
+                    condition: on-failure
+                    max_attempts: 3
+                    window: 120s
+                  resources:
+                    limits:
+                      cpus: '1.0'
+                      memory: 1G
+                  update_config:
+                    parallelism: 1
+                    delay: 15s
+                    order: start-first
+                    failure_action: rollback
+                  rollback_config:
+                    parallelism: 1
+                    delay: 15s
+                    order: start-first
+                logging:
+                  driver: json-file
+                  options:
+                    max-size: "10m"
+                    max-file: "3"
             EOL
             
             # Pull latest images and deploy
