@@ -30,8 +30,6 @@ services:
       POSTGRES_USER: ${PG_USER}
       POSTGRES_DB: ${PG_DATABASE}
       POSTGRES_PASSWORD_FILE: /run/secrets/pg_password
-      PG_PORT: 5433
-      PG_HOST: database
     secrets:
       - pg_password
     ports:

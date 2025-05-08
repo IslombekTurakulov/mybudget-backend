@@ -37,7 +37,7 @@ until $CONTAINER_CMD exec $CONTAINER_NAME pg_isready -U $POSTGRES_USER -d $POSTG
 done
 echo "Postgres готов!"
 
-# Экспорт переменных окружения для backend
+# Экспорт переменных окружения для backend (только для локального запуска!)
 export DATABASE_URL="jdbc:postgresql://localhost:$POSTGRES_PORT/$POSTGRES_DB"
 export PG_DATABASE=$POSTGRES_DB
 export PG_HOST=localhost
@@ -46,6 +46,7 @@ export PG_PORT=$POSTGRES_PORT
 export PG_USER=$POSTGRES_USER
 export SERVER_PORT=8080
 
+# ВАЖНО: Эти переменные только для локального запуска! В продакшене используйте database:5432
 echo "Экспортированы переменные окружения для backend:"
 echo "DATABASE_URL=$DATABASE_URL"
 echo "PG_USER=$PG_USER"
