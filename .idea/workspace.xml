@@ -4,21 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4bbd917-8929-44b4-afda-19b441d6e48e" name="Changes" comment="MYBUDGETBACKEND-57: fix deploy, change ip address">
-      <change afterPath="$PROJECT_DIR$/run-local-backend.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.github/workflows/quick-deploy.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/quick-deploy.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/Application.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/Application.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/database/ConfigureDataBase.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/database/ConfigureDataBase.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/application.conf" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.conf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/db/migrations/V2__add_project_fields.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/db/migrations/V3__Make_email_nullable_and_add_unique_code_index.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/db/migrations/V4__Migration_notification_type_added_new_types.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/db/migrations/V5__Migration_device_tokens_language.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/hikari.properties" beforeDir="false" />
-    </list>
+    <list default="true" id="c4bbd917-8929-44b4-afda-19b441d6e48e" name="Changes" comment="MYBUDGETBACKEND-58: add local run, fix db, fix application config, fix deploy" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -239,14 +225,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1737229814397</updated>
-    </task>
-    <task id="LOCAL-00042" summary="MYBUDGETBACKEND-40: fix docker swarm">
-      <option name="closed" value="true" />
-      <created>1746590769085</created>
-      <option name="number" value="00042" />
-      <option name="presentableId" value="LOCAL-00042" />
-      <option name="project" value="LOCAL" />
-      <updated>1746590769085</updated>
     </task>
     <task id="LOCAL-00043" summary="MYBUDGETBACKEND-41: fix docker swarm">
       <option name="closed" value="true" />
@@ -632,7 +610,15 @@
       <option name="project" value="LOCAL" />
       <updated>1746736635522</updated>
     </task>
-    <option name="localTasksCounter" value="91" />
+    <task id="LOCAL-00091" summary="MYBUDGETBACKEND-58: add local run, fix db, fix application config, fix deploy">
+      <option name="closed" value="true" />
+      <created>1746740104557</created>
+      <option name="number" value="00091" />
+      <option name="presentableId" value="LOCAL-00091" />
+      <option name="project" value="LOCAL" />
+      <updated>1746740104557</updated>
+    </task>
+    <option name="localTasksCounter" value="92" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -647,7 +633,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="MYBUDGETBACKEND-43: optimizing ci/cd" />
     <MESSAGE value="MYBUDGETBACKEND-44: fix docker" />
     <MESSAGE value="MYBUDGETBACKEND-45: fix deploy.yml" />
     <MESSAGE value="MYBUDGETBACKEND-46: fix deploy.yml" />
@@ -672,7 +657,8 @@
     <MESSAGE value="MYBUDGETBACKEND-55: fix dockerfile" />
     <MESSAGE value="MYBUDGETBACKEND-56: fix dockerfile" />
     <MESSAGE value="MYBUDGETBACKEND-57: fix deploy, change ip address" />
-    <option name="LAST_COMMIT_MESSAGE" value="MYBUDGETBACKEND-57: fix deploy, change ip address" />
+    <MESSAGE value="MYBUDGETBACKEND-58: add local run, fix db, fix application config, fix deploy" />
+    <option name="LAST_COMMIT_MESSAGE" value="MYBUDGETBACKEND-58: add local run, fix db, fix application config, fix deploy" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

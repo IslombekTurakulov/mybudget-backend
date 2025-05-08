@@ -462,12 +462,27 @@ jobs:
             docker service logs backend_database --tail 200 > backend_database.log || true
             docker service logs backend_traefik --tail 200 > backend_traefik.log || true
 
+            # Выводим логи в stdout для GitHub Actions
+            echo "========== BACKEND LOGS =========="
+            cat backend_backend.log || echo "No backend_backend logs"
+            echo "========== DATABASE LOGS =========="
+            cat backend_database.log || echo "No backend_database logs"
+            echo "========== TRAEFIK LOGS =========="
+            cat backend_traefik.log || echo "No backend_traefik logs"
+
+      - name: Download logs from server
+        if: always()
+        run: |
+          scp -i ${{ secrets.SERVER_SSH_KEY }} -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/opt/mybudget/backend/backend_backend.log .
+          scp -i ${{ secrets.SERVER_SSH_KEY }} -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/opt/mybudget/backend/backend_database.log .
+          scp -i ${{ secrets.SERVER_SSH_KEY }} -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/opt/mybudget/backend/backend_traefik.log .
+
       - name: Upload deployment logs
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: deployment-logs
           path: |
-            /opt/mybudget/backend/backend_backend.log
-            /opt/mybudget/backend/backend_database.log
-            /opt/mybudget/backend/backend_traefik.log
+            backend_backend.log
+            backend_database.log
+            backend_traefik.log
