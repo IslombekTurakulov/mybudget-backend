@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "ru.iuturakulov.mybudgetbackend"
-version = "1.0.0"
+version = System.getenv("IMAGE_TAG") ?: "1.0.0"
 application {
     mainClass.set("ru.iuturakulov.mybudgetbackend.ApplicationKt")
     project.setProperty("mainClassName", "ru.iuturakulov.mybudgetbackend.ApplicationKt")
@@ -107,4 +107,19 @@ tasks.shadowJar {
         )
     }
     mergeServiceFiles()
+    archiveBaseName.set("MyBudget-backend")
+    archiveClassifier.set("")
+    archiveVersion.set(project.version.toString())
+    
+    from(project.sourceSets.main.get().output)
+    from(project.sourceSets.main.get().resources)
+    
+    configurations = listOf(project.configurations.getByName("runtimeClasspath"))
+}
+
+tasks.named("jar") {
+    enabled = false
+}
+tasks.named("build") {
+    dependsOn("shadowJar")
 }

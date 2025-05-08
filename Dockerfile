@@ -1,11 +1,13 @@
 FROM gradle:8.5-jdk17 AS build
 WORKDIR /app
 COPY . .
-RUN gradle shadowJar --no-daemon
-COPY src/main/resources/application.conf app/application.conf
+ARG IMAGE_TAG=latest
+ENV IMAGE_TAG=$IMAGE_TAG
+RUN gradle clean shadowJar --no-daemon
 
 FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
-COPY --from=build /app/build/libs/MyBudget-backend-1.0.0-all.jar ./MyBudget-backend-1.0.0.jar
+COPY --from=build /app/build/libs/MyBudget-backend-${IMAGE_TAG}-all.jar ./app.jar
+COPY --from=build /app/src/main/resources/application.conf ./application.conf
 EXPOSE 8082
-ENTRYPOINT ["java", "-jar", "MyBudget-backend-1.0.0.jar"]
+ENTRYPOINT ["java", "-jar", "app.jar"]

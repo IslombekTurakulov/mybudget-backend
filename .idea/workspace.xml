@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4bbd917-8929-44b4-afda-19b441d6e48e" name="Changes" comment="MYBUDGETBACKEND-61: fix env">
+    <list default="true" id="c4bbd917-8929-44b4-afda-19b441d6e48e" name="Changes" comment="MYBUDGETBACKEND-62: fix manifest and jar">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/Dockerfile" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle.kts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -77,6 +79,7 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "Docker.Dockerfile.executor": "Run",
     "Docker.docker-compose.yml: Compose Deployment.executor": "Run",
     "Gradle.ApplicationTest.executor": "Run",
     "Gradle.Build MyBudget-backend.executor": "Run",
@@ -122,31 +125,7 @@
       <recent name="ru.iuturakulov.mybudgetbackend.models.fcm" />
     </key>
   </component>
-  <component name="RunManager" selected="Kotlin.ApplicationKt">
-    <configuration name="ApplicationTest" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
-      <ExternalSystemSettings>
-        <option name="executionName" />
-        <option name="externalProjectPath" value="$PROJECT_DIR$" />
-        <option name="externalSystemIdString" value="GRADLE" />
-        <option name="scriptParameters" value="" />
-        <option name="taskDescriptions">
-          <list />
-        </option>
-        <option name="taskNames">
-          <list>
-            <option value=":test" />
-            <option value="--tests" />
-            <option value="&quot;ru.iuturakulov.mybudgetbackend.ApplicationTest&quot;" />
-          </list>
-        </option>
-        <option name="vmOptions" />
-      </ExternalSystemSettings>
-      <ExternalSystemDebugServerProcess>false</ExternalSystemDebugServerProcess>
-      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
-      <DebugAllEnabled>false</DebugAllEnabled>
-      <RunAsTest>true</RunAsTest>
-      <method v="2" />
-    </configuration>
+  <component name="RunManager" selected="Docker.Dockerfile">
     <configuration name="ApplicationKt" type="JetRunConfigurationType" temporary="true" nameIsGenerated="true">
       <envs>
         <env name="DATABASE_URL" value="jdbc:postgresql://localhost:5433/postgres" />
@@ -194,6 +173,18 @@
       <envs />
       <method v="2" />
     </configuration>
+    <configuration name="Dockerfile" type="docker-deploy" factoryName="dockerfile" temporary="true" server-name="Docker">
+      <deployment type="dockerfile">
+        <settings>
+          <option name="sourceFilePath" value="Dockerfile" />
+        </settings>
+      </deployment>
+      <method v="2" />
+    </configuration>
+    <configuration default="true" type="docker-deploy" factoryName="dockerfile" temporary="true">
+      <deployment type="dockerfile" />
+      <method v="2" />
+    </configuration>
     <configuration name="docker-compose.yml: Compose Deployment" type="docker-deploy" factoryName="docker-compose.yml" temporary="true" server-name="Docker">
       <deployment type="docker-compose.yml">
         <settings>
@@ -203,19 +194,19 @@
       <method v="2" />
     </configuration>
     <list>
+      <item itemvalue="Docker.Dockerfile" />
       <item itemvalue="Docker.docker-compose.yml: Compose Deployment" />
-      <item itemvalue="Gradle.ApplicationTest" />
       <item itemvalue="Kotlin.ApplicationKt" />
       <item itemvalue="Shell Script.run-local-backend.sh" />
       <item itemvalue="Shell Script.start-local.sh" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Docker.Dockerfile" />
         <item itemvalue="Kotlin.ApplicationKt" />
         <item itemvalue="Shell Script.run-local-backend.sh" />
         <item itemvalue="Shell Script.start-local.sh" />
         <item itemvalue="Docker.docker-compose.yml: Compose Deployment" />
-        <item itemvalue="Gradle.ApplicationTest" />
       </list>
     </recent_temporary>
   </component>
@@ -227,14 +218,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1737229814397</updated>
-    </task>
-    <task id="LOCAL-00052" summary="MYBUDGETBACKEND-47: fix fast deploy">
-      <option name="closed" value="true" />
-      <created>1746596963060</created>
-      <option name="number" value="00052" />
-      <option name="presentableId" value="LOCAL-00052" />
-      <option name="project" value="LOCAL" />
-      <updated>1746596963060</updated>
     </task>
     <task id="LOCAL-00053" summary="MYBUDGETBACKEND-47: fix replica deploy and postgres">
       <option name="closed" value="true" />
@@ -620,7 +603,15 @@
       <option name="project" value="LOCAL" />
       <updated>1746743184645</updated>
     </task>
-    <option name="localTasksCounter" value="101" />
+    <task id="LOCAL-00101" summary="MYBUDGETBACKEND-62: fix manifest and jar">
+      <option name="closed" value="true" />
+      <created>1746743341072</created>
+      <option name="number" value="00101" />
+      <option name="presentableId" value="LOCAL-00101" />
+      <option name="project" value="LOCAL" />
+      <updated>1746743341072</updated>
+    </task>
+    <option name="localTasksCounter" value="102" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -635,8 +626,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="MYBUDGETBACKEND-47: fix replica deploy and postgres" />
-    <MESSAGE value="MYBUDGETBACKEND-47: fix pgpassword" />
     <MESSAGE value="MYBUDGETBACKEND-48: fix deploy" />
     <MESSAGE value="MYBUDGETBACKEND-49: Add README.md" />
     <MESSAGE value="MYBUDGETBACKEND-50: fix deploy" />
@@ -660,7 +649,9 @@
     <MESSAGE value="MYBUDGETBACKEND-60: fix deploy and docker file" />
     <MESSAGE value="MYBUDGETBACKEND-60: fix env variable" />
     <MESSAGE value="MYBUDGETBACKEND-61: fix env" />
-    <option name="LAST_COMMIT_MESSAGE" value="MYBUDGETBACKEND-61: fix env" />
+    <MESSAGE value="MYBUDGETBACKEND-61: fix manifest and jar" />
+    <MESSAGE value="MYBUDGETBACKEND-62: fix manifest and jar" />
+    <option name="LAST_COMMIT_MESSAGE" value="MYBUDGETBACKEND-62: fix manifest and jar" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
