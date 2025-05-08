@@ -33,7 +33,7 @@ services:
     secrets:
       - backend_pg_password
     ports:
-      - "5433:5432"
+      - "5432:5432"
     deploy:
       replicas: 1
       restart_policy:
