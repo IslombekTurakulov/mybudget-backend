@@ -147,11 +147,20 @@ jobs:
             mkdir -p secrets
             
             # Create password files
+            echo "${{ secrets.PG_USER }}" > secrets/pg_user.txt
             echo "${{ secrets.PG_PASSWORD }}" > secrets/pg_password.txt
+            echo "${{ secrets.PG_DATABASE }}" > secrets/pg_database.txt
             echo "${{ secrets.JWT_SECRET }}" > secrets/app_jwt_secret.txt
             
             # Set proper permissions
-            chmod 600 secrets/pg_password.txt secrets/app_jwt_secret.txt
+            chmod 600 secrets/pg_user.txt secrets/pg_password.txt secrets/pg_database.txt secrets/app_jwt_secret.txt
+
+            # Create Docker secrets
+            echo "Creating Docker secrets..."
+            echo "${{ secrets.PG_USER }}" | docker secret create backend_pg_user - || true
+            echo "${{ secrets.PG_PASSWORD }}" | docker secret create backend_pg_password - || true
+            echo "${{ secrets.PG_DATABASE }}" | docker secret create backend_pg_database - || true
+            echo "${{ secrets.JWT_SECRET }}" | docker secret create backend_app_secret - || true
             
             # Login to GitHub Container Registry
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
@@ -458,9 +467,9 @@ jobs:
             done
 
             # Сохраняем логи деплоя в файл для артефакта
-            docker service logs backend_backend --tail 200 > backend_backend.log || true
-            docker service logs backend_database --tail 200 > backend_database.log || true
-            docker service logs backend_traefik --tail 200 > backend_traefik.log || true
+            docker service logs backend_backend --tail 10 > backend_backend.log || true
+            docker service logs backend_database --tail 10 > backend_database.log || true
+            docker service logs backend_traefik --tail 10 > backend_traefik.log || true
 
             # Выводим логи в stdout для GitHub Actions
             echo "========== BACKEND LOGS =========="

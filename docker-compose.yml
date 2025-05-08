@@ -28,12 +28,14 @@ services:
     volumes:
       - pg_data:/var/lib/postgresql/data
     environment:
-      POSTGRES_USER: ${PG_USER}
-      POSTGRES_DB: ${PG_DATABASE}
+      POSTGRES_USER_FILE: /run/secrets/backend_pg_user
+      POSTGRES_DB_FILE: /run/secrets/backend_pg_database
       POSTGRES_PASSWORD_FILE: /run/secrets/backend_pg_password
       PGDATA: /var/lib/postgresql/data/pgdata
     user: postgres
     secrets:
+      - backend_pg_user
+      - backend_pg_database
       - backend_pg_password
     ports:
       - "5432:5432"
@@ -75,12 +77,12 @@ services:
     depends_on:
       - database
     environment:
-      PG_USER: ${PG_USER}
-      PG_PASSWORD: ${PG_PASSWORD}
-      PG_DATABASE: ${PG_DATABASE}
+      PG_USER_FILE: /run/secrets/backend_pg_user
+      PG_PASSWORD_FILE: /run/secrets/backend_pg_password
+      PG_DATABASE_FILE: /run/secrets/backend_pg_database
       PG_PORT: 5432
       PG_HOST: database
-      DATABASE_URL: jdbc:postgresql://database:5432/${PG_DATABASE}
+      DATABASE_URL: jdbc:postgresql://database:5432/$(cat /run/secrets/backend_pg_database)
       JWT_SECRET: /run/secrets/backend_app_secret
       SPRING_PROFILES_ACTIVE: prod
       SERVER_PORT: 8082
