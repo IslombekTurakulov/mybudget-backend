@@ -29,16 +29,9 @@ services:
     environment:
       POSTGRES_USER: ${PG_USER}
       POSTGRES_DB: ${PG_DATABASE}
-      TAG: ${TAG}
       POSTGRES_PASSWORD_FILE: /run/secrets/pg_password
     secrets:
       - pg_password
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $POSTGRES_USER -d $POSTGRES_DB"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 30s
     deploy:
       replicas: 1
       restart_policy:
@@ -57,9 +50,11 @@ services:
         parallelism: 1
         delay: 10s
         order: start-first
-      placement:
-        constraints:
-          - node.role == manager
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   backend:
     image: ghcr.io/islombekturakulov/mybudget-backend:${TAG}
@@ -69,10 +64,6 @@ services:
     depends_on:
       - database
     environment:
-      PG_USER: ${PG_USER}
-      PG_PASSWORD: ${PG_PASSWORD}
-      PG_DATABASE: ${PG_DATABASE}
-      TAG: ${TAG}
       DATABASE_URL: jdbc:postgresql://database:5432/${PG_DATABASE}
       JWT_SECRET: /run/secrets/app_secret
       SPRING_PROFILES_ACTIVE: prod

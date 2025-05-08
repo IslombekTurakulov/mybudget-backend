@@ -101,7 +101,7 @@ jobs:
             # Echo variables for debug
             echo "GITHUB_OWNER=$(grep GITHUB_OWNER .env | cut -d'=' -f2)"
             echo "TAG=$(grep TAG .env | cut -d'=' -f2)"
-
+            
             # Verify environment variables
             echo "Verifying environment variables..."
             if [ -z "${{ secrets.PG_USER }}" ] || [ -z "${{ secrets.PG_DATABASE }}" ] || [ -z "${{ secrets.PG_PASSWORD }}" ] || [ -z "${{ secrets.JWT_SECRET }}" ]; then
@@ -403,7 +403,7 @@ jobs:
             # Final status with detailed information
             echo "Deployment completed. Checking final status..."
             echo "Stack services:"
-            docker stack services backend
+            docker stack services backend 
             echo "Stack tasks:"
             docker stack ps backend --no-trunc
             echo "Service logs:"
