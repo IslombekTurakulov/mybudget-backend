@@ -24,6 +24,27 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
+            # Проверка наличия docker
+            if ! command -v docker &> /dev/null; then
+              echo "Docker is not installed!"
+              exit 1
+            fi
+
+            # Проверка наличия docker-compose
+            if ! command -v docker-compose &> /dev/null; then
+              echo "docker-compose is not installed!"
+              exit 1
+            fi
+
+            # Не удаляем volume-ы по умолчанию! Для полного сброса используйте флаг FULL_RESET
+            if [ "$FULL_RESET" = "true" ]; then
+              echo "FULL_RESET enabled: removing all volumes, including database!"
+              docker volume rm backend_pg_data || true
+              docker volume rm backend_traefik_pg_data || true
+            else
+              echo "Skipping volume removal (FULL_RESET not set)"
+            fi
+
             # Create directory if it doesn't exist
             sudo mkdir -p /opt/mybudget/backend
             sudo chown -R $USER:$USER /opt/mybudget/backend
@@ -67,11 +88,6 @@ jobs:
             # Remove unused volumes
             echo "Removing unused volumes..."
             docker volume prune -f
-            
-            # Remove PostgreSQL volume specifically
-            echo "Removing PostgreSQL volume..."
-            docker volume rm backend_pg_data || true
-            docker volume rm backend_traefik_pg_data || true
             
             # Remove unused images
             echo "Removing unused images..."
@@ -331,17 +347,45 @@ jobs:
                     max-file: "3"
             EOL
             
-            # Verify docker-compose.yml
+            # Проверка свободного места на диске
+            echo "Checking disk space..."
+            df -h
+            free_space=$(df --output=avail -k / | tail -1)
+            if [ "$free_space" -lt 2097152 ]; then
+              echo "Warning: Less than 2GB disk space available!"
+            fi
+
+            # Проверка docker compose config
             echo "Verifying docker-compose.yml..."
-            docker-compose config
-            
-            # Pull latest images and deploy
+            docker compose config
+
+            # Deploy stack
             echo "Deploying stack..."
             docker stack deploy -c docker-compose.yml backend --with-registry-auth
-            
-            # Wait for services to be ready
-            echo "Waiting for services to be ready..."
-            sleep 30
+
+            # Ожидание readiness всех сервисов
+            echo "Waiting for all services to be ready..."
+            services=(backend_backend backend_database backend_traefik)
+            for service in "${services[@]}"; do
+              max_retries=18
+              retry_count=0
+              while [ $retry_count -lt $max_retries ]; do
+                ready=$(docker service ls | grep $service | awk '{print $4}' | grep -E '^[1-9]+/[1-9]+' || true)
+                if [ -n "$ready" ]; then
+                  echo "$service is running: $ready"
+                  break
+                fi
+                retry_count=$((retry_count + 1))
+                echo "Waiting for $service to be ready... ($retry_count/$max_retries)"
+                sleep 10
+              done
+              if [ $retry_count -eq $max_retries ]; then
+                echo "$service did not become ready in time"
+                docker service ls
+                docker service ps $service --no-trunc || true
+                exit 1
+              fi
+            done
             
             # Check service status with more details
             echo "Checking service status..."
@@ -412,3 +456,18 @@ jobs:
               docker service logs $service --tail 50 || echo "No logs available for $service"
               echo "----------------------------------------"
             done
+
+            # Сохраняем логи деплоя в файл для артефакта
+            docker service logs backend_backend --tail 200 > backend_backend.log || true
+            docker service logs backend_database --tail 200 > backend_database.log || true
+            docker service logs backend_traefik --tail 200 > backend_traefik.log || true
+
+      - name: Upload deployment logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: deployment-logs
+          path: |
+            /opt/mybudget/backend/backend_backend.log
+            /opt/mybudget/backend/backend_database.log
+            /opt/mybudget/backend/backend_traefik.log

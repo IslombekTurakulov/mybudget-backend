@@ -13,7 +13,7 @@ fun main() {
     val host = config.property("ktor.deployment.host").getString()
 
     embeddedServer(Netty, port = port, host = host) {
-        configureDatabase()
+        configureDatabase(config)
         configureBasic()
         configureDI()
         configureRequestValidation()

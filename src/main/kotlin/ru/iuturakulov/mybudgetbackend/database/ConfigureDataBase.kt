@@ -2,6 +2,7 @@ package ru.iuturakulov.mybudgetbackend.database
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
+import io.ktor.server.config.*
 import org.flywaydb.core.Flyway
 import org.flywaydb.core.api.FlywayException
 import org.jetbrains.exposed.sql.Database
@@ -21,8 +22,8 @@ import ru.iuturakulov.mybudgetbackend.entities.user.EmailVerificationTable
 import ru.iuturakulov.mybudgetbackend.entities.user.UserTable
 import javax.sql.DataSource
 
-fun configureDatabase() {
-    DatabaseConfig.initDB()
+fun configureDatabase(config: ApplicationConfig) {
+    DatabaseConfig.initDB(config)
     transaction {
         addLogger(StdOutSqlLogger)
         create(UserTable)
@@ -39,9 +40,19 @@ fun configureDatabase() {
 }
 
 object DatabaseConfig {
-    fun initDB() {
-        val config = HikariConfig("/hikari.properties")
-        val dataSource = HikariDataSource(config)
+    fun initDB(config: ApplicationConfig) {
+        val dbUrl = config.property("database.url").getString()
+        val dbUser = config.property("database.user").getString()
+        val dbPassword = config.property("database.password").getString()
+        val dbDriver = config.property("database.driver").getString()
+
+        val hikariConfig = HikariConfig().apply {
+            jdbcUrl = dbUrl
+            username = dbUser
+            password = dbPassword
+            driverClassName = dbDriver
+        }
+        val dataSource = HikariDataSource(hikariConfig)
         runFlyway(dataSource)
         Database.connect(dataSource)
     }

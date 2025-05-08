@@ -30,8 +30,12 @@ services:
       POSTGRES_USER: ${PG_USER}
       POSTGRES_DB: ${PG_DATABASE}
       POSTGRES_PASSWORD_FILE: /run/secrets/pg_password
+      PG_PORT: 5433
+      PG_HOST: database
     secrets:
       - pg_password
+    ports:
+      - "5433:5432"
     deploy:
       replicas: 1
       restart_policy:
@@ -64,6 +68,11 @@ services:
     depends_on:
       - database
     environment:
+      PG_USER: ${PG_USER}
+      PG_PASSWORD: ${PG_PASSWORD}
+      PG_DATABASE: ${PG_DATABASE}
+      PG_PORT: 5432
+      PG_HOST: database
       DATABASE_URL: jdbc:postgresql://database:5432/${PG_DATABASE}
       JWT_SECRET: /run/secrets/app_secret
       SPRING_PROFILES_ACTIVE: prod

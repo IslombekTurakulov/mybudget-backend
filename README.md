@@ -407,3 +407,52 @@ docker service logs backend_traefik | grep "certificate"
 # Force certificate renewal
 docker service update --force backend_traefik
 ```
+
+## Быстрый локальный запуск backend с Postgres
+
+### 1. Через Docker
+
+1. Убедитесь, что Docker установлен и запущен.
+2. Запустите скрипт:
+   ```sh
+   ./run-local-backend.sh
+   ```
+3. После запуска скрипта, в этом же терминале выполните:
+   ```sh
+   ./gradlew run
+   ```
+   или
+   ```sh
+   java -jar build/libs/MyBudget-backend-1.0.0.jar
+   ```
+
+### 2. Через Podman (Mac/Windows/Linux)
+
+1. Убедитесь, что Podman установлен.
+2. **На Mac/Windows обязательно запустите Podman Machine:**
+   ```sh
+   podman machine init   # только при первом запуске
+   podman machine start
+   ```
+3. Проверьте, что Podman работает:
+   ```sh
+   podman info
+   ```
+4. Запустите скрипт:
+   ```sh
+   ./run-local-backend.sh
+   ```
+5. После запуска скрипта, в этом же терминале выполните:
+   ```sh
+   ./gradlew run
+   ```
+   или
+   ```sh
+   java -jar build/libs/MyBudget-backend-1.0.0.jar
+   ```
+
+**Важно:**
+- Скрипт автоматически определяет, что использовать — podman или docker.
+- Для Podman на Mac/Windows всегда должна быть запущена Podman Machine, иначе будет ошибка подключения.
+- Если хотите использовать только Docker, убедитесь, что podman не установлен или временно уберите его из PATH.
+
