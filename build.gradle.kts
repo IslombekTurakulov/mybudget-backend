@@ -99,3 +99,12 @@ java {
 tasks.create("stage") {
     dependsOn("installDist")
 }
+
+tasks.shadowJar {
+    manifest {
+        attributes(
+            "Main-Class" to "ru.iuturakulov.mybudgetbackend.ApplicationKt"
+        )
+    }
+    mergeServiceFiles()
+}

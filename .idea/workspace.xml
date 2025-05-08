@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4bbd917-8929-44b4-afda-19b441d6e48e" name="Changes" comment="MYBUDGETBACKEND-60: fix env variable" />
+    <list default="true" id="c4bbd917-8929-44b4-afda-19b441d6e48e" name="Changes" comment="MYBUDGETBACKEND-61: fix env">
+      <change beforePath="$PROJECT_DIR$/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle.kts" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -225,14 +227,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1737229814397</updated>
-    </task>
-    <task id="LOCAL-00051" summary="MYBUDGETBACKEND-47: fix deploy.yml add fast deploy">
-      <option name="closed" value="true" />
-      <created>1746596873321</created>
-      <option name="number" value="00051" />
-      <option name="presentableId" value="LOCAL-00051" />
-      <option name="project" value="LOCAL" />
-      <updated>1746596873321</updated>
     </task>
     <task id="LOCAL-00052" summary="MYBUDGETBACKEND-47: fix fast deploy">
       <option name="closed" value="true" />
@@ -618,7 +612,15 @@
       <option name="project" value="LOCAL" />
       <updated>1746742952609</updated>
     </task>
-    <option name="localTasksCounter" value="100" />
+    <task id="LOCAL-00100" summary="MYBUDGETBACKEND-61: fix env">
+      <option name="closed" value="true" />
+      <created>1746743184645</created>
+      <option name="number" value="00100" />
+      <option name="presentableId" value="LOCAL-00100" />
+      <option name="project" value="LOCAL" />
+      <updated>1746743184645</updated>
+    </task>
+    <option name="localTasksCounter" value="101" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -633,7 +635,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="MYBUDGETBACKEND-47: fix fast deploy" />
     <MESSAGE value="MYBUDGETBACKEND-47: fix replica deploy and postgres" />
     <MESSAGE value="MYBUDGETBACKEND-47: fix pgpassword" />
     <MESSAGE value="MYBUDGETBACKEND-48: fix deploy" />
@@ -658,7 +659,8 @@
     <MESSAGE value="MYBUDGETBACKEND-59: fix secrets" />
     <MESSAGE value="MYBUDGETBACKEND-60: fix deploy and docker file" />
     <MESSAGE value="MYBUDGETBACKEND-60: fix env variable" />
-    <option name="LAST_COMMIT_MESSAGE" value="MYBUDGETBACKEND-60: fix env variable" />
+    <MESSAGE value="MYBUDGETBACKEND-61: fix env" />
+    <option name="LAST_COMMIT_MESSAGE" value="MYBUDGETBACKEND-61: fix env" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
