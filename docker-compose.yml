@@ -42,7 +42,7 @@ services:
       - backend_pg_database
       - backend_pg_password
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready"]
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -70,6 +70,7 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
+    command: ["postgres", "-c", "log_statement=all", "-c", "log_connections=on", "-c", "log_disconnections=on"]
 
   traefik:
     image: traefik:v2.10
@@ -108,7 +109,8 @@ services:
       - backend
       - public
     depends_on:
-      - database
+      database:
+        condition: service_healthy
     environment:
       PG_USER: ${PG_USER}
       PG_PASSWORD: ${PG_PASSWORD}

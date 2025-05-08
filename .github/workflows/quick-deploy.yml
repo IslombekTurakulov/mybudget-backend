@@ -363,75 +363,47 @@ jobs:
             echo "Waiting for services to start..."
             sleep 10
 
-            # Check service status
-            echo "Checking service status..."
+            # Check service status with more detail
+            echo "Checking service status with more detail..."
             docker service ls
-
-            # Check service details
-            echo "Checking service details..."
             for service in backend_backend backend_database backend_traefik; do
               echo "Service: $service"
-              docker service ps $service --no-trunc || echo "Service $service not found"
+              docker service ps $service --no-trunc
               echo "Service logs:"
-              docker service logs $service --tail 50 || echo "No logs available for $service"
-              echo "----------------------------------------"
-            done
-            
-            # Check container logs with more detail
-            echo "Checking container logs with more detail..."
-            for container in $(docker ps -q); do
-              echo "Container: $container"
-              docker logs $container
-              echo "Container inspect:"
-              docker inspect $container
+              docker service logs $service --tail 50
+              echo "Service inspect:"
+              docker service inspect $service
               echo "----------------------------------------"
             done
 
-            # Check if backend can connect to database
-            echo "Checking database connectivity..."
-            docker service ps backend_database --no-trunc
+            # Check database logs specifically
+            echo "Checking database logs..."
             DB_CONTAINER=$(docker ps -q -f name=backend_database)
             if [ -n "$DB_CONTAINER" ]; then
               echo "Database container found: $DB_CONTAINER"
-              docker exec $DB_CONTAINER pg_isready -U postgres
+              docker logs $DB_CONTAINER
+              echo "Database container inspect:"
+              docker inspect $DB_CONTAINER
+              echo "Database environment:"
+              docker exec $DB_CONTAINER env
+              echo "Database process list:"
+              docker exec $DB_CONTAINER ps aux
             else
               echo "Database container not found"
             fi
 
-            # Check if backend can resolve database host
-            echo "Checking DNS resolution..."
-            BACKEND_CONTAINER=$(docker ps -q -f name=backend_backend)
-            if [ -n "$BACKEND_CONTAINER" ]; then
-              echo "Backend container found: $BACKEND_CONTAINER"
-              docker exec $BACKEND_CONTAINER ping -c 1 database
-              docker exec $BACKEND_CONTAINER cat /etc/hosts
-            else
-              echo "Backend container not found"
-            fi
-
-            # Check environment variables in backend container
-            if [ -n "$BACKEND_CONTAINER" ]; then
-              echo "Backend environment variables:"
-              docker exec $BACKEND_CONTAINER env
-            fi
-            
-            # Check stack status
-            echo "Checking stack status..."
-            docker stack ps backend --no-trunc
-            
-            # Check if all replicas are running with more detailed output
-            echo "Checking replicas with detailed status..."
-            for service in backend_backend backend_database backend_traefik; do
-              echo "Checking service: $service"
-              docker service ps $service --no-trunc || echo "Service $service not found"
-              echo "Service logs for $service:"
-              docker service logs $service --tail 50 || echo "No logs available for $service"
-              echo "----------------------------------------"
+            # Check if secrets are properly mounted
+            echo "Checking secrets..."
+            docker secret ls
+            for secret in backend_pg_user backend_pg_database backend_pg_password backend_app_secret; do
+              echo "Secret: $secret"
+              docker secret inspect $secret
             done
-            
+
             # Check network connectivity
-            echo "Checking networks..."
-            docker network ls | grep backend
+            echo "Checking network connectivity..."
+            docker network inspect backend
+            docker network inspect public
             
             # Check if ports are open
             echo "Checking if ports are open..."
