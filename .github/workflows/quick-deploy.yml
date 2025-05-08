@@ -260,7 +260,7 @@ jobs:
                   resources:
                     limits:
                       cpus: '0.5'
-                      memory: 512M
+                      memory: 1G
                   update_config:
                     parallelism: 1
                     delay: 10s
@@ -269,35 +269,34 @@ jobs:
                     parallelism: 1
                     delay: 10s
                     order: start-first
-                  placement:
-                    constraints:
-                      - node.role == manager
+                logging:
+                  driver: json-file
+                  options:
+                    max-size: "10m"
+                    max-file: "3"
 
               backend:
-                image: ghcr.io/${GITHUB_OWNER_LC}/mybudget-backend:${TAG}
+                image: ghcr.io/\${GITHUB_OWNER_LC}/mybudget-backend:\${TAG}
                 networks:
                   - backend
                   - public
                 depends_on:
                   - database
                 environment:
-                  PG_USER_FILE: /run/secrets/backend_pg_user
-                  PG_PASSWORD_FILE: /run/secrets/backend_pg_password
-                  PG_DATABASE_FILE: /run/secrets/backend_pg_database
-                  PG_PORT: 5432
-                  PG_HOST: database
-                  DATABASE_URL: jdbc:postgresql://database:5432/postgres
-                  JWT_SECRET_FILE: /run/secrets/backend_app_secret
+                  PG_USER: \${PG_USER}
+                  PG_PASSWORD: \${PG_PASSWORD}
+                  PG_DATABASE: \${PG_DATABASE}
+                  DATABASE_URL: jdbc:postgresql://database:5432/\${PG_DATABASE}
+                  JWT_SECRET: \${JWT_SECRET}
                   SPRING_PROFILES_ACTIVE: prod
                   SERVER_PORT: 8082
                   SPRING_SECURITY_CORS_ALLOWED_ORIGINS: "*"
                   SPRING_SECURITY_CORS_ALLOWED_METHODS: "GET,POST,PUT,DELETE,OPTIONS"
                   SPRING_SECURITY_CORS_ALLOWED_HEADERS: "*"
                   SPRING_SECURITY_CORS_ALLOW_CREDENTIALS: "true"
+                expose:
+                  - "8082"
                 secrets:
-                  - backend_pg_user
-                  - backend_pg_password
-                  - backend_pg_database
                   - backend_app_secret
                 labels:
                   - "traefik.enable=true"
@@ -370,7 +369,7 @@ jobs:
 
             # Check service details
             echo "Checking service details..."
-            for service in backend_backend backend_database; do
+            for service in backend_backend backend_database backend_traefik; do
               echo "Service: $service"
               docker service ps $service --no-trunc || echo "Service $service not found"
               echo "Service logs:"
@@ -378,13 +377,43 @@ jobs:
               echo "----------------------------------------"
             done
             
-            # Check container logs
-            echo "Checking container logs..."
+            # Check container logs with more detail
+            echo "Checking container logs with more detail..."
             for container in $(docker ps -q); do
               echo "Container: $container"
               docker logs $container
+              echo "Container inspect:"
+              docker inspect $container
               echo "----------------------------------------"
             done
+
+            # Check if backend can connect to database
+            echo "Checking database connectivity..."
+            docker service ps backend_database --no-trunc
+            DB_CONTAINER=$(docker ps -q -f name=backend_database)
+            if [ -n "$DB_CONTAINER" ]; then
+              echo "Database container found: $DB_CONTAINER"
+              docker exec $DB_CONTAINER pg_isready -U postgres
+            else
+              echo "Database container not found"
+            fi
+
+            # Check if backend can resolve database host
+            echo "Checking DNS resolution..."
+            BACKEND_CONTAINER=$(docker ps -q -f name=backend_backend)
+            if [ -n "$BACKEND_CONTAINER" ]; then
+              echo "Backend container found: $BACKEND_CONTAINER"
+              docker exec $BACKEND_CONTAINER ping -c 1 database
+              docker exec $BACKEND_CONTAINER cat /etc/hosts
+            else
+              echo "Backend container not found"
+            fi
+
+            # Check environment variables in backend container
+            if [ -n "$BACKEND_CONTAINER" ]; then
+              echo "Backend environment variables:"
+              docker exec $BACKEND_CONTAINER env
+            fi
             
             # Check stack status
             echo "Checking stack status..."
