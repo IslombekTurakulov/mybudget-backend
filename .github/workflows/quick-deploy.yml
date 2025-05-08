@@ -161,26 +161,22 @@ jobs:
             echo "${{ secrets.PG_DATABASE }}" | docker secret create backend_pg_database - || true
             echo "${{ secrets.JWT_SECRET }}" | docker secret create backend_app_secret - || true
             
+            # Verify secrets were created
+            echo "Verifying secrets..."
+            docker secret ls
+            
             # Login to GitHub Container Registry
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
             
             # Create docker-compose.yml with correct configuration
             cat > docker-compose.yml << EOL
-            version: '3.9'
-
-            secrets:
-              pg_password:
-                file: ./secrets/pg_password.txt
-              app_secret:
-                file: ./secrets/app_jwt_secret.txt
-
             networks:
               backend:
-                driver: overlay
-                attachable: true
+                name: backend
+                external: true
               public:
-                driver: overlay
-                attachable: true
+                name: public
+                external: true
 
             volumes:
               pg_data:
@@ -188,66 +184,6 @@ jobs:
               traefik_logs:
 
             services:
-              traefik:
-                image: traefik:v2.11
-                networks:
-                  - public
-                  - backend
-                command:
-                  - "--providers.docker=true"
-                  - "--providers.docker.swarmMode=true"
-                  - "--providers.docker.exposedByDefault=false"
-                  - "--entrypoints.web.address=:80"
-                  - "--entrypoints.websecure.address=:443"
-                  - "--entrypoints.dashboard.address=:8081"
-                  - "--certificatesresolvers.leresolver.acme.email=\${LETSENCRYPT_EMAIL}"
-                  - "--certificatesresolvers.leresolver.acme.storage=/letsencrypt/acme.json"
-                  - "--certificatesresolvers.leresolver.acme.httpchallenge.entrypoint=web"
-                  - "--log.level=INFO"
-                  - "--accesslog=true"
-                  - "--accesslog.filepath=/var/log/traefik/access.log"
-                  - "--metrics.prometheus=true"
-                  - "--api.dashboard=true"
-                  - "--api.insecure=true"
-                  - "--providers.docker.network=public"
-                  - "--providers.docker.watch=true"
-                  - "--providers.docker.swarmModeRefreshSeconds=15s"
-                ports:
-                  - "80:80"
-                  - "443:443"
-                  - "8081:8081"
-                volumes:
-                  - /var/run/docker.sock:/var/run/docker.sock:ro
-                  - letsencrypt:/letsencrypt
-                  - traefik_logs:/var/log/traefik
-                healthcheck:
-                  test: ["CMD", "traefik", "healthcheck"]
-                  interval: 30s
-                  timeout: 5s
-                  retries: 3
-                deploy:
-                  mode: global
-                  placement:
-                    constraints:
-                      - node.role == manager
-                  restart_policy:
-                    condition: on-failure
-                    max_attempts: 3
-                    window: 120s
-                  update_config:
-                    parallelism: 1
-                    delay: 10s
-                    order: start-first
-                  rollback_config:
-                    parallelism: 1
-                    delay: 10s
-                    order: start-first
-                logging:
-                  driver: json-file
-                  options:
-                    max-size: "5m"
-                    max-file: "5"
-
               database:
                 image: postgres:17-alpine
                 networks:
@@ -319,7 +255,7 @@ jobs:
                   - backend_app_secret
                 labels:
                   - "traefik.enable=true"
-                  - "traefik.http.routers.backend.rule=Host(\'51.250.65.154\')"
+                  - "traefik.http.routers.backend.rule=Host('51.250.65.154')"
                   - "traefik.http.routers.backend.entrypoints=web"
                   - "traefik.http.services.backend.loadbalancer.server.port=8082"
                   - "traefik.http.middlewares.cors.headers.accessControlAllowMethods=GET,POST,PUT,DELETE,OPTIONS"
@@ -374,37 +310,27 @@ jobs:
             echo "Verifying docker-compose.yml..."
             docker compose config
 
-            # Deploy stack
+            # Deploy stack with debug output
             echo "Deploying stack..."
-            docker stack deploy -c docker-compose.yml backend --with-registry-auth
+            docker stack deploy -c docker-compose.yml backend --with-registry-auth --prune
 
-            # Ожидание readiness всех сервисов
-            echo "Waiting for all services to be ready..."
-            services=(backend_backend backend_database backend_traefik)
-            for service in "${services[@]}"; do
-              max_retries=18
-              retry_count=0
-              while [ $retry_count -lt $max_retries ]; do
-                ready=$(docker service ls | grep $service | awk '{print $4}' | grep -E '^[1-9]+/[1-9]+' || true)
-                if [ -n "$ready" ]; then
-                  echo "$service is running: $ready"
-                  break
-                fi
-                retry_count=$((retry_count + 1))
-                echo "Waiting for $service to be ready... ($retry_count/$max_retries)"
-                sleep 10
-              done
-              if [ $retry_count -eq $max_retries ]; then
-                echo "$service did not become ready in time"
-                docker service ls
-                docker service ps $service --no-trunc || true
-                exit 1
-              fi
-            done
-            
-            # Check service status with more details
+            # Wait for services to start
+            echo "Waiting for services to start..."
+            sleep 10
+
+            # Check service status
             echo "Checking service status..."
             docker service ls
+
+            # Check service details
+            echo "Checking service details..."
+            for service in backend_backend backend_database; do
+              echo "Service: $service"
+              docker service ps $service --no-trunc || echo "Service $service not found"
+              echo "Service logs:"
+              docker service logs $service --tail 50 || echo "No logs available for $service"
+              echo "----------------------------------------"
+            done
             
             # Check stack status
             echo "Checking stack status..."
