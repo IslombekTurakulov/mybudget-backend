@@ -83,7 +83,6 @@ services:
       PG_USER: ${PG_USER}
       PG_PASSWORD: ${PG_PASSWORD}
       PG_DATABASE: ${PG_DATABASE}
-      DATABASE_URL: jdbc:postgresql://database:5432/${PG_DATABASE}
       JWT_SECRET: ${JWT_SECRET}
       SPRING_PROFILES_ACTIVE: prod
       SERVER_PORT: 8082
