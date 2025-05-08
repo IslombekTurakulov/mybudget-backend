@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4bbd917-8929-44b4-afda-19b441d6e48e" name="Changes" comment="MYBUDGETBACKEND-63: fix gradle" />
+    <list default="true" id="c4bbd917-8929-44b4-afda-19b441d6e48e" name="Changes" comment="MYBUDGETBACKEND-63: fix env to start database docker" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -214,22 +214,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1737229814397</updated>
-    </task>
-    <task id="LOCAL-00057" summary="MYBUDGETBACKEND-50: fix deploy">
-      <option name="closed" value="true" />
-      <created>1746599603414</created>
-      <option name="number" value="00057" />
-      <option name="presentableId" value="LOCAL-00057" />
-      <option name="project" value="LOCAL" />
-      <updated>1746599603414</updated>
-    </task>
-    <task id="LOCAL-00058" summary="MYBUDGETBACKEND-51: fix deploy">
-      <option name="closed" value="true" />
-      <created>1746599813982</created>
-      <option name="number" value="00058" />
-      <option name="presentableId" value="LOCAL-00058" />
-      <option name="project" value="LOCAL" />
-      <updated>1746599813982</updated>
     </task>
     <task id="LOCAL-00059" summary="MYBUDGETBACKEND-52: fix deploy">
       <option name="closed" value="true" />
@@ -607,7 +591,23 @@
       <option name="project" value="LOCAL" />
       <updated>1746744524155</updated>
     </task>
-    <option name="localTasksCounter" value="106" />
+    <task id="LOCAL-00106" summary="MYBUDGETBACKEND-63: fix env to start database docker">
+      <option name="closed" value="true" />
+      <created>1746744885747</created>
+      <option name="number" value="00106" />
+      <option name="presentableId" value="LOCAL-00106" />
+      <option name="project" value="LOCAL" />
+      <updated>1746744885747</updated>
+    </task>
+    <task id="LOCAL-00107" summary="MYBUDGETBACKEND-63: fix env to start database docker">
+      <option name="closed" value="true" />
+      <created>1746745080048</created>
+      <option name="number" value="00107" />
+      <option name="presentableId" value="LOCAL-00107" />
+      <option name="project" value="LOCAL" />
+      <updated>1746745080048</updated>
+    </task>
+    <option name="localTasksCounter" value="108" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -622,7 +622,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="MYBUDGETBACKEND-50: fix deploy" />
     <MESSAGE value="MYBUDGETBACKEND-51: fix deploy" />
     <MESSAGE value="MYBUDGETBACKEND-52: fix deploy" />
     <MESSAGE value="MYBUDGETBACKEND-52: fix docker-compose.yml" />
@@ -647,7 +646,8 @@
     <MESSAGE value="MYBUDGETBACKEND-62: fix manifest and jar" />
     <MESSAGE value="MYBUDGETBACKEND-62: fix gradle" />
     <MESSAGE value="MYBUDGETBACKEND-63: fix gradle" />
-    <option name="LAST_COMMIT_MESSAGE" value="MYBUDGETBACKEND-63: fix gradle" />
+    <MESSAGE value="MYBUDGETBACKEND-63: fix env to start database docker" />
+    <option name="LAST_COMMIT_MESSAGE" value="MYBUDGETBACKEND-63: fix env to start database docker" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

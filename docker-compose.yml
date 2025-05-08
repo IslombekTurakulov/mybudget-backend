@@ -28,7 +28,9 @@ services:
   database:
     image: postgres:17-alpine
     networks:
-      - backend
+      backend:
+        aliases:
+          - database
     volumes:
       - pg_data:/var/lib/postgresql/data
     environment:
@@ -76,10 +78,15 @@ services:
   backend:
     image: ghcr.io/islombekturakulov/mybudget-backend:${TAG}
     networks:
-      - backend
-      - public
+      backend:
+        aliases:
+          - backend
+      public:
+        aliases:
+          - backend-public
     depends_on:
-      - database
+      database:
+        condition: service_healthy
     environment:
       PG_USER_FILE: /run/secrets/backend_pg_user
       PG_PASSWORD_FILE: /run/secrets/backend_pg_password
