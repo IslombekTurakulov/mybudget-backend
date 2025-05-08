@@ -210,7 +210,7 @@ jobs:
                   - backend_pg_database
                   - backend_pg_password
                 healthcheck:
-                  test: ["CMD-SHELL", "pg_isready -U $$(cat /run/secrets/backend_pg_user) -d $$(cat /run/secrets/backend_pg_database)"]
+                  test: ["CMD-SHELL", "pg_isready -U postgres"]
                   interval: 10s
                   timeout: 5s
                   retries: 5
@@ -250,7 +250,7 @@ jobs:
                   PG_DATABASE_FILE: /run/secrets/backend_pg_database
                   PG_PORT: 5432
                   PG_HOST: database
-                  DATABASE_URL: jdbc:postgresql://database:5432/$$(cat /run/secrets/backend_pg_database)
+                  DATABASE_URL: jdbc:postgresql://database:5432/postgres
                   JWT_SECRET_FILE: /run/secrets/backend_app_secret
                   SPRING_PROFILES_ACTIVE: prod
                   SERVER_PORT: 8082
@@ -339,6 +339,14 @@ jobs:
               docker service ps $service --no-trunc || echo "Service $service not found"
               echo "Service logs:"
               docker service logs $service --tail 50 || echo "No logs available for $service"
+              echo "----------------------------------------"
+            done
+            
+            # Check container logs
+            echo "Checking container logs..."
+            for container in $(docker ps -q); do
+              echo "Container: $container"
+              docker logs $container
               echo "----------------------------------------"
             done
             
