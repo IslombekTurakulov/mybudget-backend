@@ -110,8 +110,8 @@ tasks.shadowJar {
     }
     mergeServiceFiles()
     archiveBaseName.set("MyBudget-backend")
-    archiveClassifier.set("")
-    archiveVersion.set(project.version.toString())
+    archiveClassifier.set("all")
+    archiveVersion.set("")
     
     from(project.sourceSets.main.get().output)
     from(project.sourceSets.main.get().resources)

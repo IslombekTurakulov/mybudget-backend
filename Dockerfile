@@ -7,7 +7,7 @@ RUN gradle clean shadowJar --no-daemon --info
 
 FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
-COPY --from=build /app/build/libs/MyBudget-backend-${IMAGE_TAG}-all.jar ./app.jar
+COPY --from=build /app/build/libs/MyBudget-backend-all.jar ./MyBudget-backend-all.jar
 COPY --from=build /app/src/main/resources/application.conf ./application.conf
 EXPOSE 8082
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-jar", "MyBudget-backend-all.jar"]
