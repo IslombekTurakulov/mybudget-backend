@@ -42,11 +42,11 @@ services:
       - backend_pg_database
       - backend_pg_password
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $(cat /run/secrets/backend_pg_user) -d $(cat /run/secrets/backend_pg_database)"]
+      test: ["CMD-SHELL", "pg_isready"]
       interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 10s
+      start_period: 30s
     deploy:
       replicas: 1
       restart_policy:

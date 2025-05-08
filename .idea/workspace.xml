@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4bbd917-8929-44b4-afda-19b441d6e48e" name="Changes" comment="MYBUDGETBACKEND-63: fix env to start database docker" />
+    <list default="true" id="c4bbd917-8929-44b4-afda-19b441d6e48e" name="Changes" comment="MYBUDGETBACKEND-64: fix deploy to start database docker" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -214,14 +214,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1737229814397</updated>
-    </task>
-    <task id="LOCAL-00061" summary="MYBUDGETBACKEND-53: fix port in docker-compose.yml">
-      <option name="closed" value="true" />
-      <created>1746600234796</created>
-      <option name="number" value="00061" />
-      <option name="presentableId" value="LOCAL-00061" />
-      <option name="project" value="LOCAL" />
-      <updated>1746600234796</updated>
     </task>
     <task id="LOCAL-00062" summary="MYBUDGETBACKEND-53: fix port in docker-compose.yml">
       <option name="closed" value="true" />
@@ -607,7 +599,15 @@
       <option name="project" value="LOCAL" />
       <updated>1746745458338</updated>
     </task>
-    <option name="localTasksCounter" value="110" />
+    <task id="LOCAL-00110" summary="MYBUDGETBACKEND-64: fix deploy to start database docker">
+      <option name="closed" value="true" />
+      <created>1746745618422</created>
+      <option name="number" value="00110" />
+      <option name="presentableId" value="LOCAL-00110" />
+      <option name="project" value="LOCAL" />
+      <updated>1746745618423</updated>
+    </task>
+    <option name="localTasksCounter" value="111" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -622,7 +622,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="MYBUDGETBACKEND-51: fix deploy" />
     <MESSAGE value="MYBUDGETBACKEND-52: fix deploy" />
     <MESSAGE value="MYBUDGETBACKEND-52: fix docker-compose.yml" />
     <MESSAGE value="MYBUDGETBACKEND-53: fix port in docker-compose.yml" />
@@ -647,7 +646,8 @@
     <MESSAGE value="MYBUDGETBACKEND-62: fix gradle" />
     <MESSAGE value="MYBUDGETBACKEND-63: fix gradle" />
     <MESSAGE value="MYBUDGETBACKEND-63: fix env to start database docker" />
-    <option name="LAST_COMMIT_MESSAGE" value="MYBUDGETBACKEND-63: fix env to start database docker" />
+    <MESSAGE value="MYBUDGETBACKEND-64: fix deploy to start database docker" />
+    <option name="LAST_COMMIT_MESSAGE" value="MYBUDGETBACKEND-64: fix deploy to start database docker" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
