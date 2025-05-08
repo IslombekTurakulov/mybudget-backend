@@ -1,10 +1,10 @@
 version: '3.9'
 
 secrets:
-  pg_password:
-    file: ./secrets/pg_password.txt
-  app_secret:
-    file: ./secrets/app_jwt_secret.txt
+  backend_pg_password:
+    external: true
+  backend_app_secret:
+    external: true
 
 networks:
   backend:
@@ -29,9 +29,9 @@ services:
     environment:
       POSTGRES_USER: ${PG_USER}
       POSTGRES_DB: ${PG_DATABASE}
-      POSTGRES_PASSWORD_FILE: /run/secrets/pg_password
+      POSTGRES_PASSWORD_FILE: /run/secrets/backend_pg_password
     secrets:
-      - pg_password
+      - backend_pg_password
     ports:
       - "5433:5432"
     deploy:
@@ -72,7 +72,7 @@ services:
       PG_PORT: 5432
       PG_HOST: database
       DATABASE_URL: jdbc:postgresql://database:5432/${PG_DATABASE}
-      JWT_SECRET: /run/secrets/app_secret
+      JWT_SECRET: /run/secrets/backend_app_secret
       SPRING_PROFILES_ACTIVE: prod
       SERVER_PORT: 8082
       SPRING_SECURITY_CORS_ALLOWED_ORIGINS: "*"
@@ -82,7 +82,7 @@ services:
     expose:
       - "8082"
     secrets:
-      - app_secret
+      - backend_app_secret
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.backend.rule=Host('51.250.65.154')"

@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4bbd917-8929-44b4-afda-19b441d6e48e" name="Changes" comment="MYBUDGETBACKEND-58: add local run, fix db, fix application config, fix deploy" />
+    <list default="true" id="c4bbd917-8929-44b4-afda-19b441d6e48e" name="Changes" comment="MYBUDGETBACKEND-59: fix deploy" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -225,22 +225,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1737229814397</updated>
-    </task>
-    <task id="LOCAL-00043" summary="MYBUDGETBACKEND-41: fix docker swarm">
-      <option name="closed" value="true" />
-      <created>1746592472091</created>
-      <option name="number" value="00043" />
-      <option name="presentableId" value="LOCAL-00043" />
-      <option name="project" value="LOCAL" />
-      <updated>1746592472091</updated>
-    </task>
-    <task id="LOCAL-00044" summary="MYBUDGETBACKEND-41: fix docker swarm">
-      <option name="closed" value="true" />
-      <created>1746592517698</created>
-      <option name="number" value="00044" />
-      <option name="presentableId" value="LOCAL-00044" />
-      <option name="project" value="LOCAL" />
-      <updated>1746592517698</updated>
     </task>
     <task id="LOCAL-00045" summary="MYBUDGETBACKEND-42: fix docker compose and network">
       <option name="closed" value="true" />
@@ -618,7 +602,23 @@
       <option name="project" value="LOCAL" />
       <updated>1746740104557</updated>
     </task>
-    <option name="localTasksCounter" value="92" />
+    <task id="LOCAL-00092" summary="MYBUDGETBACKEND-58: fix deploy, add logs">
+      <option name="closed" value="true" />
+      <created>1746740513773</created>
+      <option name="number" value="00092" />
+      <option name="presentableId" value="LOCAL-00092" />
+      <option name="project" value="LOCAL" />
+      <updated>1746740513773</updated>
+    </task>
+    <task id="LOCAL-00093" summary="MYBUDGETBACKEND-59: fix deploy">
+      <option name="closed" value="true" />
+      <created>1746740894926</created>
+      <option name="number" value="00093" />
+      <option name="presentableId" value="LOCAL-00093" />
+      <option name="project" value="LOCAL" />
+      <updated>1746740894926</updated>
+    </task>
+    <option name="localTasksCounter" value="94" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -633,8 +633,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="MYBUDGETBACKEND-44: fix docker" />
-    <MESSAGE value="MYBUDGETBACKEND-45: fix deploy.yml" />
     <MESSAGE value="MYBUDGETBACKEND-46: fix deploy.yml" />
     <MESSAGE value="MYBUDGETBACKEND-46: fix deploy.yml add fast deploy" />
     <MESSAGE value="MYBUDGETBACKEND-47: fix deploy.yml add fast deploy" />
@@ -658,7 +656,9 @@
     <MESSAGE value="MYBUDGETBACKEND-56: fix dockerfile" />
     <MESSAGE value="MYBUDGETBACKEND-57: fix deploy, change ip address" />
     <MESSAGE value="MYBUDGETBACKEND-58: add local run, fix db, fix application config, fix deploy" />
-    <option name="LAST_COMMIT_MESSAGE" value="MYBUDGETBACKEND-58: add local run, fix db, fix application config, fix deploy" />
+    <MESSAGE value="MYBUDGETBACKEND-58: fix deploy, add logs" />
+    <MESSAGE value="MYBUDGETBACKEND-59: fix deploy" />
+    <option name="LAST_COMMIT_MESSAGE" value="MYBUDGETBACKEND-59: fix deploy" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
