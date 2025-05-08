@@ -35,8 +35,8 @@ services:
       POSTGRES_PASSWORD_FILE: /run/secrets/backend_pg_password
       PGDATA: /var/lib/postgresql/data/pgdata
     user: postgres
-    ports:
-      - "5432:5432"
+    expose:
+      - "5432"
     secrets:
       - backend_pg_user
       - backend_pg_database
@@ -65,6 +65,37 @@ services:
         parallelism: 1
         delay: 10s
         order: start-first
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  traefik:
+    image: traefik:v2.10
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.swarmMode=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+    ports:
+      - "80:80"
+      - "8080:8080"
+    networks:
+      - public
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: on-failure
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
     logging:
       driver: json-file
       options:
