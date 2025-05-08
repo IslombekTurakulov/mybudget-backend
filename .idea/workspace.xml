@@ -215,22 +215,6 @@
       <option name="presentableId" value="Default" />
       <updated>1737229814397</updated>
     </task>
-    <task id="LOCAL-00059" summary="MYBUDGETBACKEND-52: fix deploy">
-      <option name="closed" value="true" />
-      <created>1746599943378</created>
-      <option name="number" value="00059" />
-      <option name="presentableId" value="LOCAL-00059" />
-      <option name="project" value="LOCAL" />
-      <updated>1746599943378</updated>
-    </task>
-    <task id="LOCAL-00060" summary="MYBUDGETBACKEND-52: fix docker-compose.yml">
-      <option name="closed" value="true" />
-      <created>1746600068818</created>
-      <option name="number" value="00060" />
-      <option name="presentableId" value="LOCAL-00060" />
-      <option name="project" value="LOCAL" />
-      <updated>1746600068818</updated>
-    </task>
     <task id="LOCAL-00061" summary="MYBUDGETBACKEND-53: fix port in docker-compose.yml">
       <option name="closed" value="true" />
       <created>1746600234796</created>
@@ -607,7 +591,23 @@
       <option name="project" value="LOCAL" />
       <updated>1746745080048</updated>
     </task>
-    <option name="localTasksCounter" value="108" />
+    <task id="LOCAL-00108" summary="MYBUDGETBACKEND-63: fix env to start database docker">
+      <option name="closed" value="true" />
+      <created>1746745284303</created>
+      <option name="number" value="00108" />
+      <option name="presentableId" value="LOCAL-00108" />
+      <option name="project" value="LOCAL" />
+      <updated>1746745284303</updated>
+    </task>
+    <task id="LOCAL-00109" summary="MYBUDGETBACKEND-63: fix env to start database docker">
+      <option name="closed" value="true" />
+      <created>1746745458338</created>
+      <option name="number" value="00109" />
+      <option name="presentableId" value="LOCAL-00109" />
+      <option name="project" value="LOCAL" />
+      <updated>1746745458338</updated>
+    </task>
+    <option name="localTasksCounter" value="110" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">

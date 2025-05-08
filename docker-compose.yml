@@ -10,8 +10,10 @@ secrets:
 
 networks:
   backend:
+    name: backend
     external: true
   public:
+    name: public
     external: true
 
 volumes:
@@ -24,9 +26,7 @@ services:
   database:
     image: postgres:17-alpine
     networks:
-      backend:
-        aliases:
-          - database
+      - backend
     volumes:
       - pg_data:/var/lib/postgresql/data
     environment:
@@ -74,12 +74,8 @@ services:
   backend:
     image: ghcr.io/islombekturakulov/mybudget-backend:${TAG}
     networks:
-      backend:
-        aliases:
-          - backend
-      public:
-        aliases:
-          - backend-public
+      - backend
+      - public
     depends_on:
       database:
         condition: service_healthy
