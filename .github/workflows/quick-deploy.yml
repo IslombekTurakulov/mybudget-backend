@@ -178,6 +178,16 @@ jobs:
                 name: public
                 external: true
 
+            secrets:
+              backend_pg_user:
+                external: true
+              backend_pg_password:
+                external: true
+              backend_pg_database:
+                external: true
+              backend_app_secret:
+                external: true
+
             volumes:
               pg_data:
               letsencrypt:
