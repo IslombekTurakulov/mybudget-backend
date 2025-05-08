@@ -69,7 +69,7 @@ jobs:
       - name: Build with Gradle
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: build
+          arguments: clean shadowJar --info
           gradle-home-cache-cleanup: true
 
       - name: Log in to the Container registry

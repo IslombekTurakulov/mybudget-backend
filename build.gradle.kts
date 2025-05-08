@@ -117,11 +117,6 @@ tasks.shadowJar {
     from(project.sourceSets.main.get().resources)
     
     configurations = listOf(project.configurations.getByName("runtimeClasspath"))
-    
-    // Ensure manifest is included
-    doFirst {
-        manifest.writeTo(project.buildDir.resolve("tmp/MANIFEST.MF"))
-    }
 }
 
 tasks.named("jar") {
