@@ -3,7 +3,7 @@ WORKDIR /app
 COPY . .
 ARG IMAGE_TAG=latest
 ENV IMAGE_TAG=$IMAGE_TAG
-RUN gradle clean shadowJar --no-daemon
+RUN gradle clean shadowJar --no-daemon --info
 
 FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app

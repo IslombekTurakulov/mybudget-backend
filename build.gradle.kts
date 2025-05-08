@@ -103,7 +103,9 @@ tasks.create("stage") {
 tasks.shadowJar {
     manifest {
         attributes(
-            "Main-Class" to "ru.iuturakulov.mybudgetbackend.ApplicationKt"
+            "Main-Class" to "ru.iuturakulov.mybudgetbackend.ApplicationKt",
+            "Implementation-Title" to "MyBudget Backend",
+            "Implementation-Version" to project.version
         )
     }
     mergeServiceFiles()
@@ -115,6 +117,11 @@ tasks.shadowJar {
     from(project.sourceSets.main.get().resources)
     
     configurations = listOf(project.configurations.getByName("runtimeClasspath"))
+    
+    // Ensure manifest is included
+    doFirst {
+        manifest.writeTo(project.buildDir.resolve("tmp/MANIFEST.MF"))
+    }
 }
 
 tasks.named("jar") {

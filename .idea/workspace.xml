@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4bbd917-8929-44b4-afda-19b441d6e48e" name="Changes" comment="MYBUDGETBACKEND-62: fix manifest and jar">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/Dockerfile" afterDir="false" />
+    <list default="true" id="c4bbd917-8929-44b4-afda-19b441d6e48e" name="Changes" comment="MYBUDGETBACKEND-62: fix gradle">
       <change beforePath="$PROJECT_DIR$/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle.kts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -218,14 +216,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1737229814397</updated>
-    </task>
-    <task id="LOCAL-00053" summary="MYBUDGETBACKEND-47: fix replica deploy and postgres">
-      <option name="closed" value="true" />
-      <created>1746597188356</created>
-      <option name="number" value="00053" />
-      <option name="presentableId" value="LOCAL-00053" />
-      <option name="project" value="LOCAL" />
-      <updated>1746597188356</updated>
     </task>
     <task id="LOCAL-00054" summary="MYBUDGETBACKEND-47: fix pgpassword">
       <option name="closed" value="true" />
@@ -611,7 +601,15 @@
       <option name="project" value="LOCAL" />
       <updated>1746743341072</updated>
     </task>
-    <option name="localTasksCounter" value="102" />
+    <task id="LOCAL-00102" summary="MYBUDGETBACKEND-62: fix gradle">
+      <option name="closed" value="true" />
+      <created>1746743704189</created>
+      <option name="number" value="00102" />
+      <option name="presentableId" value="LOCAL-00102" />
+      <option name="project" value="LOCAL" />
+      <updated>1746743704189</updated>
+    </task>
+    <option name="localTasksCounter" value="103" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -626,7 +624,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="MYBUDGETBACKEND-48: fix deploy" />
     <MESSAGE value="MYBUDGETBACKEND-49: Add README.md" />
     <MESSAGE value="MYBUDGETBACKEND-50: fix deploy" />
     <MESSAGE value="MYBUDGETBACKEND-51: fix deploy" />
@@ -651,7 +648,8 @@
     <MESSAGE value="MYBUDGETBACKEND-61: fix env" />
     <MESSAGE value="MYBUDGETBACKEND-61: fix manifest and jar" />
     <MESSAGE value="MYBUDGETBACKEND-62: fix manifest and jar" />
-    <option name="LAST_COMMIT_MESSAGE" value="MYBUDGETBACKEND-62: fix manifest and jar" />
+    <MESSAGE value="MYBUDGETBACKEND-62: fix gradle" />
+    <option name="LAST_COMMIT_MESSAGE" value="MYBUDGETBACKEND-62: fix gradle" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
