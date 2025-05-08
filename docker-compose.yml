@@ -29,9 +29,7 @@ services:
     environment:
       POSTGRES_USER: ${PG_USER}
       POSTGRES_DB: ${PG_DATABASE}
-      POSTGRES_PASSWORD_FILE: /run/secrets/backend_pg_password
-    secrets:
-      - backend_pg_password
+      POSTGRES_PASSWORD: ${PG_PASSWORD}
     ports:
       - "5432:5432"
     deploy:
@@ -43,7 +41,7 @@ services:
       resources:
         limits:
           cpus: '0.5'
-          memory: 512M
+          memory: 1G
       update_config:
         parallelism: 1
         delay: 10s
