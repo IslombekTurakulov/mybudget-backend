@@ -19,12 +19,34 @@ jobs:
       - name: Validate secrets
         run: |
           # Check required secrets
-          for secret in SERVER_HOST SERVER_USER SERVER_SSH_KEY PG_USER PG_PASSWORD PG_DATABASE JWT_SECRET GITHUB_TOKEN; do
-            if [ -z "${!secret}" ]; then
-              echo "Error: Required secret $secret is not set"
-              exit 1
-            fi
-          done
+          if [ -z "${{ secrets.SERVER_HOST }}" ]; then
+            echo "Error: Required secret SERVER_HOST is not set"
+            exit 1
+          fi
+          if [ -z "${{ secrets.SERVER_USER }}" ]; then
+            echo "Error: Required secret SERVER_USER is not set"
+            exit 1
+          fi
+          if [ -z "${{ secrets.SERVER_SSH_KEY }}" ]; then
+            echo "Error: Required secret SERVER_SSH_KEY is not set"
+            exit 1
+          fi
+          if [ -z "${{ secrets.PG_USER }}" ]; then
+            echo "Error: Required secret PG_USER is not set"
+            exit 1
+          fi
+          if [ -z "${{ secrets.PG_PASSWORD }}" ]; then
+            echo "Error: Required secret PG_PASSWORD is not set"
+            exit 1
+          fi
+          if [ -z "${{ secrets.PG_DATABASE }}" ]; then
+            echo "Error: Required secret PG_DATABASE is not set"
+            exit 1
+          fi
+          if [ -z "${{ secrets.JWT_SECRET }}" ]; then
+            echo "Error: Required secret JWT_SECRET is not set"
+            exit 1
+          fi
           echo "All required secrets are set"
 
       - name: Deploy to server
