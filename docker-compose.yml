@@ -1,3 +1,5 @@
+version: '3.8'
+
 secrets:
   backend_pg_password:
     external: true
@@ -18,7 +20,7 @@ networks:
 
 volumes:
   pg_data:
-    driver: local
+    name: backend_pg_data
   letsencrypt:
   traefik_logs:
 
@@ -35,8 +37,8 @@ services:
       POSTGRES_PASSWORD_FILE: /run/secrets/backend_pg_password
       PGDATA: /var/lib/postgresql/data/pgdata
     user: postgres
-    expose:
-      - "5432"
+    ports:
+      - "5432:5432"
     secrets:
       - backend_pg_user
       - backend_pg_database
@@ -123,8 +125,8 @@ services:
       SPRING_SECURITY_CORS_ALLOWED_METHODS: "GET,POST,PUT,DELETE,OPTIONS"
       SPRING_SECURITY_CORS_ALLOWED_HEADERS: "*"
       SPRING_SECURITY_CORS_ALLOW_CREDENTIALS: "true"
-    expose:
-      - "8082"
+    ports:
+      - "8082:8082"
     secrets:
       - backend_app_secret
     labels:

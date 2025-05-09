@@ -98,52 +98,11 @@ jobs:
             docker network create --driver overlay --attachable public || true
             sleep 5
             
-            # Create .env file
-            cat > .env << EOL
-            PG_USER=${{ secrets.PG_USER }}
-            PG_PASSWORD=${{ secrets.PG_PASSWORD }}
-            PG_DATABASE=${{ secrets.PG_DATABASE }}
-            JWT_SECRET=${{ secrets.JWT_SECRET }}
-            GITHUB_OWNER=islombekturakulov
-            TAG=${{ github.event.inputs.image_tag }}
-            LETSENCRYPT_EMAIL=${{ secrets.LETSENCRYPT_EMAIL }}
-            EOL
+            # Clean up existing secrets
+            echo "Cleaning up existing secrets..."
+            docker secret rm backend_pg_user backend_pg_database backend_pg_password backend_app_secret || true
+            sleep 5
 
-            # Export DB variables for backend
-            export PG_USER="${{ secrets.PG_USER }}"
-            export PG_PASSWORD="${{ secrets.PG_PASSWORD }}"
-            export PG_DATABASE="${{ secrets.PG_DATABASE }}"
-            export JWT_SECRET="${{ secrets.JWT_SECRET }}"
-
-            # Echo variables for debug
-            echo "GITHUB_OWNER=$(grep GITHUB_OWNER .env | cut -d'=' -f2)"
-            echo "TAG=$(grep TAG .env | cut -d'=' -f2)"
-            
-            # Verify environment variables
-            echo "Verifying environment variables..."
-            if [ -z "${{ secrets.PG_USER }}" ] || [ -z "${{ secrets.PG_DATABASE }}" ] || [ -z "${{ secrets.PG_PASSWORD }}" ] || [ -z "${{ secrets.JWT_SECRET }}" ]; then
-              echo "Error: Missing required environment variables"
-              exit 1
-            fi
-
-            # Set variables from GitHub Actions context
-            GITHUB_OWNER="${{ github.repository_owner }}"
-            GITHUB_OWNER_LC=$(echo "$GITHUB_OWNER" | tr '[:upper:]' '[:lower:]')
-            TAG="${{ github.event.inputs.image_tag }}"
-            echo "GITHUB_OWNER=$GITHUB_OWNER"
-            echo "GITHUB_OWNER_LC=$GITHUB_OWNER_LC"
-            echo "TAG=$TAG"
-
-            # Validate image tag and owner
-            if [ -z "$GITHUB_OWNER_LC" ]; then
-              echo "Error: GITHUB_OWNER_LC is required"
-              exit 1
-            fi
-            if [ -z "$TAG" ]; then
-              echo "Error: TAG is required"
-              exit 1
-            fi
-            
             # Create secrets directory if it doesn't exist
             mkdir -p secrets
             
@@ -158,15 +117,42 @@ jobs:
 
             # Create Docker secrets
             echo "Creating Docker secrets..."
-            echo "${{ secrets.PG_USER }}" | docker secret create backend_pg_user - || true
-            echo "${{ secrets.PG_PASSWORD }}" | docker secret create backend_pg_password - || true
-            echo "${{ secrets.PG_DATABASE }}" | docker secret create backend_pg_database - || true
-            echo "${{ secrets.JWT_SECRET }}" | docker secret create backend_app_secret - || true
+            echo "${{ secrets.PG_USER }}" | docker secret create backend_pg_user -
+            echo "${{ secrets.PG_PASSWORD }}" | docker secret create backend_pg_password -
+            echo "${{ secrets.PG_DATABASE }}" | docker secret create backend_pg_database -
+            echo "${{ secrets.JWT_SECRET }}" | docker secret create backend_app_secret -
             
             # Verify secrets were created
             echo "Verifying secrets..."
             docker secret ls
-            
+
+            # Export environment variables
+            export PG_USER="${{ secrets.PG_USER }}"
+            export PG_PASSWORD="${{ secrets.PG_PASSWORD }}"
+            export PG_DATABASE="${{ secrets.PG_DATABASE }}"
+            export JWT_SECRET="${{ secrets.JWT_SECRET }}"
+            export TAG="${{ github.event.inputs.image_tag }}"
+
+            # Verify environment variables
+            echo "Verifying environment variables..."
+            if [ -z "$PG_USER" ] || [ -z "$PG_DATABASE" ] || [ -z "$PG_PASSWORD" ] || [ -z "$JWT_SECRET" ]; then
+              echo "Error: Missing required environment variables"
+              exit 1
+            fi
+
+            # Create .env file
+            cat > .env << EOL
+            PG_USER=$PG_USER
+            PG_PASSWORD=$PG_PASSWORD
+            PG_DATABASE=$PG_DATABASE
+            JWT_SECRET=$JWT_SECRET
+            TAG=$TAG
+            EOL
+
+            # Verify .env file
+            echo "Verifying .env file..."
+            cat .env
+
             # Login to GitHub Container Registry
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
             
