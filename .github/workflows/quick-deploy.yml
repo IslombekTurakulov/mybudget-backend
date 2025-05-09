@@ -271,6 +271,11 @@ jobs:
                   POSTGRES_DB_FILE: /run/secrets/backend_pg_database
                   POSTGRES_PASSWORD_FILE: /run/secrets/backend_pg_password
                   PGDATA: /var/lib/postgresql/data/pgdata
+                  POSTGRES_MAX_CONNECTIONS: "200"
+                  POSTGRES_SHARED_BUFFERS: "2GB"
+                  POSTGRES_EFFECTIVE_CACHE_SIZE: "6GB"
+                  POSTGRES_MAINTENANCE_WORK_MEM: "512MB"
+                  POSTGRES_WORK_MEM: "64MB"
                 user: postgres
                 ports:
                   - target: 5432
@@ -295,8 +300,11 @@ jobs:
                     window: 120s
                   resources:
                     limits:
-                      cpus: '0.5'
-                      memory: 1G
+                      cpus: '2.0'
+                      memory: 3G
+                    reservations:
+                      cpus: '1.0'
+                      memory: 2G
                   update_config:
                     parallelism: 1
                     delay: 10s
@@ -308,8 +316,8 @@ jobs:
                 logging:
                   driver: json-file
                   options:
-                    max-size: "10m"
-                    max-file: "3"
+                    max-size: "100m"
+                    max-file: "5"
                 command: ["postgres", "-c", "log_statement=all", "-c", "log_connections=on", "-c", "log_disconnections=on"]
             EOL
 
@@ -378,8 +386,24 @@ jobs:
                     window: 120s
                   resources:
                     limits:
+                      cpus: '1.0'
+                      memory: 1G
+                    reservations:
                       cpus: '0.5'
                       memory: 512M
+                  update_config:
+                    parallelism: 1
+                    delay: 10s
+                    order: start-first
+                  rollback_config:
+                    parallelism: 1
+                    delay: 10s
+                    order: start-first
+                logging:
+                  driver: json-file
+                  options:
+                    max-size: "100m"
+                    max-file: "5"
             EOL
 
             # Backend service compose file
@@ -423,16 +447,15 @@ jobs:
                   SPRING_SECURITY_CORS_ALLOWED_HEADERS: "*"
                   SPRING_SECURITY_CORS_ALLOW_CREDENTIALS: "true"
                   SPRING_DATASOURCE_HIKARI_CONNECTION_TIMEOUT: 30000
-                  SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE: 5
-                  SPRING_DATASOURCE_HIKARI_MINIMUM_IDLE: 1
+                  SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE: 20
+                  SPRING_DATASOURCE_HIKARI_MINIMUM_IDLE: 5
                   SPRING_DATASOURCE_HIKARI_IDLE_TIMEOUT: 300000
                   SPRING_DATASOURCE_HIKARI_MAX_LIFETIME: 1200000
                   SPRING_DATASOURCE_HIKARI_VALIDATION_TIMEOUT: 5000
                   SPRING_DATASOURCE_HIKARI_LEAK_DETECTION_THRESHOLD: 60000
-                  SPRING_APPLICATION_NAME: "mybudget-backend"
-                  LOGGING_LEVEL_ROOT: "INFO"
-                  LOGGING_LEVEL_RU_IUTURAKULOV_MYBUDGETBACKEND: "DEBUG"
-                  LOGGING_PATTERN_CONSOLE: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+                  SPRING_JVM_MEMORY_XMS: "1g"
+                  SPRING_JVM_MEMORY_XMX: "2g"
+                  SPRING_JVM_MEMORY_XX_MAXMETASPACESIZE: "256m"
                 ports:
                   - target: 8082
                     published: 8082
@@ -461,20 +484,32 @@ jobs:
                   start_period: 40s
                 deploy:
                   mode: replicated
-                  replicas: 1
+                  replicas: 2
                   restart_policy:
                     condition: on-failure
                     max_attempts: 3
                     window: 120s
                   resources:
                     limits:
+                      cpus: '2.0'
+                      memory: 2G
+                    reservations:
                       cpus: '1.0'
                       memory: 1G
+                  update_config:
+                    parallelism: 1
+                    delay: 15s
+                    order: start-first
+                    failure_action: rollback
+                  rollback_config:
+                    parallelism: 1
+                    delay: 15s
+                    order: start-first
                 logging:
                   driver: json-file
                   options:
-                    max-size: "10m"
-                    max-file: "3"
+                    max-size: "100m"
+                    max-file: "5"
             EOL
 
             # Проверка свободного места на диске

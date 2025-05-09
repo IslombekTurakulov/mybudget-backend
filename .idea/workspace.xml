@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4bbd917-8929-44b4-afda-19b441d6e48e" name="Changes" comment="MYBUDGETBACKEND-78: fix deploy" />
+    <list default="true" id="c4bbd917-8929-44b4-afda-19b441d6e48e" name="Changes" comment="MYBUDGETBACKEND-79: fix traefik filtering" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -216,14 +216,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1737229814397</updated>
-    </task>
-    <task id="LOCAL-00108" summary="MYBUDGETBACKEND-63: fix env to start database docker">
-      <option name="closed" value="true" />
-      <created>1746745284303</created>
-      <option name="number" value="00108" />
-      <option name="presentableId" value="LOCAL-00108" />
-      <option name="project" value="LOCAL" />
-      <updated>1746745284303</updated>
     </task>
     <task id="LOCAL-00109" summary="MYBUDGETBACKEND-63: fix env to start database docker">
       <option name="closed" value="true" />
@@ -609,7 +601,15 @@
       <option name="project" value="LOCAL" />
       <updated>1746764584531</updated>
     </task>
-    <option name="localTasksCounter" value="157" />
+    <task id="LOCAL-00157" summary="MYBUDGETBACKEND-79: fix traefik filtering">
+      <option name="closed" value="true" />
+      <created>1746764880949</created>
+      <option name="number" value="00157" />
+      <option name="presentableId" value="LOCAL-00157" />
+      <option name="project" value="LOCAL" />
+      <updated>1746764880949</updated>
+    </task>
+    <option name="localTasksCounter" value="158" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -647,7 +647,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="MYBUDGETBACKEND-61: fix manifest and jar" />
     <MESSAGE value="MYBUDGETBACKEND-62: fix manifest and jar" />
     <MESSAGE value="MYBUDGETBACKEND-62: fix gradle" />
     <MESSAGE value="MYBUDGETBACKEND-63: fix gradle" />
@@ -672,7 +671,8 @@
     <MESSAGE value="MYBUDGETBACKEND-77: fix yml formatting" />
     <MESSAGE value="MYBUDGETBACKEND-77: fix unique label" />
     <MESSAGE value="MYBUDGETBACKEND-78: fix deploy" />
-    <option name="LAST_COMMIT_MESSAGE" value="MYBUDGETBACKEND-78: fix deploy" />
+    <MESSAGE value="MYBUDGETBACKEND-79: fix traefik filtering" />
+    <option name="LAST_COMMIT_MESSAGE" value="MYBUDGETBACKEND-79: fix traefik filtering" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
