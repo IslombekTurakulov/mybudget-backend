@@ -86,11 +86,11 @@ jobs:
             cd /opt/mybudget/backend
 
             # Create monitoring directory
-            mkdir -p /opt/mybudget/monitoring/grafana/provisioning/dashboards
-            mkdir -p /opt/mybudget/monitoring/grafana/dashboards
+            mkdir -p monitoring/grafana/provisioning/dashboards
+            mkdir -p monitoring/grafana/dashboards
 
             # Copy monitoring files
-            cat > /opt/mybudget/monitoring/prometheus.yml << 'EOL'
+            cat > monitoring/prometheus.yml << 'EOL'
             global:
               scrape_interval: 15s
               evaluation_interval: 15s
@@ -116,7 +116,7 @@ jobs:
                 metrics_path: '/metrics'
             EOL
 
-            cat > /opt/mybudget/monitoring/grafana/provisioning/dashboards/dashboards.yml << 'EOL'
+            cat > monitoring/grafana/provisioning/dashboards/dashboards.yml << 'EOL'
             apiVersion: 1
 
             providers:
@@ -130,7 +130,7 @@ jobs:
                   path: /var/lib/grafana/dashboards
             EOL
 
-            cat > /opt/mybudget/monitoring/grafana/dashboards/backend.json << 'EOL'
+            cat > monitoring/grafana/dashboards/backend.json << 'EOL'
             {
               "annotations": {
                 "list": []
@@ -334,7 +334,7 @@ jobs:
             }
             EOL
 
-            cat > /opt/mybudget/monitoring/docker-compose.monitoring.yml << 'EOL'
+            cat > monitoring/docker-compose.monitoring.yml << 'EOL'
             version: '3.8'
 
             networks:
@@ -473,7 +473,7 @@ jobs:
 
             # Deploy monitoring stack
             echo "Deploying monitoring stack..."
-            cd /opt/mybudget/monitoring
+            cd monitoring
             docker stack deploy -c docker-compose.monitoring.yml monitoring
 
             # Wait for monitoring services to be ready
@@ -515,7 +515,7 @@ jobs:
             cat grafana.log || echo "No grafana logs available"
 
             # Return to backend directory
-            cd /opt/mybudget/backend
+            cd ..
 
             # Initialize Docker Swarm if needed
             echo "Checking Docker Swarm status..."
