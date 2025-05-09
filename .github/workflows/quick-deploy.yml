@@ -166,17 +166,22 @@ jobs:
             echo "Verifying environment variables..."
             if [ -z "$PG_USER" ] || [ -z "$PG_DATABASE" ] || [ -z "$PG_PASSWORD" ] || [ -z "$JWT_SECRET" ] || [ -z "$GITHUB_OWNER_LC" ]; then
               echo "Error: Missing required environment variables"
+              echo "PG_USER: ${PG_USER:+set}"
+              echo "PG_DATABASE: ${PG_DATABASE:+set}"
+              echo "PG_PASSWORD: ${PG_PASSWORD:+set}"
+              echo "JWT_SECRET: ${JWT_SECRET:+set}"
+              echo "GITHUB_OWNER_LC: ${GITHUB_OWNER_LC:+set}"
               exit 1
             fi
 
             # Create .env file
             cat > .env << EOL
-            PG_USER=${PG_USER}
-            PG_PASSWORD=${PG_PASSWORD}
-            PG_DATABASE=${PG_DATABASE}
-            JWT_SECRET=${JWT_SECRET}
-            TAG=${TAG}
-            GITHUB_OWNER_LC=${GITHUB_OWNER_LC}
+            PG_USER=$PG_USER
+            PG_PASSWORD=$PG_PASSWORD
+            PG_DATABASE=$PG_DATABASE
+            JWT_SECRET=$JWT_SECRET
+            TAG=$TAG
+            GITHUB_OWNER_LC=$GITHUB_OWNER_LC
             EOL
 
             # Verify .env file
@@ -186,6 +191,15 @@ jobs:
             # Login to GitHub Container Registry
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
             
+            # Verify GitHub Container Registry login
+            echo "Verifying GitHub Container Registry login..."
+            if ! docker pull ghcr.io/$GITHUB_OWNER_LC/mybudget-backend:$TAG; then
+              echo "Error: Failed to pull image from GitHub Container Registry"
+              echo "Checking image existence..."
+              docker images | grep "ghcr.io/$GITHUB_OWNER_LC/mybudget-backend:$TAG"
+              exit 1
+            fi
+
             # Create temporary compose files for each service
             echo "Creating temporary compose files..."
             
@@ -341,7 +355,6 @@ jobs:
             echo "      SPRING_SECURITY_CORS_ALLOWED_ORIGINS: \"*\"" >> docker-compose.backend.yml
             echo "      SPRING_SECURITY_CORS_ALLOWED_METHODS: \"GET,POST,PUT,DELETE,OPTIONS\"" >> docker-compose.backend.yml
             echo "      SPRING_SECURITY_CORS_ALLOWED_HEADERS: \"*\"" >> docker-compose.backend.yml
-            echo "      SPRING_SECURITY_CORS_ALLOW_CREDENTIALS: \"true\"" >> docker-compose.backend.yml
             echo "      SPRING_SECURITY_CORS_ALLOW_CREDENTIALS: \"true\"" >> docker-compose.backend.yml
             echo "    ports:" >> docker-compose.backend.yml
             echo "      - target: 8082" >> docker-compose.backend.yml
