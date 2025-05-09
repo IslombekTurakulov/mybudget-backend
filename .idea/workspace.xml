@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4bbd917-8929-44b4-afda-19b441d6e48e" name="Changes" comment="MYBUDGETBACKEND-69: fix deploy to start database docker" />
+    <list default="true" id="c4bbd917-8929-44b4-afda-19b441d6e48e" name="Changes" comment="MYBUDGETBACKEND-70: fix deploy" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -214,14 +214,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1737229814397</updated>
-    </task>
-    <task id="LOCAL-00087" summary="MYBUDGETBACKEND-55: fix dockerfile">
-      <option name="closed" value="true" />
-      <created>1746640412313</created>
-      <option name="number" value="00087" />
-      <option name="presentableId" value="LOCAL-00087" />
-      <option name="project" value="LOCAL" />
-      <updated>1746640412313</updated>
     </task>
     <task id="LOCAL-00088" summary="MYBUDGETBACKEND-56: fix dockerfile">
       <option name="closed" value="true" />
@@ -607,7 +599,15 @@
       <option name="project" value="LOCAL" />
       <updated>1746753582968</updated>
     </task>
-    <option name="localTasksCounter" value="136" />
+    <task id="LOCAL-00136" summary="MYBUDGETBACKEND-70: fix deploy">
+      <option name="closed" value="true" />
+      <created>1746754655975</created>
+      <option name="number" value="00136" />
+      <option name="presentableId" value="LOCAL-00136" />
+      <option name="project" value="LOCAL" />
+      <updated>1746754655975</updated>
+    </task>
+    <option name="localTasksCounter" value="137" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -622,7 +622,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="MYBUDGETBACKEND-54: fix dockerfile" />
     <MESSAGE value="MYBUDGETBACKEND-54: fix deploy ci" />
     <MESSAGE value="MYBUDGETBACKEND-54: split traefik" />
     <MESSAGE value="MYBUDGETBACKEND-54: fix pg volumes" />
@@ -647,7 +646,8 @@
     <MESSAGE value="MYBUDGETBACKEND-67: fix deploy to start database docker" />
     <MESSAGE value="MYBUDGETBACKEND-69: fix deploy to start database docker" />
     <MESSAGE value="MYBUDGETBACKEND-69: fix deploy to start database docker" />
-    <option name="LAST_COMMIT_MESSAGE" value="MYBUDGETBACKEND-69: fix deploy to start database docker" />
+    <MESSAGE value="MYBUDGETBACKEND-70: fix deploy" />
+    <option name="LAST_COMMIT_MESSAGE" value="MYBUDGETBACKEND-70: fix deploy" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
