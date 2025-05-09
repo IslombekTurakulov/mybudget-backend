@@ -4,8 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4bbd917-8929-44b4-afda-19b441d6e48e" name="Changes" comment="MYBUDGETBACKEND-85: add grafana monitorings">
+    <list default="true" id="c4bbd917-8929-44b4-afda-19b441d6e48e" name="Changes" comment="Revert &quot;MYBUDGETBACKEND-85: add grafana monitorings&quot;&#10;&#10;This reverts commit 42a573ed">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/setup-server.sh" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/setup-server.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/setup-yc-vm.sh" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/setup-yc-vm.sh" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -218,22 +221,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1737229814397</updated>
-    </task>
-    <task id="LOCAL-00121" summary="MYBUDGETBACKEND-68: fix deploy to start database docker">
-      <option name="closed" value="true" />
-      <created>1746748817453</created>
-      <option name="number" value="00121" />
-      <option name="presentableId" value="LOCAL-00121" />
-      <option name="project" value="LOCAL" />
-      <updated>1746748817453</updated>
-    </task>
-    <task id="LOCAL-00122" summary="MYBUDGETBACKEND-68: fix deploy to start database docker">
-      <option name="closed" value="true" />
-      <created>1746749005438</created>
-      <option name="number" value="00122" />
-      <option name="presentableId" value="LOCAL-00122" />
-      <option name="project" value="LOCAL" />
-      <updated>1746749005438</updated>
     </task>
     <task id="LOCAL-00123" summary="MYBUDGETBACKEND-68: fix deploy to start database docker">
       <option name="closed" value="true" />
@@ -611,7 +598,23 @@
       <option name="project" value="LOCAL" />
       <updated>1746819004813</updated>
     </task>
-    <option name="localTasksCounter" value="170" />
+    <task id="LOCAL-00170" summary="Revert &quot;MYBUDGETBACKEND-85: add grafana monitorings&quot;&#10;&#10;This reverts commit bea81487">
+      <option name="closed" value="true" />
+      <created>1746826605621</created>
+      <option name="number" value="00170" />
+      <option name="presentableId" value="LOCAL-00170" />
+      <option name="project" value="LOCAL" />
+      <updated>1746826605621</updated>
+    </task>
+    <task id="LOCAL-00171" summary="Revert &quot;MYBUDGETBACKEND-85: add grafana monitorings&quot;&#10;&#10;This reverts commit 42a573ed">
+      <option name="closed" value="true" />
+      <created>1746826618730</created>
+      <option name="number" value="00171" />
+      <option name="presentableId" value="LOCAL-00171" />
+      <option name="project" value="LOCAL" />
+      <updated>1746826618730</updated>
+    </task>
+    <option name="localTasksCounter" value="172" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -649,8 +652,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="MYBUDGETBACKEND-67: fix deploy to start database docker" />
-    <MESSAGE value="MYBUDGETBACKEND-69: fix deploy to start database docker" />
     <MESSAGE value="MYBUDGETBACKEND-69: fix deploy to start database docker" />
     <MESSAGE value="MYBUDGETBACKEND-70: fix deploy" />
     <MESSAGE value="MYBUDGETBACKEND-71: fix formatting" />
@@ -674,7 +675,9 @@
     <MESSAGE value="MYBUDGETBACKEND-83: fix syntax host check" />
     <MESSAGE value="MYBUDGETBACKEND-84: update documentation and CI deploy" />
     <MESSAGE value="MYBUDGETBACKEND-85: add grafana monitorings" />
-    <option name="LAST_COMMIT_MESSAGE" value="MYBUDGETBACKEND-85: add grafana monitorings" />
+    <MESSAGE value="Revert &quot;MYBUDGETBACKEND-85: add grafana monitorings&quot;&#10;&#10;This reverts commit bea81487" />
+    <MESSAGE value="Revert &quot;MYBUDGETBACKEND-85: add grafana monitorings&quot;&#10;&#10;This reverts commit 42a573ed" />
+    <option name="LAST_COMMIT_MESSAGE" value="Revert &quot;MYBUDGETBACKEND-85: add grafana monitorings&quot;&#10;&#10;This reverts commit 42a573ed" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

@@ -1,6 +1,5 @@
 #!/bin/bash
 
-# Exit on error
 set -e
 
 # Check if yc is installed
@@ -21,10 +20,9 @@ VM_NAME="mybudget-backend"
 FOLDER_ID=$(yc config get folder-id)
 ZONE="ru-central1-a"
 SUBNET_NAME="default-ru-central1-a"
-# Using Ubuntu 22.04 LTS image ID from Yandex Cloud
-IMAGE_ID="fd80qm01ah03dkqb14lc"  # Ubuntu 22.04 LTS
-CORES=2
-MEMORY=2  # Reduced to 2GB as it's enough for our needs
+IMAGE_ID="fd80qm01ah03dkqb14lc"
+CORES=4
+MEMORY=8
 DISK_SIZE=30  # Minimum required size for Ubuntu
 VM_USER="ubuntu"  # Default user for Ubuntu image
 
@@ -118,18 +116,3 @@ echo "Please add the following secrets to your GitHub repository:"
 echo "SERVER_HOST: $VM_IP"
 echo "SERVER_USER: $VM_USER"
 echo "SERVER_SSH_KEY: (your private SSH key)"
-
-# Calculate and display estimated monthly cost
-echo -e "\nEstimated monthly cost breakdown:"
-echo "VM (2 vCPU, 2GB RAM): ~7,000 RUB"
-echo "Disk (30GB): ~300 RUB"
-echo "Network (outgoing traffic): ~100 RUB"
-echo "Total estimated cost: ~7,400 RUB/month"
-
-# Display next steps
-echo -e "\nNext steps:"
-echo "1. Add the secrets to your GitHub repository"
-echo "2. Copy docker-compose.yml to the server:"
-echo "   scp docker-compose.yml $VM_USER@$VM_IP:/opt/mybudget/backend/"
-echo "3. Configure GitHub Actions workflow"
-echo "4. Test the deployment with a push to backend-ci branch" 

@@ -17,13 +17,10 @@ sudo chown -R $USER:$USER /opt/mybudget
 # Install Docker if not installed
 if ! command -v docker &> /dev/null; then
     echo "Installing Docker..."
-    # Remove any existing Docker packages
     sudo apt-get remove -y docker docker-engine docker.io containerd runc || true
     
-    # Update package index
     sudo apt-get update
     
-    # Install prerequisites
     sudo apt-get install -y \
         apt-transport-https \
         ca-certificates \
@@ -61,7 +58,3 @@ mkdir -p /opt/mybudget/backend/secrets
 chmod 700 /opt/mybudget/backend/secrets
 
 echo "Server setup completed successfully!"
-echo "Please make sure to:"
-echo "1. Add your SSH public key to the server"
-echo "2. Configure GitHub secrets with the server details"
-echo "3. Copy docker-compose.yml to /opt/mybudget/backend/" 
