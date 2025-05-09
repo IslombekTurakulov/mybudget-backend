@@ -9,6 +9,6 @@ FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
 COPY --from=build /app/build/libs/MyBudget-backend-all.jar ./MyBudget-backend-all.jar
 COPY --from=build /app/src/main/resources/application.conf ./application.conf
-COPY --from=build /app/src/main/resources/mybudget-android-firebase-adminsdk-fbsvc-7c8a60cfde.json ./mybudget-android-firebase-adminsdk-fbsvc-7c8a60cfde.json
+COPY --from=build /mybudget-android-firebase-adminsdk-fbsvc-7c8a60cfde.json ./mybudget-android-firebase-adminsdk-fbsvc-7c8a60cfde.json
 EXPOSE 8082
 ENTRYPOINT ["java", "-jar", "MyBudget-backend-all.jar"]
