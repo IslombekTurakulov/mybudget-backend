@@ -126,6 +126,18 @@ jobs:
             echo "Verifying secrets..."
             docker secret ls
 
+            # Wait for secrets to be available
+            echo "Waiting for secrets to be available..."
+            sleep 10
+
+            # Verify each secret exists
+            for secret in backend_pg_user backend_pg_database backend_pg_password backend_app_secret; do
+              if ! docker secret inspect $secret > /dev/null 2>&1; then
+                echo "Error: Secret $secret was not created properly"
+                exit 1
+              fi
+            done
+
             # Set variables from GitHub Actions context
             GITHUB_OWNER="${{ github.repository_owner }}"
             GITHUB_OWNER_LC=$(echo "$GITHUB_OWNER" | tr '[:upper:]' '[:lower:]')
@@ -179,6 +191,14 @@ jobs:
             
             # Database service compose file
             cat > docker-compose.database.yml << EOL
+            secrets:
+              backend_pg_password:
+                external: true
+              backend_pg_user:
+                external: true
+              backend_pg_database:
+                external: true
+
             networks:
               backend:
                 name: backend
@@ -234,6 +254,10 @@ jobs:
 
             # Traefik service compose file
             cat > docker-compose.traefik.yml << EOL
+            secrets:
+              backend_app_secret:
+                external: true
+
             networks:
               public:
                 name: public
@@ -279,6 +303,10 @@ jobs:
 
             # Backend service compose file
             cat > docker-compose.backend.yml << EOL
+            secrets:
+              backend_app_secret:
+                external: true
+
             networks:
               backend:
                 name: backend
