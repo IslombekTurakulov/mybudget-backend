@@ -6,6 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="c4bbd917-8929-44b4-afda-19b441d6e48e" name="Changes" comment="MYBUDGETBACKEND-68: fix deploy to start database docker">
       <change beforePath="$PROJECT_DIR$/.github/workflows/quick-deploy.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/quick-deploy.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -216,22 +217,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1737229814397</updated>
-    </task>
-    <task id="LOCAL-00073" summary="MYBUDGETBACKEND-54: fix pg volumes">
-      <option name="closed" value="true" />
-      <created>1746603457362</created>
-      <option name="number" value="00073" />
-      <option name="presentableId" value="LOCAL-00073" />
-      <option name="project" value="LOCAL" />
-      <updated>1746603457362</updated>
-    </task>
-    <task id="LOCAL-00074" summary="MYBUDGETBACKEND-54: fix pg volumes">
-      <option name="closed" value="true" />
-      <created>1746603639295</created>
-      <option name="number" value="00074" />
-      <option name="presentableId" value="LOCAL-00074" />
-      <option name="project" value="LOCAL" />
-      <updated>1746603639295</updated>
     </task>
     <task id="LOCAL-00075" summary="MYBUDGETBACKEND-54: fix pg volumes">
       <option name="closed" value="true" />
@@ -609,7 +594,23 @@
       <option name="project" value="LOCAL" />
       <updated>1746748817453</updated>
     </task>
-    <option name="localTasksCounter" value="122" />
+    <task id="LOCAL-00122" summary="MYBUDGETBACKEND-68: fix deploy to start database docker">
+      <option name="closed" value="true" />
+      <created>1746749005438</created>
+      <option name="number" value="00122" />
+      <option name="presentableId" value="LOCAL-00122" />
+      <option name="project" value="LOCAL" />
+      <updated>1746749005438</updated>
+    </task>
+    <task id="LOCAL-00123" summary="MYBUDGETBACKEND-68: fix deploy to start database docker">
+      <option name="closed" value="true" />
+      <created>1746749157196</created>
+      <option name="number" value="00123" />
+      <option name="presentableId" value="LOCAL-00123" />
+      <option name="project" value="LOCAL" />
+      <updated>1746749157196</updated>
+    </task>
+    <option name="localTasksCounter" value="124" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">

@@ -148,10 +148,11 @@ jobs:
             export PG_DATABASE="${{ secrets.PG_DATABASE }}"
             export JWT_SECRET="${{ secrets.JWT_SECRET }}"
             export TAG="$TAG"
+            export GITHUB_OWNER_LC="$GITHUB_OWNER_LC"
 
             # Verify environment variables
             echo "Verifying environment variables..."
-            if [ -z "$PG_USER" ] || [ -z "$PG_DATABASE" ] || [ -z "$PG_PASSWORD" ] || [ -z "$JWT_SECRET" ]; then
+            if [ -z "$PG_USER" ] || [ -z "$PG_DATABASE" ] || [ -z "$PG_PASSWORD" ] || [ -z "$JWT_SECRET" ] || [ -z "$GITHUB_OWNER_LC" ]; then
               echo "Error: Missing required environment variables"
               exit 1
             fi
@@ -163,6 +164,7 @@ jobs:
             PG_DATABASE=$PG_DATABASE
             JWT_SECRET=$JWT_SECRET
             TAG=$TAG
+            GITHUB_OWNER_LC=$GITHUB_OWNER_LC
             EOL
 
             # Verify .env file
@@ -371,6 +373,22 @@ jobs:
             # Check service status with more detail
             echo "Checking service status with more detail..."
             docker service ls
+
+            # Wait for database to be ready
+            echo "Waiting for database to be ready..."
+            max_retries=30
+            retry_count=0
+            while [ $retry_count -lt $max_retries ]; do
+              if docker service ps backend_database --format '{{.CurrentState}}' | grep -q "Running"; then
+                echo "Database service is running"
+                break
+              fi
+              retry_count=$((retry_count + 1))
+              echo "Waiting for database service... Attempt $retry_count of $max_retries"
+              sleep 10
+            done
+
+            # Check service status
             for service in backend_database backend_traefik backend_backend; do
               echo "Service: $service"
               docker service ps $service --no-trunc

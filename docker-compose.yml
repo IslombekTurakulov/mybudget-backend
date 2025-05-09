@@ -1,5 +1,3 @@
-version: '3.8'
-
 secrets:
   backend_pg_password:
     external: true
@@ -120,8 +118,6 @@ services:
         ipv4_address: 10.0.1.3
       public:
         ipv4_address: 10.0.2.3
-    depends_on:
-      - database
     environment:
       PG_USER: ${PG_USER}
       PG_PASSWORD: ${PG_PASSWORD}
