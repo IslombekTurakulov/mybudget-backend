@@ -190,202 +190,196 @@ jobs:
             echo "Creating temporary compose files..."
             
             # Database service compose file
-            cat > docker-compose.database.yml << EOF
-            secrets:
-              backend_pg_password:
-                external: true
-              backend_pg_user:
-                external: true
-              backend_pg_database:
-                external: true
-
-            networks:
-              backend:
-                name: backend
-                external: true
-                driver: overlay
-                driver_opts:
-                  com.docker.network.driver.mtu: "1400"
-            
-            volumes:
-              pg_data:
-                name: backend_pg_data
-            
-            services:
-              database:
-                image: postgres:17-alpine
-                networks:
-                  backend:
-                    ipv4_address: 10.0.1.2
-                volumes:
-                  - pg_data:/var/lib/postgresql/data
-                environment:
-                  POSTGRES_USER: "$PG_USER"
-                  POSTGRES_DB: "$PG_DATABASE"
-                  POSTGRES_PASSWORD: "$PG_PASSWORD"
-                  PGDATA: /var/lib/postgresql/data/pgdata
-                user: postgres
-                ports:
-                  - target: 5432
-                    published: 5432
-                    protocol: tcp
-                    mode: host
-                secrets:
-                  - backend_pg_user
-                  - backend_pg_database
-                  - backend_pg_password
-                healthcheck:
-                  test: ["CMD-SHELL", "pg_isready -U postgres"]
-                  interval: 10s
-                  timeout: 5s
-                  retries: 5
-                  start_period: 30s
-                deploy:
-                  replicas: 1
-                  restart_policy:
-                    condition: on-failure
-                    max_attempts: 3
-                    window: 120s
-                  resources:
-                    limits:
-                      cpus: '0.5'
-                      memory: 1G
-            EOF
+            echo "secrets:" > docker-compose.database.yml
+            echo "  backend_pg_password:" >> docker-compose.database.yml
+            echo "    external: true" >> docker-compose.database.yml
+            echo "  backend_pg_user:" >> docker-compose.database.yml
+            echo "    external: true" >> docker-compose.database.yml
+            echo "  backend_pg_database:" >> docker-compose.database.yml
+            echo "    external: true" >> docker-compose.database.yml
+            echo "" >> docker-compose.database.yml
+            echo "networks:" >> docker-compose.database.yml
+            echo "  backend:" >> docker-compose.database.yml
+            echo "    name: backend" >> docker-compose.database.yml
+            echo "    external: true" >> docker-compose.database.yml
+            echo "    driver: overlay" >> docker-compose.database.yml
+            echo "    driver_opts:" >> docker-compose.database.yml
+            echo "      com.docker.network.driver.mtu: \"1400\"" >> docker-compose.database.yml
+            echo "" >> docker-compose.database.yml
+            echo "volumes:" >> docker-compose.database.yml
+            echo "  pg_data:" >> docker-compose.database.yml
+            echo "    name: backend_pg_data" >> docker-compose.database.yml
+            echo "" >> docker-compose.database.yml
+            echo "services:" >> docker-compose.database.yml
+            echo "  database:" >> docker-compose.database.yml
+            echo "    image: postgres:17-alpine" >> docker-compose.database.yml
+            echo "    networks:" >> docker-compose.database.yml
+            echo "      backend:" >> docker-compose.database.yml
+            echo "        ipv4_address: 10.0.1.2" >> docker-compose.database.yml
+            echo "    volumes:" >> docker-compose.database.yml
+            echo "      - pg_data:/var/lib/postgresql/data" >> docker-compose.database.yml
+            echo "    environment:" >> docker-compose.database.yml
+            echo "      POSTGRES_USER: $PG_USER" >> docker-compose.database.yml
+            echo "      POSTGRES_DB: $PG_DATABASE" >> docker-compose.database.yml
+            echo "      POSTGRES_PASSWORD: $PG_PASSWORD" >> docker-compose.database.yml
+            echo "      PGDATA: /var/lib/postgresql/data/pgdata" >> docker-compose.database.yml
+            echo "    user: postgres" >> docker-compose.database.yml
+            echo "    ports:" >> docker-compose.database.yml
+            echo "      - target: 5432" >> docker-compose.database.yml
+            echo "        published: 5432" >> docker-compose.database.yml
+            echo "        protocol: tcp" >> docker-compose.database.yml
+            echo "        mode: host" >> docker-compose.database.yml
+            echo "    secrets:" >> docker-compose.database.yml
+            echo "      - backend_pg_user" >> docker-compose.database.yml
+            echo "      - backend_pg_database" >> docker-compose.database.yml
+            echo "      - backend_pg_password" >> docker-compose.database.yml
+            echo "    healthcheck:" >> docker-compose.database.yml
+            echo "      test: [\"CMD-SHELL\", \"pg_isready -U postgres\"]" >> docker-compose.database.yml
+            echo "      interval: 10s" >> docker-compose.database.yml
+            echo "      timeout: 5s" >> docker-compose.database.yml
+            echo "      retries: 5" >> docker-compose.database.yml
+            echo "      start_period: 30s" >> docker-compose.database.yml
+            echo "    deploy:" >> docker-compose.database.yml
+            echo "      replicas: 1" >> docker-compose.database.yml
+            echo "      restart_policy:" >> docker-compose.database.yml
+            echo "        condition: on-failure" >> docker-compose.database.yml
+            echo "        max_attempts: 3" >> docker-compose.database.yml
+            echo "        window: 120s" >> docker-compose.database.yml
+            echo "      resources:" >> docker-compose.database.yml
+            echo "        limits:" >> docker-compose.database.yml
+            echo "          cpus: '0.5'" >> docker-compose.database.yml
+            echo "          memory: 1G" >> docker-compose.database.yml
 
             # Traefik service compose file
-            cat > docker-compose.traefik.yml << EOF
-            secrets:
-              backend_app_secret:
-                external: true
-
-            networks:
-              public:
-                name: public
-                external: true
-                driver: overlay
-                driver_opts:
-                  com.docker.network.driver.mtu: "1400"
-            
-            services:
-              traefik:
-                image: traefik:v2.10
-                command:
-                  - "--api.insecure=true"
-                  - "--providers.docker=true"
-                  - "--providers.docker.swarmMode=true"
-                  - "--providers.docker.exposedbydefault=false"
-                  - "--entrypoints.web.address=:80"
-                ports:
-                  - target: 80
-                    published: 80
-                    protocol: tcp
-                    mode: host
-                  - target: 8080
-                    published: 8080
-                    protocol: tcp
-                    mode: host
-                networks:
-                  public:
-                    ipv4_address: 10.0.2.2
-                volumes:
-                  - /var/run/docker.sock:/var/run/docker.sock:ro
-                deploy:
-                  placement:
-                    constraints:
-                      - node.role == manager
-                  restart_policy:
-                    condition: on-failure
-                  resources:
-                    limits:
-                      cpus: '0.5'
-                      memory: 512M
-            EOF
+            echo "secrets:" > docker-compose.traefik.yml
+            echo "  backend_app_secret:" >> docker-compose.traefik.yml
+            echo "    external: true" >> docker-compose.traefik.yml
+            echo "" >> docker-compose.traefik.yml
+            echo "networks:" >> docker-compose.traefik.yml
+            echo "  public:" >> docker-compose.traefik.yml
+            echo "    name: public" >> docker-compose.traefik.yml
+            echo "    external: true" >> docker-compose.traefik.yml
+            echo "    driver: overlay" >> docker-compose.traefik.yml
+            echo "    driver_opts:" >> docker-compose.traefik.yml
+            echo "      com.docker.network.driver.mtu: \"1400\"" >> docker-compose.traefik.yml
+            echo "" >> docker-compose.traefik.yml
+            echo "services:" >> docker-compose.traefik.yml
+            echo "  traefik:" >> docker-compose.traefik.yml
+            echo "    image: traefik:v2.10" >> docker-compose.traefik.yml
+            echo "    command:" >> docker-compose.traefik.yml
+            echo "      - \"--api.insecure=true\"" >> docker-compose.traefik.yml
+            echo "      - \"--providers.docker=true\"" >> docker-compose.traefik.yml
+            echo "      - \"--providers.docker.swarmMode=true\"" >> docker-compose.traefik.yml
+            echo "      - \"--providers.docker.exposedbydefault=false\"" >> docker-compose.traefik.yml
+            echo "      - \"--entrypoints.web.address=:80\"" >> docker-compose.traefik.yml
+            echo "    ports:" >> docker-compose.traefik.yml
+            echo "      - target: 80" >> docker-compose.traefik.yml
+            echo "        published: 80" >> docker-compose.traefik.yml
+            echo "        protocol: tcp" >> docker-compose.traefik.yml
+            echo "        mode: host" >> docker-compose.traefik.yml
+            echo "      - target: 8080" >> docker-compose.traefik.yml
+            echo "        published: 8080" >> docker-compose.traefik.yml
+            echo "        protocol: tcp" >> docker-compose.traefik.yml
+            echo "        mode: host" >> docker-compose.traefik.yml
+            echo "    networks:" >> docker-compose.traefik.yml
+            echo "      public:" >> docker-compose.traefik.yml
+            echo "        ipv4_address: 10.0.2.2" >> docker-compose.traefik.yml
+            echo "    volumes:" >> docker-compose.traefik.yml
+            echo "      - /var/run/docker.sock:/var/run/docker.sock:ro" >> docker-compose.traefik.yml
+            echo "    deploy:" >> docker-compose.traefik.yml
+            echo "      placement:" >> docker-compose.traefik.yml
+            echo "        constraints:" >> docker-compose.traefik.yml
+            echo "          - node.role == manager" >> docker-compose.traefik.yml
+            echo "      restart_policy:" >> docker-compose.traefik.yml
+            echo "        condition: on-failure" >> docker-compose.traefik.yml
+            echo "      resources:" >> docker-compose.traefik.yml
+            echo "        limits:" >> docker-compose.traefik.yml
+            echo "          cpus: '0.5'" >> docker-compose.traefik.yml
+            echo "          memory: 512M" >> docker-compose.traefik.yml
 
             # Backend service compose file
-            cat > docker-compose.backend.yml << EOF
-            secrets:
-              backend_app_secret:
-                external: true
-
-            networks:
-              backend:
-                name: backend
-                external: true
-                driver: overlay
-                driver_opts:
-                  com.docker.network.driver.mtu: "1400"
-              public:
-                name: public
-                external: true
-                driver: overlay
-                driver_opts:
-                  com.docker.network.driver.mtu: "1400"
-            
-            services:
-              backend:
-                image: ghcr.io/$GITHUB_OWNER_LC/mybudget-backend:$TAG
-                networks:
-                  backend:
-                    ipv4_address: 10.0.1.3
-                  public:
-                    ipv4_address: 10.0.2.3
-                environment:
-                  PG_USER: "$PG_USER"
-                  PG_PASSWORD: "$PG_PASSWORD"
-                  PG_DATABASE: "$PG_DATABASE"
-                  DATABASE_URL: "jdbc:postgresql://database:5432/$PG_DATABASE"
-                  JWT_SECRET: "$JWT_SECRET"
-                  SPRING_PROFILES_ACTIVE: prod
-                  SERVER_PORT: 8082
-                  SPRING_SECURITY_CORS_ALLOWED_ORIGINS: "*"
-                  SPRING_SECURITY_CORS_ALLOWED_METHODS: "GET,POST,PUT,DELETE,OPTIONS"
-                  SPRING_SECURITY_CORS_ALLOWED_HEADERS: "*"
-                  SPRING_SECURITY_CORS_ALLOW_CREDENTIALS: "true"
-                ports:
-                  - target: 8082
-                    published: 8082
-                    protocol: tcp
-                    mode: host
-                secrets:
-                  - backend_app_secret
-                labels:
-                  - "traefik.enable=true"
-                  - "traefik.http.routers.backend.rule=Host('51.250.65.154')"
-                  - "traefik.http.routers.backend.entrypoints=web"
-                  - "traefik.http.services.backend.loadbalancer.server.port=8082"
-                  - "traefik.http.middlewares.cors.headers.accessControlAllowMethods=GET,POST,PUT,DELETE,OPTIONS"
-                  - "traefik.http.middlewares.cors.headers.accessControlAllowOriginList=*"
-                  - "traefik.http.middlewares.cors.headers.accessControlAllowHeaders=*"
-                  - "traefik.http.middlewares.cors.headers.accessControlAllowCredentials=true"
-                  - "traefik.http.middlewares.cors.headers.accessControlMaxAge=100"
-                  - "traefik.http.routers.backend.middlewares=cors"
-                  - "traefik.http.services.backend.loadbalancer.passHostHeader=true"
-                healthcheck:
-                  test: ["CMD-SHELL", "curl -f http://localhost:8082/ping || exit 1"]
-                  interval: 30s
-                  timeout: 5s
-                  retries: 3
-                  start_period: 40s
-                deploy:
-                  mode: replicated
-                  replicas: 2
-                  restart_policy:
-                    condition: on-failure
-                    max_attempts: 3
-                    window: 120s
-                  resources:
-                    limits:
-                      cpus: '1.0'
-                      memory: 1G
-                  update_config:
-                    parallelism: 1
-                    delay: 15s
-                    order: start-first
-                  rollback_config:
-                    parallelism: 1
-                    delay: 15s
-                    order: start-first
-            EOF
+            echo "secrets:" > docker-compose.backend.yml
+            echo "  backend_app_secret:" >> docker-compose.backend.yml
+            echo "    external: true" >> docker-compose.backend.yml
+            echo "" >> docker-compose.backend.yml
+            echo "networks:" >> docker-compose.backend.yml
+            echo "  backend:" >> docker-compose.backend.yml
+            echo "    name: backend" >> docker-compose.backend.yml
+            echo "    external: true" >> docker-compose.backend.yml
+            echo "    driver: overlay" >> docker-compose.backend.yml
+            echo "    driver_opts:" >> docker-compose.backend.yml
+            echo "      com.docker.network.driver.mtu: \"1400\"" >> docker-compose.backend.yml
+            echo "  public:" >> docker-compose.backend.yml
+            echo "    name: public" >> docker-compose.backend.yml
+            echo "    external: true" >> docker-compose.backend.yml
+            echo "    driver: overlay" >> docker-compose.backend.yml
+            echo "    driver_opts:" >> docker-compose.backend.yml
+            echo "      com.docker.network.driver.mtu: \"1400\"" >> docker-compose.backend.yml
+            echo "" >> docker-compose.backend.yml
+            echo "services:" >> docker-compose.backend.yml
+            echo "  backend:" >> docker-compose.backend.yml
+            echo "    image: ghcr.io/$GITHUB_OWNER_LC/mybudget-backend:$TAG" >> docker-compose.backend.yml
+            echo "    networks:" >> docker-compose.backend.yml
+            echo "      backend:" >> docker-compose.backend.yml
+            echo "        ipv4_address: 10.0.1.3" >> docker-compose.backend.yml
+            echo "      public:" >> docker-compose.backend.yml
+            echo "        ipv4_address: 10.0.2.3" >> docker-compose.backend.yml
+            echo "    environment:" >> docker-compose.backend.yml
+            echo "      PG_USER: $PG_USER" >> docker-compose.backend.yml
+            echo "      PG_PASSWORD: $PG_PASSWORD" >> docker-compose.backend.yml
+            echo "      PG_DATABASE: $PG_DATABASE" >> docker-compose.backend.yml
+            echo "      DATABASE_URL: jdbc:postgresql://database:5432/$PG_DATABASE" >> docker-compose.backend.yml
+            echo "      JWT_SECRET: $JWT_SECRET" >> docker-compose.backend.yml
+            echo "      SPRING_PROFILES_ACTIVE: prod" >> docker-compose.backend.yml
+            echo "      SERVER_PORT: 8082" >> docker-compose.backend.yml
+            echo "      SPRING_SECURITY_CORS_ALLOWED_ORIGINS: \"*\"" >> docker-compose.backend.yml
+            echo "      SPRING_SECURITY_CORS_ALLOWED_METHODS: \"GET,POST,PUT,DELETE,OPTIONS\"" >> docker-compose.backend.yml
+            echo "      SPRING_SECURITY_CORS_ALLOWED_HEADERS: \"*\"" >> docker-compose.backend.yml
+            echo "      SPRING_SECURITY_CORS_ALLOW_CREDENTIALS: \"true\"" >> docker-compose.backend.yml
+            echo "    ports:" >> docker-compose.backend.yml
+            echo "      - target: 8082" >> docker-compose.backend.yml
+            echo "        published: 8082" >> docker-compose.backend.yml
+            echo "        protocol: tcp" >> docker-compose.backend.yml
+            echo "        mode: host" >> docker-compose.backend.yml
+            echo "    secrets:" >> docker-compose.backend.yml
+            echo "      - backend_app_secret" >> docker-compose.backend.yml
+            echo "    labels:" >> docker-compose.backend.yml
+            echo "      - \"traefik.enable=true\"" >> docker-compose.backend.yml
+            echo "      - \"traefik.http.routers.backend.rule=Host('51.250.65.154')\"" >> docker-compose.backend.yml
+            echo "      - \"traefik.http.routers.backend.entrypoints=web\"" >> docker-compose.backend.yml
+            echo "      - \"traefik.http.services.backend.loadbalancer.server.port=8082\"" >> docker-compose.backend.yml
+            echo "      - \"traefik.http.middlewares.cors.headers.accessControlAllowMethods=GET,POST,PUT,DELETE,OPTIONS\"" >> docker-compose.backend.yml
+            echo "      - \"traefik.http.middlewares.cors.headers.accessControlAllowOriginList=*\"" >> docker-compose.backend.yml
+            echo "      - \"traefik.http.middlewares.cors.headers.accessControlAllowHeaders=*\"" >> docker-compose.backend.yml
+            echo "      - \"traefik.http.middlewares.cors.headers.accessControlAllowCredentials=true\"" >> docker-compose.backend.yml
+            echo "      - \"traefik.http.middlewares.cors.headers.accessControlMaxAge=100\"" >> docker-compose.backend.yml
+            echo "      - \"traefik.http.routers.backend.middlewares=cors\"" >> docker-compose.backend.yml
+            echo "      - \"traefik.http.services.backend.loadbalancer.passHostHeader=true\"" >> docker-compose.backend.yml
+            echo "    healthcheck:" >> docker-compose.backend.yml
+            echo "      test: [\"CMD-SHELL\", \"curl -f http://localhost:8082/ping || exit 1\"]" >> docker-compose.backend.yml
+            echo "      interval: 30s" >> docker-compose.backend.yml
+            echo "      timeout: 5s" >> docker-compose.backend.yml
+            echo "      retries: 3" >> docker-compose.backend.yml
+            echo "      start_period: 40s" >> docker-compose.backend.yml
+            echo "    deploy:" >> docker-compose.backend.yml
+            echo "      mode: replicated" >> docker-compose.backend.yml
+            echo "      replicas: 2" >> docker-compose.backend.yml
+            echo "      restart_policy:" >> docker-compose.backend.yml
+            echo "        condition: on-failure" >> docker-compose.backend.yml
+            echo "        max_attempts: 3" >> docker-compose.backend.yml
+            echo "        window: 120s" >> docker-compose.backend.yml
+            echo "      resources:" >> docker-compose.backend.yml
+            echo "        limits:" >> docker-compose.backend.yml
+            echo "          cpus: '1.0'" >> docker-compose.backend.yml
+            echo "          memory: 1G" >> docker-compose.backend.yml
+            echo "      update_config:" >> docker-compose.backend.yml
+            echo "        parallelism: 1" >> docker-compose.backend.yml
+            echo "        delay: 15s" >> docker-compose.backend.yml
+            echo "        order: start-first" >> docker-compose.backend.yml
+            echo "      rollback_config:" >> docker-compose.backend.yml
+            echo "        parallelism: 1" >> docker-compose.backend.yml
+            echo "        delay: 15s" >> docker-compose.backend.yml
+            echo "        order: start-first" >> docker-compose.backend.yml
 
             # Проверка свободного места на диске
             echo "Checking disk space..."
