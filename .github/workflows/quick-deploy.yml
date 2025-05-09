@@ -206,10 +206,10 @@ jobs:
                   PGDATA: /var/lib/postgresql/data/pgdata
                 user: postgres
                 ports:
-                  target: 5432
-                  published: 5432
-                  protocol: tcp
-                  mode: host
+                  - target: 5432
+                    published: 5432
+                    protocol: tcp
+                    mode: host
                 secrets:
                   - backend_pg_user
                   - backend_pg_database
@@ -314,10 +314,10 @@ jobs:
                   SPRING_SECURITY_CORS_ALLOWED_HEADERS: "*"
                   SPRING_SECURITY_CORS_ALLOW_CREDENTIALS: "true"
                 ports:
-                  target: 8082
-                  published: 8082
-                  protocol: tcp
-                  mode: host
+                  - target: 8082
+                    published: 8082
+                    protocol: tcp
+                    mode: host
                 secrets:
                   - backend_app_secret
                 labels:
