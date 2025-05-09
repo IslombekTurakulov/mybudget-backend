@@ -127,8 +127,8 @@ jobs:
             
             # Create networks if they don't exist
             echo "Creating networks..."
-            docker network create --driver overlay --attachable backend || true
-            docker network create --driver overlay --attachable public || true
+            docker network create --driver overlay --attachable backend_backend || true
+            docker network create --driver overlay --attachable backend_public || true
             sleep 5
             
             # Clean up existing secrets
@@ -247,8 +247,8 @@ jobs:
                 external: true
             
             networks:
-              backend:
-                name: backend
+              backend_backend:
+                name: backend_backend
                 external: true
                 driver: overlay
                 driver_opts:
@@ -262,7 +262,7 @@ jobs:
               database:
                 image: postgres:17-alpine
                 networks:
-                  backend:
+                  backend_backend:
                     ipv4_address: 10.0.1.2
                 volumes:
                   - pg_data:/var/lib/postgresql/data
@@ -324,8 +324,14 @@ jobs:
               echo "    external: true"
               echo ""
               echo "networks:"
-              echo "  public:"
-              echo "    name: public"
+              echo "  backend_backend:"
+              echo "    name: backend_backend"
+              echo "    external: true"
+              echo "    driver: overlay"
+              echo "    driver_opts:"
+              echo "      com.docker.network.driver.mtu: \"1400\""
+              echo "  backend_public:"
+              echo "    name: backend_public"
               echo "    external: true"
               echo "    driver: overlay"
               echo "    driver_opts:"
@@ -343,7 +349,7 @@ jobs:
               echo "      - \"--ping=true\""
               echo "      - \"--log.level=DEBUG\""
               echo "      - \"--accesslog=true\""
-              echo "      - \"--providers.docker.network=backend\""
+              echo "      - \"--providers.docker.network=backend_backend\""
               echo "      - \"--providers.docker.watch=true\""
               echo "      - \"--providers.docker.endpoint=unix:///var/run/docker.sock\""
               echo "    ports:"
@@ -356,9 +362,9 @@ jobs:
               echo "        protocol: tcp"
               echo "        mode: host"
               echo "    networks:"
-              echo "      backend:"
-              echo "        ipv4_address: 10.0.1.2"
-              echo "      public:"
+              echo "      backend_backend:"
+              echo "        ipv4_address: 10.0.1.3"
+              echo "      backend_public:"
               echo "        ipv4_address: 10.0.2.2"
               echo "    volumes:"
               echo "      - /var/run/docker.sock:/var/run/docker.sock:ro"
@@ -381,14 +387,14 @@ jobs:
                 external: true
             
             networks:
-              backend:
-                name: backend
+              backend_backend:
+                name: backend_backend
                 external: true
                 driver: overlay
                 driver_opts:
                   com.docker.network.driver.mtu: "1400"
-              public:
-                name: public
+              backend_public:
+                name: backend_public
                 external: true
                 driver: overlay
                 driver_opts:
@@ -398,9 +404,9 @@ jobs:
               backend:
                 image: ghcr.io/$GITHUB_OWNER_LC/mybudget-backend:$TAG
                 networks:
-                  backend:
-                    ipv4_address: 10.0.1.3
-                  public:
+                  backend_backend:
+                    ipv4_address: 10.0.1.4
+                  backend_public:
                     ipv4_address: 10.0.2.3
                 environment:
                   PG_USER: "$PG_USER"
