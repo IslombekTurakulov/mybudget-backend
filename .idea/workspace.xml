@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4bbd917-8929-44b4-afda-19b441d6e48e" name="Changes" comment="MYBUDGETBACKEND-74: fix traefik ports and providers" />
+    <list default="true" id="c4bbd917-8929-44b4-afda-19b441d6e48e" name="Changes" comment="MYBUDGETBACKEND-76: fix traefik containers" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -216,22 +216,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1737229814397</updated>
-    </task>
-    <task id="LOCAL-00103" summary="MYBUDGETBACKEND-63: fix gradle">
-      <option name="closed" value="true" />
-      <created>1746743926253</created>
-      <option name="number" value="00103" />
-      <option name="presentableId" value="LOCAL-00103" />
-      <option name="project" value="LOCAL" />
-      <updated>1746743926253</updated>
-    </task>
-    <task id="LOCAL-00104" summary="MYBUDGETBACKEND-63: fix gradle">
-      <option name="closed" value="true" />
-      <created>1746744139993</created>
-      <option name="number" value="00104" />
-      <option name="presentableId" value="LOCAL-00104" />
-      <option name="project" value="LOCAL" />
-      <updated>1746744139993</updated>
     </task>
     <task id="LOCAL-00105" summary="MYBUDGETBACKEND-63: fix gradle">
       <option name="closed" value="true" />
@@ -609,7 +593,23 @@
       <option name="project" value="LOCAL" />
       <updated>1746763242386</updated>
     </task>
-    <option name="localTasksCounter" value="152" />
+    <task id="LOCAL-00152" summary="MYBUDGETBACKEND-75: fix traefik and balancer">
+      <option name="closed" value="true" />
+      <created>1746763492440</created>
+      <option name="number" value="00152" />
+      <option name="presentableId" value="LOCAL-00152" />
+      <option name="project" value="LOCAL" />
+      <updated>1746763492440</updated>
+    </task>
+    <task id="LOCAL-00153" summary="MYBUDGETBACKEND-76: fix traefik containers">
+      <option name="closed" value="true" />
+      <created>1746763716952</created>
+      <option name="number" value="00153" />
+      <option name="presentableId" value="LOCAL-00153" />
+      <option name="project" value="LOCAL" />
+      <updated>1746763716952</updated>
+    </task>
+    <option name="localTasksCounter" value="154" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -632,13 +632,6 @@
                       </list>
                     </value>
                   </entry>
-                  <entry key="structure">
-                    <value>
-                      <list>
-                        <option value="dir:/Users/iuturakulov/IdeaProjects/MyBudget-backend/src/main/resources/db/migrations" />
-                      </list>
-                    </value>
-                  </entry>
                 </map>
               </option>
               <option name="SHOW_ONLY_AFFECTED_CHANGES" value="true" />
@@ -654,8 +647,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="MYBUDGETBACKEND-59: fix deploy" />
-    <MESSAGE value="MYBUDGETBACKEND-59: fix secrets" />
     <MESSAGE value="MYBUDGETBACKEND-60: fix deploy and docker file" />
     <MESSAGE value="MYBUDGETBACKEND-60: fix env variable" />
     <MESSAGE value="MYBUDGETBACKEND-61: fix env" />
@@ -679,7 +670,9 @@
     <MESSAGE value="MYBUDGETBACKEND-74: fix file" />
     <MESSAGE value="MYBUDGETBACKEND-74: fix migration file" />
     <MESSAGE value="MYBUDGETBACKEND-74: fix traefik ports and providers" />
-    <option name="LAST_COMMIT_MESSAGE" value="MYBUDGETBACKEND-74: fix traefik ports and providers" />
+    <MESSAGE value="MYBUDGETBACKEND-75: fix traefik and balancer" />
+    <MESSAGE value="MYBUDGETBACKEND-76: fix traefik containers" />
+    <option name="LAST_COMMIT_MESSAGE" value="MYBUDGETBACKEND-76: fix traefik containers" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
