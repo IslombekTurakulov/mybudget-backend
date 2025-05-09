@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4bbd917-8929-44b4-afda-19b441d6e48e" name="Changes" comment="MYBUDGETBACKEND-76: fix traefik containers" />
+    <list default="true" id="c4bbd917-8929-44b4-afda-19b441d6e48e" name="Changes" comment="MYBUDGETBACKEND-77: fix unique label" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -216,22 +216,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1737229814397</updated>
-    </task>
-    <task id="LOCAL-00105" summary="MYBUDGETBACKEND-63: fix gradle">
-      <option name="closed" value="true" />
-      <created>1746744524155</created>
-      <option name="number" value="00105" />
-      <option name="presentableId" value="LOCAL-00105" />
-      <option name="project" value="LOCAL" />
-      <updated>1746744524155</updated>
-    </task>
-    <task id="LOCAL-00106" summary="MYBUDGETBACKEND-63: fix env to start database docker">
-      <option name="closed" value="true" />
-      <created>1746744885747</created>
-      <option name="number" value="00106" />
-      <option name="presentableId" value="LOCAL-00106" />
-      <option name="project" value="LOCAL" />
-      <updated>1746744885747</updated>
     </task>
     <task id="LOCAL-00107" summary="MYBUDGETBACKEND-63: fix env to start database docker">
       <option name="closed" value="true" />
@@ -609,7 +593,23 @@
       <option name="project" value="LOCAL" />
       <updated>1746763716952</updated>
     </task>
-    <option name="localTasksCounter" value="154" />
+    <task id="LOCAL-00154" summary="MYBUDGETBACKEND-77: fix yml formatting">
+      <option name="closed" value="true" />
+      <created>1746763915643</created>
+      <option name="number" value="00154" />
+      <option name="presentableId" value="LOCAL-00154" />
+      <option name="project" value="LOCAL" />
+      <updated>1746763915643</updated>
+    </task>
+    <task id="LOCAL-00155" summary="MYBUDGETBACKEND-77: fix unique label">
+      <option name="closed" value="true" />
+      <created>1746764145695</created>
+      <option name="number" value="00155" />
+      <option name="presentableId" value="LOCAL-00155" />
+      <option name="project" value="LOCAL" />
+      <updated>1746764145695</updated>
+    </task>
+    <option name="localTasksCounter" value="156" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -647,8 +647,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="MYBUDGETBACKEND-60: fix deploy and docker file" />
-    <MESSAGE value="MYBUDGETBACKEND-60: fix env variable" />
     <MESSAGE value="MYBUDGETBACKEND-61: fix env" />
     <MESSAGE value="MYBUDGETBACKEND-61: fix manifest and jar" />
     <MESSAGE value="MYBUDGETBACKEND-62: fix manifest and jar" />
@@ -672,7 +670,9 @@
     <MESSAGE value="MYBUDGETBACKEND-74: fix traefik ports and providers" />
     <MESSAGE value="MYBUDGETBACKEND-75: fix traefik and balancer" />
     <MESSAGE value="MYBUDGETBACKEND-76: fix traefik containers" />
-    <option name="LAST_COMMIT_MESSAGE" value="MYBUDGETBACKEND-76: fix traefik containers" />
+    <MESSAGE value="MYBUDGETBACKEND-77: fix yml formatting" />
+    <MESSAGE value="MYBUDGETBACKEND-77: fix unique label" />
+    <option name="LAST_COMMIT_MESSAGE" value="MYBUDGETBACKEND-77: fix unique label" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

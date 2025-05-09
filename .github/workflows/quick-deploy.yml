@@ -263,7 +263,7 @@ jobs:
                 image: postgres:17-alpine
                 networks:
                   backend_backend:
-                    ipv4_address: 10.0.1.2
+                    ipv4_address: 10.0.1.3
                 volumes:
                   - pg_data:/var/lib/postgresql/data
                 environment:
@@ -345,13 +345,12 @@ jobs:
                   - "--providers.docker=true"
                   - "--providers.docker.swarmMode=true"
                   - "--providers.docker.exposedbydefault=false"
-                  - "--entrypoints.web.address=:80"
-                  - "--ping=true"
-                  - "--log.level=DEBUG"
-                  - "--accesslog=true"
                   - "--providers.docker.network=backend_backend"
                   - "--providers.docker.watch=true"
                   - "--providers.docker.endpoint=unix:///var/run/docker.sock"
+                  - "--entrypoints.web.address=:80"
+                  - "--log.level=DEBUG"
+                  - "--accesslog=true"
                 ports:
                   - target: 80
                     published: 80
@@ -363,9 +362,9 @@ jobs:
                     mode: host
                 networks:
                   backend_backend:
-                    ipv4_address: 10.0.1.3
+                    ipv4_address: 10.0.1.6
                   backend_public:
-                    ipv4_address: 10.0.2.2
+                    ipv4_address: 10.0.2.3
                 volumes:
                   - /var/run/docker.sock:/var/run/docker.sock:ro
                 deploy:
@@ -374,6 +373,8 @@ jobs:
                       - node.role == manager
                   restart_policy:
                     condition: on-failure
+                    max_attempts: 3
+                    window: 120s
                   resources:
                     limits:
                       cpus: '0.5'
@@ -405,9 +406,9 @@ jobs:
                 image: ghcr.io/$GITHUB_OWNER_LC/mybudget-backend:$TAG
                 networks:
                   backend_backend:
-                    ipv4_address: 10.0.1.4
+                    ipv4_address: 10.0.1.8
                   backend_public:
-                    ipv4_address: 10.0.2.3
+                    ipv4_address: 10.0.2.6
                 environment:
                   PG_USER: "$PG_USER"
                   PG_PASSWORD: "$PG_PASSWORD"
@@ -427,6 +428,10 @@ jobs:
                   SPRING_DATASOURCE_HIKARI_MAX_LIFETIME: 1200000
                   SPRING_DATASOURCE_HIKARI_VALIDATION_TIMEOUT: 5000
                   SPRING_DATASOURCE_HIKARI_LEAK_DETECTION_THRESHOLD: 60000
+                  SPRING_APPLICATION_NAME: "mybudget-backend"
+                  LOGGING_LEVEL_ROOT: "INFO"
+                  LOGGING_LEVEL_RU_IUTURAKULOV_MYBUDGETBACKEND: "DEBUG"
+                  LOGGING_PATTERN_CONSOLE: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
                 ports:
                   - target: 8082
                     published: 8082
@@ -435,31 +440,17 @@ jobs:
                 secrets:
                   - backend_app_secret
                 labels:
-                  # Enable Traefik
                   - "traefik.enable=true"
-                  # Router configuration
                   - "traefik.http.routers.backend.rule=Host('51.250.65.154')"
                   - "traefik.http.routers.backend.entrypoints=web"
-                  - "traefik.http.routers.backend.priority=100"
-                  - "traefik.http.routers.backend.service=backend@docker"
-                  - "traefik.http.routers.backend.middlewares=cors"
-                  # Service configuration
                   - "traefik.http.services.backend.loadbalancer.server.port=8082"
-                  - "traefik.http.services.backend.loadbalancer.server.scheme=http"
-                  - "traefik.http.services.backend.loadbalancer.passHostHeader=true"
-                  # Health check configuration
-                  - "traefik.http.services.backend.loadbalancer.healthcheck.path=/ping"
-                  - "traefik.http.services.backend.loadbalancer.healthcheck.interval=10s"
-                  - "traefik.http.services.backend.loadbalancer.healthcheck.timeout=5s"
-                  # CORS configuration
                   - "traefik.http.middlewares.cors.headers.accessControlAllowMethods=GET,POST,PUT,DELETE,OPTIONS"
                   - "traefik.http.middlewares.cors.headers.accessControlAllowOriginList=*"
                   - "traefik.http.middlewares.cors.headers.accessControlAllowHeaders=*"
                   - "traefik.http.middlewares.cors.headers.accessControlAllowCredentials=true"
                   - "traefik.http.middlewares.cors.headers.accessControlMaxAge=100"
-                  # Docker configuration
-                  - "traefik.docker.network=backend_backend"
-                  - "traefik.docker.lbswarm=true"
+                  - "traefik.http.routers.backend.middlewares=cors"
+                  - "traefik.http.services.backend.loadbalancer.passHostHeader=true"
                 healthcheck:
                   test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8082/ping || exit 1"]
                   interval: 30s
@@ -477,15 +468,6 @@ jobs:
                     limits:
                       cpus: '1.0'
                       memory: 1G
-                  update_config:
-                    parallelism: 1
-                    delay: 15s
-                    order: start-first
-                    failure_action: rollback
-                  rollback_config:
-                    parallelism: 1
-                    delay: 15s
-                    order: start-first
                 logging:
                   driver: json-file
                   options:
