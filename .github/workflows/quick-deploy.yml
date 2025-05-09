@@ -366,12 +366,12 @@ jobs:
 
             # Wait for services to start
             echo "Waiting for services to start..."
-            sleep 10
+            sleep 30
 
             # Check service status with more detail
             echo "Checking service status with more detail..."
             docker service ls
-            for service in backend_backend backend_database backend_traefik; do
+            for service in backend_database backend_traefik backend_backend; do
               echo "Service: $service"
               docker service ps $service --no-trunc
               echo "Service logs:"
@@ -452,7 +452,7 @@ jobs:
             echo "Stack tasks:"
             docker stack ps backend --no-trunc
             echo "Service logs:"
-            for service in backend_backend backend_database backend_traefik; do
+            for service in backend_database backend_traefik backend_backend; do
               echo "Logs for $service:"
               docker service logs $service --tail 50 || echo "No logs available for $service"
               echo "----------------------------------------"

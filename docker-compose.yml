@@ -121,8 +121,7 @@ services:
       public:
         ipv4_address: 10.0.2.3
     depends_on:
-      database:
-        condition: service_healthy
+      - database
     environment:
       PG_USER: ${PG_USER}
       PG_PASSWORD: ${PG_PASSWORD}
