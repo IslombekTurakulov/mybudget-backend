@@ -16,6 +16,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Validate secrets
+        run: |
+          # Check required secrets
+          for secret in SERVER_HOST SERVER_USER SERVER_SSH_KEY PG_USER PG_PASSWORD PG_DATABASE JWT_SECRET GITHUB_TOKEN; do
+            if [ -z "${!secret}" ]; then
+              echo "Error: Required secret $secret is not set"
+              exit 1
+            fi
+          done
+          echo "All required secrets are set"
+
       - name: Deploy to server
         uses: appleboy/ssh-action@v1.0.3
         with:
