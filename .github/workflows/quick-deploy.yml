@@ -348,6 +348,7 @@ jobs:
                   - "--providers.docker.network=backend_backend"
                   - "--providers.docker.watch=true"
                   - "--providers.docker.endpoint=unix:///var/run/docker.sock"
+                  - "--providers.docker.swarmModeRefreshSeconds=15"
                   - "--entrypoints.web.address=:80"
                   - "--log.level=DEBUG"
                   - "--accesslog=true"
@@ -441,6 +442,7 @@ jobs:
                   - backend_app_secret
                 labels:
                   - "traefik.enable=true"
+                  - "traefik.docker.network=backend_backend"
                   - "traefik.http.routers.backend.rule=Host('51.250.65.154')"
                   - "traefik.http.routers.backend.entrypoints=web"
                   - "traefik.http.services.backend.loadbalancer.server.port=8082"
