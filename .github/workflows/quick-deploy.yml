@@ -357,7 +357,7 @@ jobs:
                   - "--providers.docker.watch=true"
                   - "--providers.docker.endpoint=unix:///var/run/docker.sock"
                   - "--providers.docker.swarmModeRefreshSeconds=15"
-                  - "--providers.docker.constraints=Label('traefik.enable', 'true')"
+                  - "--providers.docker.constraints=Label(`traefik.enable`, `true`)"
                   - "--entrypoints.web.address=:80"
                   - "--log.level=DEBUG"
                   - "--accesslog=true"
