@@ -1,0 +1,2 @@
+UPDATE notifications SET type = 'PROJECT_INVITE_SEND' WHERE type = 'PROJECT_INVITE';
+UPDATE notifications SET type = 'PARTICIPANT_ROLE_CHANGE' WHERE type = 'ROLE_CHANGE';
