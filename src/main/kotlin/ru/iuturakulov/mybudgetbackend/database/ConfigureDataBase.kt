@@ -41,9 +41,9 @@ fun configureDatabase(config: ApplicationConfig) {
 
 object DatabaseConfig {
     fun initDB(config: ApplicationConfig) {
-        val dbUrl = config.property("database.url").getString()
-        val dbUser = config.property("database.user").getString()
-        val dbPassword = config.property("database.password").getString()
+        val dbUrl = System.getenv("DATABASE_URL") ?: config.property("database.url").getString()
+        val dbUser = System.getenv("PG_USER") ?: config.property("database.user").getString()
+        val dbPassword = System.getenv("PG_PASSWORD") ?: config.property("database.password").getString()
         val dbDriver = config.property("database.driver").getString()
 
         val hikariConfig = HikariConfig().apply {
