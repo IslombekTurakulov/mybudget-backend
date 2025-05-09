@@ -41,6 +41,11 @@ fun configureDatabase(config: ApplicationConfig) {
 
 object DatabaseConfig {
     fun initDB(config: ApplicationConfig) {
+        println("Environment variables:")
+        println("PG_USER: ${System.getenv("PG_USER")}")
+        println("PG_PASSWORD: ${System.getenv("PG_PASSWORD")}")
+        println("PG_DATABASE: ${System.getenv("PG_DATABASE")}")
+
         val dbUrl = System.getenv("DATABASE_URL") ?: config.property("database.url").getString()
         val dbUser = System.getenv("PG_USER") ?: config.property("database.user").getString()
         val dbPassword = System.getenv("PG_PASSWORD") ?: config.property("database.password").getString()
