@@ -4,12 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4bbd917-8929-44b4-afda-19b441d6e48e" name="Changes" comment="MYBUDGETBACKEND-74: fix env">
-      <change beforePath="$PROJECT_DIR$/.idea/resourceBundles.xml" beforeDir="false" />
+    <list default="true" id="c4bbd917-8929-44b4-afda-19b441d6e48e" name="Changes" comment="MYBUDGETBACKEND-74: fix file">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/Dockerfile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/database/ConfigureDataBase.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/database/ConfigureDataBase.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/application.conf" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.conf" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -222,30 +218,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1737229814397</updated>
-    </task>
-    <task id="LOCAL-00096" summary="MYBUDGETBACKEND-60: fix env variable">
-      <option name="closed" value="true" />
-      <created>1746742097163</created>
-      <option name="number" value="00096" />
-      <option name="presentableId" value="LOCAL-00096" />
-      <option name="project" value="LOCAL" />
-      <updated>1746742097163</updated>
-    </task>
-    <task id="LOCAL-00097" summary="MYBUDGETBACKEND-60: fix env variable">
-      <option name="closed" value="true" />
-      <created>1746742432218</created>
-      <option name="number" value="00097" />
-      <option name="presentableId" value="LOCAL-00097" />
-      <option name="project" value="LOCAL" />
-      <updated>1746742432218</updated>
-    </task>
-    <task id="LOCAL-00098" summary="MYBUDGETBACKEND-60: fix env variable">
-      <option name="closed" value="true" />
-      <created>1746742681163</created>
-      <option name="number" value="00098" />
-      <option name="presentableId" value="LOCAL-00098" />
-      <option name="project" value="LOCAL" />
-      <updated>1746742681163</updated>
     </task>
     <task id="LOCAL-00099" summary="MYBUDGETBACKEND-60: fix env variable">
       <option name="closed" value="true" />
@@ -615,7 +587,31 @@
       <option name="project" value="LOCAL" />
       <updated>1746757375541</updated>
     </task>
-    <option name="localTasksCounter" value="145" />
+    <task id="LOCAL-00145" summary="MYBUDGETBACKEND-74: fix file">
+      <option name="closed" value="true" />
+      <created>1746758267860</created>
+      <option name="number" value="00145" />
+      <option name="presentableId" value="LOCAL-00145" />
+      <option name="project" value="LOCAL" />
+      <updated>1746758267860</updated>
+    </task>
+    <task id="LOCAL-00146" summary="MYBUDGETBACKEND-74: fix file">
+      <option name="closed" value="true" />
+      <created>1746758963128</created>
+      <option name="number" value="00146" />
+      <option name="presentableId" value="LOCAL-00146" />
+      <option name="project" value="LOCAL" />
+      <updated>1746758963128</updated>
+    </task>
+    <task id="LOCAL-00147" summary="MYBUDGETBACKEND-74: fix file">
+      <option name="closed" value="true" />
+      <created>1746759500159</created>
+      <option name="number" value="00147" />
+      <option name="presentableId" value="LOCAL-00147" />
+      <option name="project" value="LOCAL" />
+      <updated>1746759500159</updated>
+    </task>
+    <option name="localTasksCounter" value="148" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -630,7 +626,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="MYBUDGETBACKEND-57: fix deploy, change ip address" />
     <MESSAGE value="MYBUDGETBACKEND-58: add local run, fix db, fix application config, fix deploy" />
     <MESSAGE value="MYBUDGETBACKEND-58: fix deploy, add logs" />
     <MESSAGE value="MYBUDGETBACKEND-59: fix deploy" />
@@ -655,7 +650,8 @@
     <MESSAGE value="MYBUDGETBACKEND-72: fix hikari and replicas" />
     <MESSAGE value="MYBUDGETBACKEND-73: fix deploy" />
     <MESSAGE value="MYBUDGETBACKEND-74: fix env" />
-    <option name="LAST_COMMIT_MESSAGE" value="MYBUDGETBACKEND-74: fix env" />
+    <MESSAGE value="MYBUDGETBACKEND-74: fix file" />
+    <option name="LAST_COMMIT_MESSAGE" value="MYBUDGETBACKEND-74: fix file" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -982,7 +978,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="kotlin-line">
           <url>file://$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/database/ConfigureDataBase.kt</url>
-          <line>73</line>
+          <line>59</line>
           <option name="timeStamp" value="168" />
         </line-breakpoint>
       </breakpoints>

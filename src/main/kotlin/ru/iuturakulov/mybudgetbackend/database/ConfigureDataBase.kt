@@ -66,7 +66,6 @@ object DatabaseConfig {
         try {
             val flyway = Flyway
                 .configure()
-                .locations("classpath:db/migrations")
                 .dataSource(dataSource)
                 .load()
             flyway.migrate()
