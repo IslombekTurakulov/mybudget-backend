@@ -171,12 +171,12 @@ jobs:
 
             # Create .env file
             cat > .env << EOL
-            PG_USER=$PG_USER
-            PG_PASSWORD=$PG_PASSWORD
-            PG_DATABASE=$PG_DATABASE
-            JWT_SECRET=$JWT_SECRET
-            TAG=$TAG
-            GITHUB_OWNER_LC=$GITHUB_OWNER_LC
+            PG_USER=${PG_USER}
+            PG_PASSWORD=${PG_PASSWORD}
+            PG_DATABASE=${PG_DATABASE}
+            JWT_SECRET=${JWT_SECRET}
+            TAG=${TAG}
+            GITHUB_OWNER_LC=${GITHUB_OWNER_LC}
             EOL
 
             # Verify .env file
@@ -190,7 +190,7 @@ jobs:
             echo "Creating temporary compose files..."
             
             # Database service compose file
-            cat > docker-compose.database.yml << EOL
+            cat > docker-compose.database.yml << EOF
             secrets:
               backend_pg_password:
                 external: true
@@ -220,9 +220,9 @@ jobs:
                 volumes:
                   - pg_data:/var/lib/postgresql/data
                 environment:
-                  POSTGRES_USER_FILE: /run/secrets/backend_pg_user
-                  POSTGRES_DB_FILE: /run/secrets/backend_pg_database
-                  POSTGRES_PASSWORD_FILE: /run/secrets/backend_pg_password
+                  POSTGRES_USER: "$PG_USER"
+                  POSTGRES_DB: "$PG_DATABASE"
+                  POSTGRES_PASSWORD: "$PG_PASSWORD"
                   PGDATA: /var/lib/postgresql/data/pgdata
                 user: postgres
                 ports:
@@ -250,10 +250,10 @@ jobs:
                     limits:
                       cpus: '0.5'
                       memory: 1G
-            EOL
+            EOF
 
             # Traefik service compose file
-            cat > docker-compose.traefik.yml << EOL
+            cat > docker-compose.traefik.yml << EOF
             secrets:
               backend_app_secret:
                 external: true
@@ -299,10 +299,10 @@ jobs:
                     limits:
                       cpus: '0.5'
                       memory: 512M
-            EOL
+            EOF
 
             # Backend service compose file
-            cat > docker-compose.backend.yml << EOL
+            cat > docker-compose.backend.yml << EOF
             secrets:
               backend_app_secret:
                 external: true
@@ -323,18 +323,18 @@ jobs:
             
             services:
               backend:
-                image: ghcr.io/\${GITHUB_OWNER_LC}/mybudget-backend:\${TAG}
+                image: ghcr.io/$GITHUB_OWNER_LC/mybudget-backend:$TAG
                 networks:
                   backend:
                     ipv4_address: 10.0.1.3
                   public:
                     ipv4_address: 10.0.2.3
                 environment:
-                  PG_USER: \${PG_USER}
-                  PG_PASSWORD: \${PG_PASSWORD}
-                  PG_DATABASE: \${PG_DATABASE}
-                  DATABASE_URL: jdbc:postgresql://database:5432/\${PG_DATABASE}
-                  JWT_SECRET: \${JWT_SECRET}
+                  PG_USER: "$PG_USER"
+                  PG_PASSWORD: "$PG_PASSWORD"
+                  PG_DATABASE: "$PG_DATABASE"
+                  DATABASE_URL: "jdbc:postgresql://database:5432/$PG_DATABASE"
+                  JWT_SECRET: "$JWT_SECRET"
                   SPRING_PROFILES_ACTIVE: prod
                   SERVER_PORT: 8082
                   SPRING_SECURITY_CORS_ALLOWED_ORIGINS: "*"
@@ -385,7 +385,7 @@ jobs:
                     parallelism: 1
                     delay: 15s
                     order: start-first
-            EOL
+            EOF
 
             # Проверка свободного места на диске
             echo "Checking disk space..."
