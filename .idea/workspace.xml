@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4bbd917-8929-44b4-afda-19b441d6e48e" name="Changes" comment="MYBUDGETBACKEND-81: fix traefik for mobile routing" />
+    <list default="true" id="c4bbd917-8929-44b4-afda-19b441d6e48e" name="Changes" comment="MYBUDGETBACKEND-81: fix formatting" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -216,30 +216,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1737229814397</updated>
-    </task>
-    <task id="LOCAL-00111" summary="MYBUDGETBACKEND-65: fix deploy to start database docker">
-      <option name="closed" value="true" />
-      <created>1746745894040</created>
-      <option name="number" value="00111" />
-      <option name="presentableId" value="LOCAL-00111" />
-      <option name="project" value="LOCAL" />
-      <updated>1746745894040</updated>
-    </task>
-    <task id="LOCAL-00112" summary="MYBUDGETBACKEND-66: fix deploy to start database docker">
-      <option name="closed" value="true" />
-      <created>1746746237667</created>
-      <option name="number" value="00112" />
-      <option name="presentableId" value="LOCAL-00112" />
-      <option name="project" value="LOCAL" />
-      <updated>1746746237667</updated>
-    </task>
-    <task id="LOCAL-00113" summary="MYBUDGETBACKEND-66: fix deploy to start database docker">
-      <option name="closed" value="true" />
-      <created>1746746637498</created>
-      <option name="number" value="00113" />
-      <option name="presentableId" value="LOCAL-00113" />
-      <option name="project" value="LOCAL" />
-      <updated>1746746637498</updated>
     </task>
     <task id="LOCAL-00114" summary="MYBUDGETBACKEND-66: fix deploy to start database docker">
       <option name="closed" value="true" />
@@ -609,7 +585,31 @@
       <option name="project" value="LOCAL" />
       <updated>1746765317399</updated>
     </task>
-    <option name="localTasksCounter" value="160" />
+    <task id="LOCAL-00160" summary="MYBUDGETBACKEND-81: fix formatting">
+      <option name="closed" value="true" />
+      <created>1746765416670</created>
+      <option name="number" value="00160" />
+      <option name="presentableId" value="LOCAL-00160" />
+      <option name="project" value="LOCAL" />
+      <updated>1746765416670</updated>
+    </task>
+    <task id="LOCAL-00161" summary="MYBUDGETBACKEND-81: fix formatting">
+      <option name="closed" value="true" />
+      <created>1746765578302</created>
+      <option name="number" value="00161" />
+      <option name="presentableId" value="LOCAL-00161" />
+      <option name="project" value="LOCAL" />
+      <updated>1746765578302</updated>
+    </task>
+    <task id="LOCAL-00162" summary="MYBUDGETBACKEND-81: fix formatting">
+      <option name="closed" value="true" />
+      <created>1746765657180</created>
+      <option name="number" value="00162" />
+      <option name="presentableId" value="LOCAL-00162" />
+      <option name="project" value="LOCAL" />
+      <updated>1746765657180</updated>
+    </task>
+    <option name="localTasksCounter" value="163" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -647,7 +647,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="MYBUDGETBACKEND-63: fix gradle" />
     <MESSAGE value="MYBUDGETBACKEND-63: fix env to start database docker" />
     <MESSAGE value="MYBUDGETBACKEND-64: fix deploy to start database docker" />
     <MESSAGE value="MYBUDGETBACKEND-65: fix deploy to start database docker" />
@@ -672,7 +671,8 @@
     <MESSAGE value="MYBUDGETBACKEND-79: fix traefik filtering" />
     <MESSAGE value="MYBUDGETBACKEND-80: add quota" />
     <MESSAGE value="MYBUDGETBACKEND-81: fix traefik for mobile routing" />
-    <option name="LAST_COMMIT_MESSAGE" value="MYBUDGETBACKEND-81: fix traefik for mobile routing" />
+    <MESSAGE value="MYBUDGETBACKEND-81: fix formatting" />
+    <option name="LAST_COMMIT_MESSAGE" value="MYBUDGETBACKEND-81: fix formatting" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
