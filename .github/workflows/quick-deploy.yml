@@ -236,82 +236,82 @@ jobs:
             # Create temporary compose files for each service
             echo "Creating temporary compose files..."
             
-            # Database service compose file
-            {
-              echo "secrets:"
-              echo "  backend_pg_password:"
-              echo "    external: true"
-              echo "  backend_pg_user:"
-              echo "    external: true"
-              echo "  backend_pg_database:"
-              echo "    external: true"
-              echo ""
-              echo "networks:"
-              echo "  backend:"
-              echo "    name: backend"
-              echo "    external: true"
-              echo "    driver: overlay"
-              echo "    driver_opts:"
-              echo "      com.docker.network.driver.mtu: \"1400\""
-              echo ""
-              echo "volumes:"
-              echo "  pg_data:"
-              echo "    name: backend_pg_data"
-              echo ""
-              echo "services:"
-              echo "  database:"
-              echo "    image: postgres:17-alpine"
-              echo "    networks:"
-              echo "      backend:"
-              echo "        ipv4_address: 10.0.1.2"
-              echo "    volumes:"
-              echo "      - pg_data:/var/lib/postgresql/data"
-              echo "    environment:"
-              echo "      POSTGRES_USER_FILE: /run/secrets/backend_pg_user"
-              echo "      POSTGRES_DB_FILE: /run/secrets/backend_pg_database"
-              echo "      POSTGRES_PASSWORD_FILE: /run/secrets/backend_pg_password"
-              echo "      PGDATA: /var/lib/postgresql/data/pgdata"
-              echo "    user: postgres"
-              echo "    ports:"
-              echo "      - target: 5432"
-              echo "        published: 5432"
-              echo "        protocol: tcp"
-              echo "        mode: host"
-              echo "    secrets:"
-              echo "      - backend_pg_user"
-              echo "      - backend_pg_database"
-              echo "      - backend_pg_password"
-              echo "    healthcheck:"
-              echo "      test: [\"CMD-SHELL\", \"pg_isready -U postgres\"]"
-              echo "      interval: 10s"
-              echo "      timeout: 5s"
-              echo "      retries: 5"
-              echo "      start_period: 30s"
-              echo "    deploy:"
-              echo "      replicas: 1"
-              echo "      restart_policy:"
-              echo "        condition: on-failure"
-              echo "        max_attempts: 3"
-              echo "        window: 120s"
-              echo "      resources:"
-              echo "        limits:"
-              echo "          cpus: '0.5'"
-              echo "          memory: 1G"
-              echo "      update_config:"
-              echo "        parallelism: 1"
-              echo "        delay: 10s"
-              echo "        order: start-first"
-              echo "      rollback_config:"
-              echo "        parallelism: 1"
-              echo "        delay: 10s"
-              echo "        order: start-first"
-              echo "    logging:"
-              echo "      driver: json-file"
-              echo "      options:"
-              echo "        max-size: \"10m\""
-              echo "        max-file: \"3\""
-              echo "    command: [\"postgres\", \"-c\", \"log_statement=all\", \"-c\", \"log_connections=on\", \"-c\", \"log_disconnections=on\"]"
-            } > docker-compose.database.yml
+            # Create database compose file
+            cat > docker-compose.database.yml << 'EOL'
+            secrets:
+              backend_pg_password:
+                external: true
+              backend_pg_user:
+                external: true
+              backend_pg_database:
+                external: true
+            
+            networks:
+              backend:
+                name: backend
+                external: true
+                driver: overlay
+                driver_opts:
+                  com.docker.network.driver.mtu: "1400"
+            
+            volumes:
+              pg_data:
+                name: backend_pg_data
+            
+            services:
+              database:
+                image: postgres:17-alpine
+                networks:
+                  backend:
+                    ipv4_address: 10.0.1.2
+                volumes:
+                  - pg_data:/var/lib/postgresql/data
+                environment:
+                  POSTGRES_USER_FILE: /run/secrets/backend_pg_user
+                  POSTGRES_DB_FILE: /run/secrets/backend_pg_database
+                  POSTGRES_PASSWORD_FILE: /run/secrets/backend_pg_password
+                  PGDATA: /var/lib/postgresql/data/pgdata
+                user: postgres
+                ports:
+                  - target: 5432
+                    published: 5432
+                    protocol: tcp
+                    mode: host
+                secrets:
+                  - backend_pg_user
+                  - backend_pg_database
+                  - backend_pg_password
+                healthcheck:
+                  test: ["CMD-SHELL", "pg_isready -U postgres"]
+                  interval: 10s
+                  timeout: 5s
+                  retries: 5
+                  start_period: 30s
+                deploy:
+                  replicas: 1
+                  restart_policy:
+                    condition: on-failure
+                    max_attempts: 3
+                    window: 120s
+                  resources:
+                    limits:
+                      cpus: '0.5'
+                      memory: 1G
+                  update_config:
+                    parallelism: 1
+                    delay: 10s
+                    order: start-first
+                  rollback_config:
+                    parallelism: 1
+                    delay: 10s
+                    order: start-first
+                logging:
+                  driver: json-file
+                  options:
+                    max-size: "10m"
+                    max-file: "3"
+                command: ["postgres", "-c", "log_statement=all", "-c", "log_connections=on", "-c", "log_disconnections=on"]
+            EOL
 
             # Verify the database compose file
             echo "Verifying database compose file..."
@@ -367,103 +367,103 @@ jobs:
             } > docker-compose.traefik.yml
 
             # Backend service compose file
-            {
-              echo "secrets:"
-              echo "  backend_app_secret:"
-              echo "    external: true"
-              echo ""
-              echo "networks:"
-              echo "  backend:"
-              echo "    name: backend"
-              echo "    external: true"
-              echo "    driver: overlay"
-              echo "    driver_opts:"
-              echo "      com.docker.network.driver.mtu: \"1400\""
-              echo "  public:"
-              echo "    name: public"
-              echo "    external: true"
-              echo "    driver: overlay"
-              echo "    driver_opts:"
-              echo "      com.docker.network.driver.mtu: \"1400\""
-              echo ""
-              echo "services:"
-              echo "  backend:"
-              echo "    image: ghcr.io/$GITHUB_OWNER_LC/mybudget-backend:$TAG"
-              echo "    networks:"
-              echo "      backend:"
-              echo "        ipv4_address: 10.0.1.3"
-              echo "      public:"
-              echo "        ipv4_address: 10.0.2.3"
-              echo "    environment:"
-              echo "      PG_USER: \"$PG_USER\""
-              echo "      PG_PASSWORD: \"$PG_PASSWORD\""
-              echo "      PG_DATABASE: \"$PG_DATABASE\""
-              echo "      DATABASE_URL: \"jdbc:postgresql://database:5432/$PG_DATABASE?reconnect=true&connectTimeout=30&socketTimeout=30&tcpKeepAlive=true\""
-              echo "      JWT_SECRET: \"$JWT_SECRET\""
-              echo "      SPRING_PROFILES_ACTIVE: prod"
-              echo "      SERVER_PORT: 8082"
-              echo "      SPRING_SECURITY_CORS_ALLOWED_ORIGINS: \"*\""
-              echo "      SPRING_SECURITY_CORS_ALLOWED_METHODS: \"GET,POST,PUT,DELETE,OPTIONS\""
-              echo "      SPRING_SECURITY_CORS_ALLOWED_HEADERS: \"*\""
-              echo "      SPRING_SECURITY_CORS_ALLOW_CREDENTIALS: \"true\""
-              echo "      SPRING_DATASOURCE_HIKARI_CONNECTION_TIMEOUT: 30000"
-              echo "      SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE: 5"
-              echo "      SPRING_DATASOURCE_HIKARI_MINIMUM_IDLE: 1"
-              echo "      SPRING_DATASOURCE_HIKARI_IDLE_TIMEOUT: 300000"
-              echo "      SPRING_DATASOURCE_HIKARI_MAX_LIFETIME: 1200000"
-              echo "      SPRING_DATASOURCE_HIKARI_VALIDATION_TIMEOUT: 5000"
-              echo "      SPRING_DATASOURCE_HIKARI_LEAK_DETECTION_THRESHOLD: 60000"
-              echo "    ports:"
-              echo "      - target: 8082"
-              echo "        published: 8082"
-              echo "        protocol: tcp"
-              echo "        mode: host"
-              echo "    secrets:"
-              echo "      - backend_app_secret"
-              echo "    labels:"
-              echo "      - \"traefik.enable=true\""
-              echo "      - \"traefik.http.routers.backend.rule=Host('51.250.65.154')\""
-              echo "      - \"traefik.http.routers.backend.entrypoints=web\""
-              echo "      - \"traefik.http.services.backend.loadbalancer.server.port=8082\""
-              echo "      - \"traefik.http.middlewares.cors.headers.accessControlAllowMethods=GET,POST,PUT,DELETE,OPTIONS\""
-              echo "      - \"traefik.http.middlewares.cors.headers.accessControlAllowOriginList=*\""
-              echo "      - \"traefik.http.middlewares.cors.headers.accessControlAllowHeaders=*\""
-              echo "      - \"traefik.http.middlewares.cors.headers.accessControlAllowCredentials=true\""
-              echo "      - \"traefik.http.middlewares.cors.headers.accessControlMaxAge=100\""
-              echo "      - \"traefik.http.routers.backend.middlewares=cors\""
-              echo "      - \"traefik.http.services.backend.loadbalancer.passHostHeader=true\""
-              echo "    healthcheck:"
-              echo "      test: [\"CMD-SHELL\", \"curl -f http://localhost:8082/ping || exit 1\"]"
-              echo "      interval: 30s"
-              echo "      timeout: 5s"
-              echo "      retries: 3"
-              echo "      start_period: 40s"
-              echo "    deploy:"
-              echo "      mode: replicated"
-              echo "      replicas: 1"
-              echo "      restart_policy:"
-              echo "        condition: on-failure"
-              echo "        max_attempts: 3"
-              echo "        window: 120s"
-              echo "      resources:"
-              echo "        limits:"
-              echo "          cpus: '1.0'"
-              echo "          memory: 1G"
-              echo "      update_config:"
-              echo "        parallelism: 1"
-              echo "        delay: 15s"
-              echo "        order: start-first"
-              echo "        failure_action: rollback"
-              echo "      rollback_config:"
-              echo "        parallelism: 1"
-              echo "        delay: 15s"
-              echo "        order: start-first"
-              echo "    logging:"
-              echo "      driver: json-file"
-              echo "      options:"
-              echo "        max-size: \"10m\""
-              echo "        max-file: \"3\""
-            } > docker-compose.backend.yml
+            cat > docker-compose.backend.yml << EOL
+            secrets:
+              backend_app_secret:
+                external: true
+            
+            networks:
+              backend:
+                name: backend
+                external: true
+                driver: overlay
+                driver_opts:
+                  com.docker.network.driver.mtu: "1400"
+              public:
+                name: public
+                external: true
+                driver: overlay
+                driver_opts:
+                  com.docker.network.driver.mtu: "1400"
+            
+            services:
+              backend:
+                image: ghcr.io/$GITHUB_OWNER_LC/mybudget-backend:$TAG
+                networks:
+                  backend:
+                    ipv4_address: 10.0.1.3
+                  public:
+                    ipv4_address: 10.0.2.3
+                environment:
+                  PG_USER: "$PG_USER"
+                  PG_PASSWORD: "$PG_PASSWORD"
+                  PG_DATABASE: "$PG_DATABASE"
+                  DATABASE_URL: "jdbc:postgresql://database:5432/$PG_DATABASE?reconnect=true&connectTimeout=30&socketTimeout=30&tcpKeepAlive=true"
+                  JWT_SECRET: "$JWT_SECRET"
+                  SPRING_PROFILES_ACTIVE: prod
+                  SERVER_PORT: 8082
+                  SPRING_SECURITY_CORS_ALLOWED_ORIGINS: "*"
+                  SPRING_SECURITY_CORS_ALLOWED_METHODS: "GET,POST,PUT,DELETE,OPTIONS"
+                  SPRING_SECURITY_CORS_ALLOWED_HEADERS: "*"
+                  SPRING_SECURITY_CORS_ALLOW_CREDENTIALS: "true"
+                  SPRING_DATASOURCE_HIKARI_CONNECTION_TIMEOUT: 30000
+                  SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE: 5
+                  SPRING_DATASOURCE_HIKARI_MINIMUM_IDLE: 1
+                  SPRING_DATASOURCE_HIKARI_IDLE_TIMEOUT: 300000
+                  SPRING_DATASOURCE_HIKARI_MAX_LIFETIME: 1200000
+                  SPRING_DATASOURCE_HIKARI_VALIDATION_TIMEOUT: 5000
+                  SPRING_DATASOURCE_HIKARI_LEAK_DETECTION_THRESHOLD: 60000
+                ports:
+                  - target: 8082
+                    published: 8082
+                    protocol: tcp
+                    mode: host
+                secrets:
+                  - backend_app_secret
+                labels:
+                  - "traefik.enable=true"
+                  - "traefik.http.routers.backend.rule=Host('51.250.65.154')"
+                  - "traefik.http.routers.backend.entrypoints=web"
+                  - "traefik.http.services.backend.loadbalancer.server.port=8082"
+                  - "traefik.http.middlewares.cors.headers.accessControlAllowMethods=GET,POST,PUT,DELETE,OPTIONS"
+                  - "traefik.http.middlewares.cors.headers.accessControlAllowOriginList=*"
+                  - "traefik.http.middlewares.cors.headers.accessControlAllowHeaders=*"
+                  - "traefik.http.middlewares.cors.headers.accessControlAllowCredentials=true"
+                  - "traefik.http.middlewares.cors.headers.accessControlMaxAge=100"
+                  - "traefik.http.routers.backend.middlewares=cors"
+                  - "traefik.http.services.backend.loadbalancer.passHostHeader=true"
+                healthcheck:
+                  test: ["CMD-SHELL", "curl -f http://localhost:8082/ping || exit 1"]
+                  interval: 30s
+                  timeout: 5s
+                  retries: 3
+                  start_period: 40s
+                deploy:
+                  mode: replicated
+                  replicas: 1
+                  restart_policy:
+                    condition: on-failure
+                    max_attempts: 3
+                    window: 120s
+                  resources:
+                    limits:
+                      cpus: '1.0'
+                      memory: 1G
+                  update_config:
+                    parallelism: 1
+                    delay: 15s
+                    order: start-first
+                    failure_action: rollback
+                  rollback_config:
+                    parallelism: 1
+                    delay: 15s
+                    order: start-first
+                logging:
+                  driver: json-file
+                  options:
+                    max-size: "10m"
+                    max-file: "3"
+            EOL
 
             # Проверка свободного места на диске
             echo "Checking disk space..."
