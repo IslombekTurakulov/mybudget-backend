@@ -77,7 +77,7 @@ sleep 120
 
 # Function to check if VM is ready
 check_vm_ready() {
-    local max_attempts=30
+    local max_attempts=10
     local attempt=1
     local sleep_time=10
 

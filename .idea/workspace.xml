@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4bbd917-8929-44b4-afda-19b441d6e48e" name="Changes" comment="MYBUDGETBACKEND-70: fix deploy" />
+    <list default="true" id="c4bbd917-8929-44b4-afda-19b441d6e48e" name="Changes" comment="MYBUDGETBACKEND-71: fix secrets check" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -214,22 +214,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1737229814397</updated>
-    </task>
-    <task id="LOCAL-00088" summary="MYBUDGETBACKEND-56: fix dockerfile">
-      <option name="closed" value="true" />
-      <created>1746641012160</created>
-      <option name="number" value="00088" />
-      <option name="presentableId" value="LOCAL-00088" />
-      <option name="project" value="LOCAL" />
-      <updated>1746641012161</updated>
-    </task>
-    <task id="LOCAL-00089" summary="MYBUDGETBACKEND-57: fix deploy, change ip address">
-      <option name="closed" value="true" />
-      <created>1746641593167</created>
-      <option name="number" value="00089" />
-      <option name="presentableId" value="LOCAL-00089" />
-      <option name="project" value="LOCAL" />
-      <updated>1746641593167</updated>
     </task>
     <task id="LOCAL-00090" summary="MYBUDGETBACKEND-57: fix deploy, change ip address">
       <option name="closed" value="true" />
@@ -607,7 +591,23 @@
       <option name="project" value="LOCAL" />
       <updated>1746754655975</updated>
     </task>
-    <option name="localTasksCounter" value="137" />
+    <task id="LOCAL-00137" summary="MYBUDGETBACKEND-71: fix formatting">
+      <option name="closed" value="true" />
+      <created>1746755250292</created>
+      <option name="number" value="00137" />
+      <option name="presentableId" value="LOCAL-00137" />
+      <option name="project" value="LOCAL" />
+      <updated>1746755250292</updated>
+    </task>
+    <task id="LOCAL-00138" summary="MYBUDGETBACKEND-71: fix secrets check">
+      <option name="closed" value="true" />
+      <created>1746755575121</created>
+      <option name="number" value="00138" />
+      <option name="presentableId" value="LOCAL-00138" />
+      <option name="project" value="LOCAL" />
+      <updated>1746755575121</updated>
+    </task>
+    <option name="localTasksCounter" value="139" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -622,8 +622,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="MYBUDGETBACKEND-54: fix deploy ci" />
-    <MESSAGE value="MYBUDGETBACKEND-54: split traefik" />
     <MESSAGE value="MYBUDGETBACKEND-54: fix pg volumes" />
     <MESSAGE value="MYBUDGETBACKEND-55: fix dockerfile" />
     <MESSAGE value="MYBUDGETBACKEND-56: fix dockerfile" />
@@ -647,7 +645,9 @@
     <MESSAGE value="MYBUDGETBACKEND-69: fix deploy to start database docker" />
     <MESSAGE value="MYBUDGETBACKEND-69: fix deploy to start database docker" />
     <MESSAGE value="MYBUDGETBACKEND-70: fix deploy" />
-    <option name="LAST_COMMIT_MESSAGE" value="MYBUDGETBACKEND-70: fix deploy" />
+    <MESSAGE value="MYBUDGETBACKEND-71: fix formatting" />
+    <MESSAGE value="MYBUDGETBACKEND-71: fix secrets check" />
+    <option name="LAST_COMMIT_MESSAGE" value="MYBUDGETBACKEND-71: fix secrets check" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
