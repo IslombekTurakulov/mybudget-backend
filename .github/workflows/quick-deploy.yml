@@ -12,13 +12,13 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Validate secrets
         run: |
+          # Check required secrets
           if [ -z "${{ secrets.SERVER_HOST }}" ]; then
             echo "Error: Required secret SERVER_HOST is not set"
             exit 1
@@ -58,44 +58,91 @@ jobs:
           script: |
             #!/bin/bash
             set -e
+            
+            # Проверка наличия docker
+            if ! command -v docker &> /dev/null; then
+              echo "Docker is not installed!"
+              exit 1
+            fi
 
-            # Check required tools
-            command -v docker >/dev/null 2>&1 || { echo "Docker is not installed!"; exit 1; }
-            command -v docker-compose >/dev/null 2>&1 || { echo "docker-compose is not installed!"; exit 1; }
+            # Проверка наличия docker-compose
+            if ! command -v docker-compose &> /dev/null; then
+              echo "docker-compose is not installed!"
+              exit 1
+            fi
 
-            # Setup environment
+            # Не удаляем volume-ы по умолчанию! Для полного сброса используйте флаг FULL_RESET
+            if [ "$FULL_RESET" = "true" ]; then
+              echo "FULL_RESET enabled: removing all volumes, including database!"
+              docker volume rm backend_pg_data || true
+              docker volume rm backend_traefik_pg_data || true
+            else
+              echo "Skipping volume removal (FULL_RESET not set)"
+            fi
+
+            # Create directory if it doesn't exist
             sudo mkdir -p /opt/mybudget/backend
             sudo chown -R $USER:$USER /opt/mybudget/backend
             cd /opt/mybudget/backend
-
-            # Initialize Docker Swarm if needed
+            
+            # Check Docker Swarm status
+            echo "Checking Docker Swarm status..."
             if ! docker info | grep -q "Swarm: active"; then
+              echo "Initializing Docker Swarm..."
               docker swarm init
             fi
-
-            # Cleanup
+            
+            # Check node status
+            echo "Checking node status..."
+            if ! docker node ls | grep -q "Ready"; then
+              echo "Error: No nodes are ready"
+              exit 1
+            fi
+            
+            # Clean up existing resources
+            echo "Cleaning up existing resources..."
             docker stack rm backend || true
-            echo "Waiting for stack removal..."
-            while docker stack ls | grep -q "backend"; do
-              sleep 5
-            done
-
-            docker rm -f $(docker ps -aq) || true
+            sleep 10
+            
+            # Force remove all containers
+            echo "Force removing all containers..."
+            CONTAINERS=$(docker ps -aq)
+            if [ -n "$CONTAINERS" ]; then
+              docker rm -f $CONTAINERS
+            fi
+            sleep 5
+            
+            # Remove all stopped containers
+            echo "Removing stopped containers..."
             docker container prune -f
+            
+            # Remove unused networks
+            echo "Removing unused networks..."
             docker network prune -f
+            
+            # Remove unused volumes
+            echo "Removing unused volumes..."
             docker volume prune -f
+            
+            # Remove unused images
+            echo "Removing unused images..."
             docker image prune -f
-
-            # Create networks
+            
+            # Create networks if they don't exist
+            echo "Creating networks..."
             docker network create --driver overlay --attachable backend_backend || true
             docker network create --driver overlay --attachable backend_public || true
-            echo "Waiting for networks to be ready..."
-            while ! docker network ls | grep -q "backend_backend" || ! docker network ls | grep -q "backend_public"; do
-              sleep 2
-            done
+            sleep 5
+            
+            # Clean up existing secrets
+            echo "Cleaning up existing secrets..."
+            docker secret rm backend_pg_user backend_pg_database backend_pg_password backend_app_secret || true
+            sleep 5
 
-            # Setup secrets
+            # Create secrets directory if it doesn't exist
             mkdir -p secrets
+            
+            # Create password files
             echo "${{ secrets.PG_USER }}" > secrets/pg_user.txt
             echo "${{ secrets.PG_PASSWORD }}" > secrets/pg_password.txt
             echo "${{ secrets.PG_DATABASE }}" > secrets/pg_database.txt
@@ -103,25 +150,94 @@ jobs:
             chmod 600 secrets/*.txt
 
             # Create Docker secrets
+            echo "Creating Docker secrets..."
             echo "${{ secrets.PG_USER }}" | docker secret create backend_pg_user -
             echo "${{ secrets.PG_PASSWORD }}" | docker secret create backend_pg_password -
             echo "${{ secrets.PG_DATABASE }}" | docker secret create backend_pg_database -
             echo "${{ secrets.JWT_SECRET }}" | docker secret create backend_app_secret -
+            
+            # Verify secrets were created
+            echo "Verifying secrets..."
+            docker secret ls
 
-            # Set variables
-            export GITHUB_OWNER="${{ github.repository_owner }}"
-            export GITHUB_OWNER_LC=$(echo "$GITHUB_OWNER" | tr '[:upper:]' '[:lower:]')
-            export TAG="${{ github.event.inputs.image_tag }}"
-            export TAG=$(echo "$TAG" | tr -cd '[:alnum:]._-')
+            # Wait for secrets to be available
+            echo "Waiting for secrets to be available..."
+            sleep 10
+
+            # Verify each secret exists
+            for secret in backend_pg_user backend_pg_database backend_pg_password backend_app_secret; do
+              if ! docker secret inspect $secret > /dev/null 2>&1; then
+                echo "Error: Secret $secret was not created properly"
+                exit 1
+              fi
+            done
+
+            # Set variables from GitHub Actions context
+            GITHUB_OWNER="${{ github.repository_owner }}"
+            GITHUB_OWNER_LC=$(echo "$GITHUB_OWNER" | tr '[:upper:]' '[:lower:]')
+            TAG="${{ github.event.inputs.image_tag }}"
+            
+            # Validate and format image tag
+            if [ -z "$TAG" ]; then
+              TAG="latest"
+            fi
+            # Remove any invalid characters from tag
+            TAG=$(echo "$TAG" | tr -cd '[:alnum:]._-')
+            
+            echo "GITHUB_OWNER=$GITHUB_OWNER"
+            echo "GITHUB_OWNER_LC=$GITHUB_OWNER_LC"
+            echo "TAG=$TAG"
+
+            # Export environment variables
             export PG_USER="${{ secrets.PG_USER }}"
             export PG_PASSWORD="${{ secrets.PG_PASSWORD }}"
             export PG_DATABASE="${{ secrets.PG_DATABASE }}"
             export JWT_SECRET="${{ secrets.JWT_SECRET }}"
+            export TAG="$TAG"
+            export GITHUB_OWNER_LC="$GITHUB_OWNER_LC"
+
+            # Verify environment variables
+            echo "Verifying environment variables..."
+            if [ -z "$PG_USER" ] || [ -z "$PG_DATABASE" ] || [ -z "$PG_PASSWORD" ] || [ -z "$JWT_SECRET" ] || [ -z "$GITHUB_OWNER_LC" ]; then
+              echo "Error: Missing required environment variables"
+              echo "PG_USER: ${PG_USER:+set}"
+              echo "PG_DATABASE: ${PG_DATABASE:+set}"
+              echo "PG_PASSWORD: ${PG_PASSWORD:+set}"
+              echo "JWT_SECRET: ${JWT_SECRET:+set}"
+              echo "GITHUB_OWNER_LC: ${GITHUB_OWNER_LC:+set}"
+              exit 1
+            fi
+
+            # Create .env file
+            cat > .env << 'EOL'
+            PG_USER=$PG_USER
+            PG_PASSWORD=$PG_PASSWORD
+            PG_DATABASE=$PG_DATABASE
+            JWT_SECRET=$JWT_SECRET
+            TAG=$TAG
+            GITHUB_OWNER_LC=$GITHUB_OWNER_LC
+            EOL
+
+            # Verify .env file
+            echo "Verifying .env file..."
+            cat .env
 
             # Login to GitHub Container Registry
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+            
+            # Verify GitHub Container Registry login
+            echo "Verifying GitHub Container Registry login..."
+            if ! docker pull ghcr.io/$GITHUB_OWNER_LC/mybudget-backend:$TAG; then
+              echo "Error: Failed to pull image from GitHub Container Registry"
+              echo "Checking image existence..."
+              docker images | grep "ghcr.io/$GITHUB_OWNER_LC/mybudget-backend:$TAG"
+              exit 1
+            fi
 
-            # Create compose files
+            # Create temporary compose files for each service
+            echo "Creating temporary compose files..."
+            
+            # Create database compose file
             cat > docker-compose.database.yml << 'EOL'
             version: '3.8'
             secrets:
@@ -418,34 +534,234 @@ jobs:
                     max-file: "5"
             EOL
 
-            # Deploy services
-            echo "Deploying database..."
+            # Проверка свободного места на диске
+            echo "Checking disk space..."
+            df -h
+            free_space=$(df --output=avail -k / | tail -1)
+            if [ "$free_space" -lt 2097152 ]; then
+              echo "Warning: Less than 2GB disk space available!"
+            fi
+
+            # Проверка docker compose config
+            echo "Verifying docker-compose.yml..."
+            docker compose config
+
+            # Deploy services one by one
+            echo "Deploying database service..."
             docker stack deploy -c docker-compose.database.yml backend --with-registry-auth
-            echo "Waiting for database to be ready..."
-            while ! docker service ls | grep -q "backend_database.*1/1"; do
-              sleep 5
-            done
+            sleep 30
 
-            echo "Deploying traefik..."
+            # Verify database service is running
+            echo "Verifying database service..."
+            if ! docker service ls | grep -q "backend_database"; then
+              echo "Error: Database service failed to deploy"
+              exit 1
+            fi
+
+            echo "Deploying traefik service..."
             docker stack deploy -c docker-compose.traefik.yml backend --with-registry-auth
-            echo "Waiting for traefik to be ready..."
-            while ! docker service ls | grep -q "backend_traefik.*1/1"; do
-              sleep 5
-            done
+            sleep 20
 
-            echo "Deploying backend..."
+            # Verify traefik service is running
+            echo "Verifying traefik service..."
+            if ! docker service ls | grep -q "backend_traefik"; then
+              echo "Error: Traefik service failed to deploy"
+              exit 1
+            fi
+
+            echo "Deploying backend service..."
             docker stack deploy -c docker-compose.backend.yml backend --with-registry-auth
-            echo "Waiting for backend to be ready..."
-            while ! docker service ls | grep -q "backend_backend.*2/2"; do
-              sleep 5
+            sleep 30
+
+            # Verify backend service is running
+            echo "Verifying backend service..."
+            if ! docker service ls | grep -q "backend_backend"; then
+              echo "Error: Backend service failed to deploy"
+              echo "Checking service status..."
+              docker service ls
+              echo "Checking stack status..."
+              docker stack ps backend --no-trunc
+              echo "Checking backend service logs..."
+              docker service logs backend_backend --tail 50 || true
+              echo "Checking backend service inspect..."
+              docker service inspect backend_backend || true
+              echo "Checking if image exists..."
+              docker images | grep "ghcr.io/$GITHUB_OWNER_LC/mybudget-backend:$TAG"
+              echo "Checking network connectivity..."
+              docker network inspect backend
+              docker network inspect public
+              exit 1
+            fi
+
+            # Wait for backend service to be ready
+            echo "Waiting for backend service to be ready..."
+            max_retries=30
+            retry_count=0
+            while [ $retry_count -lt $max_retries ]; do
+              if docker service ps backend_backend --format '{{.CurrentState}}' | grep -q "Running"; then
+                echo "Backend service is running"
+                break
+              fi
+              retry_count=$((retry_count + 1))
+              echo "Waiting for backend service... Attempt $retry_count of $max_retries"
+              docker service ps backend_backend --no-trunc
+              docker service logs backend_backend --tail 10
+              sleep 10
             done
 
-            # Verify services
-            for service in backend_database backend_traefik backend_backend; do
-              if ! docker service ls | grep -q "$service"; then
-                echo "Error: Service $service failed to deploy"
-                exit 1
+            if [ $retry_count -eq $max_retries ]; then
+              echo "Error: Backend service failed to start within the timeout period"
+              echo "Checking service status..."
+              docker service ls
+              echo "Checking stack status..."
+              docker stack ps backend --no-trunc
+              echo "Checking backend service logs..."
+              docker service logs backend_backend --tail 50
+              echo "Checking backend service inspect..."
+              docker service inspect backend_backend
+              exit 1
+            fi
+
+            # Clean up temporary files
+            rm docker-compose.database.yml docker-compose.traefik.yml docker-compose.backend.yml
+
+            # Check service status with more detail
+            echo "Checking service status with more detail..."
+            docker service ls
+
+            # Wait for database to be ready
+            echo "Waiting for database to be ready..."
+            max_retries=30
+            retry_count=0
+            while [ $retry_count -lt $max_retries ]; do
+              if docker service ps backend_database --format '{{.CurrentState}}' | grep -q "Running"; then
+                echo "Database service is running, checking connectivity..."
+                DB_CONTAINER=$(docker ps -q -f name=backend_database)
+                if [ -n "$DB_CONTAINER" ]; then
+                  if docker exec $DB_CONTAINER pg_isready -U postgres; then
+                    echo "Database is ready to accept connections"
+                    break
+                  fi
+                fi
               fi
+              retry_count=$((retry_count + 1))
+              echo "Waiting for database service... Attempt $retry_count of $max_retries"
+              sleep 10
+            done
+
+            if [ $retry_count -eq $max_retries ]; then
+              echo "Error: Database service failed to start within the timeout period"
+              echo "Checking database logs..."
+              docker service logs backend_database --tail 50
+              echo "Checking database container status..."
+              docker ps -a | grep backend_database
+              exit 1
+            fi
+
+            # Additional database checks
+            echo "Performing additional database checks..."
+            DB_CONTAINER=$(docker ps -q -f name=backend_database)
+            if [ -n "$DB_CONTAINER" ]; then
+              echo "Database container found: $DB_CONTAINER"
+              echo "Checking database environment..."
+              docker exec $DB_CONTAINER env | grep POSTGRES
+              echo "Checking database process list..."
+              docker exec $DB_CONTAINER ps aux
+              echo "Checking database logs..."
+              docker logs $DB_CONTAINER
+              echo "Testing database connection..."
+              docker exec $DB_CONTAINER psql -U postgres -c "\l"
+            else
+              echo "Database container not found"
+              exit 1
+            fi
+
+            # Check service status
+            for service in backend_database backend_traefik backend_backend; do
+              echo "Service: $service"
+              docker service ps $service --no-trunc
+              echo "Service logs:"
+              docker service logs $service --tail 50
+              echo "Service inspect:"
+              docker service inspect $service
+              echo "----------------------------------------"
+            done
+
+            # Check database logs specifically
+            echo "Checking database logs..."
+            DB_CONTAINER=$(docker ps -q -f name=backend_database)
+            if [ -n "$DB_CONTAINER" ]; then
+              echo "Database container found: $DB_CONTAINER"
+              docker logs $DB_CONTAINER
+              echo "Database container inspect:"
+              docker inspect $DB_CONTAINER
+              echo "Database environment:"
+              docker exec $DB_CONTAINER env
+              echo "Database process list:"
+              docker exec $DB_CONTAINER ps aux
+            else
+              echo "Database container not found"
+            fi
+
+            # Check if secrets are properly mounted
+            echo "Checking secrets..."
+            docker secret ls
+            for secret in backend_pg_user backend_pg_database backend_pg_password backend_app_secret; do
+              echo "Secret: $secret"
+              docker secret inspect $secret
+            done
+
+            # Check network connectivity
+            echo "Checking network connectivity..."
+            docker network inspect backend
+            docker network inspect public
+            
+            # Check if ports are open
+            echo "Checking if ports are open..."
+            if command -v netstat &> /dev/null; then
+              netstat -tulpn | grep -E '80|443' || true
+            else
+              echo "netstat not available, skipping port check"
+            fi
+            
+            # Verify health endpoints with more detailed output
+            echo "Verifying health endpoints..."
+            max_retries=5
+            retry_count=0
+            while [ $retry_count -lt $max_retries ]; do
+              echo "Attempt $((retry_count + 1)) of $max_retries"
+              if curl -v http://51.250.65.154/ping; then
+                echo "Health check passed"
+                break
+              fi
+              retry_count=$((retry_count + 1))
+              echo "Health check attempt $retry_count failed, retrying..."
+              sleep 10
+            done
+            
+            if [ $retry_count -eq $max_retries ]; then
+              echo "Error: Health check failed after $max_retries attempts"
+              echo "Checking service status one more time..."
+              docker service ls
+              docker stack ps backend --no-trunc
+              exit 1
+            fi
+            
+            # Check resource usage
+            echo "Checking resource usage..."
+            docker stats --no-stream
+            
+            # Final status with detailed information
+            echo "Deployment completed. Checking final status..."
+            echo "Stack services:"
+            docker stack services backend 
+            echo "Stack tasks:"
+            docker stack ps backend --no-trunc
+            echo "Service logs:"
+            for service in backend_database backend_traefik backend_backend; do
+              echo "Logs for $service:"
+              docker service logs $service --tail 50 || echo "No logs available for $service"
+              echo "----------------------------------------"
             done
 
             # Save logs
@@ -453,7 +769,15 @@ jobs:
             docker service logs backend_database --tail 10 > backend_database.log || true
             docker service logs backend_traefik --tail 10 > backend_traefik.log || true
 
-      - name: Download logs
+            # Выводим логи в stdout для GitHub Actions
+            echo "========== BACKEND LOGS =========="
+            cat backend_backend.log || echo "No backend_backend logs"
+            echo "========== DATABASE LOGS =========="
+            cat backend_database.log || echo "No backend_database logs"
+            echo "========== TRAEFIK LOGS =========="
+            cat backend_traefik.log || echo "No backend_traefik logs"
+
+      - name: Download logs from server
         if: always()
         run: |
           scp -i ${{ secrets.SERVER_SSH_KEY }} -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/opt/mybudget/backend/*.log .
