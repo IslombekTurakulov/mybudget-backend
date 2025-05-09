@@ -4,10 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4bbd917-8929-44b4-afda-19b441d6e48e" name="Changes" comment="MYBUDGETBACKEND-72: fix hikari and replicas">
-      <change beforePath="$PROJECT_DIR$/.github/workflows/quick-deploy.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/quick-deploy.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="c4bbd917-8929-44b4-afda-19b441d6e48e" name="Changes" comment="MYBUDGETBACKEND-73: fix deploy" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -217,22 +214,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1737229814397</updated>
-    </task>
-    <task id="LOCAL-00091" summary="MYBUDGETBACKEND-58: add local run, fix db, fix application config, fix deploy">
-      <option name="closed" value="true" />
-      <created>1746740104557</created>
-      <option name="number" value="00091" />
-      <option name="presentableId" value="LOCAL-00091" />
-      <option name="project" value="LOCAL" />
-      <updated>1746740104557</updated>
-    </task>
-    <task id="LOCAL-00092" summary="MYBUDGETBACKEND-58: fix deploy, add logs">
-      <option name="closed" value="true" />
-      <created>1746740513773</created>
-      <option name="number" value="00092" />
-      <option name="presentableId" value="LOCAL-00092" />
-      <option name="project" value="LOCAL" />
-      <updated>1746740513773</updated>
     </task>
     <task id="LOCAL-00093" summary="MYBUDGETBACKEND-59: fix deploy">
       <option name="closed" value="true" />
@@ -610,7 +591,23 @@
       <option name="project" value="LOCAL" />
       <updated>1746755901543</updated>
     </task>
-    <option name="localTasksCounter" value="140" />
+    <task id="LOCAL-00140" summary="MYBUDGETBACKEND-73: fix deploy">
+      <option name="closed" value="true" />
+      <created>1746756306956</created>
+      <option name="number" value="00140" />
+      <option name="presentableId" value="LOCAL-00140" />
+      <option name="project" value="LOCAL" />
+      <updated>1746756306956</updated>
+    </task>
+    <task id="LOCAL-00141" summary="MYBUDGETBACKEND-73: fix deploy">
+      <option name="closed" value="true" />
+      <created>1746756524587</created>
+      <option name="number" value="00141" />
+      <option name="presentableId" value="LOCAL-00141" />
+      <option name="project" value="LOCAL" />
+      <updated>1746756524587</updated>
+    </task>
+    <option name="localTasksCounter" value="142" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -625,7 +622,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="MYBUDGETBACKEND-55: fix dockerfile" />
     <MESSAGE value="MYBUDGETBACKEND-56: fix dockerfile" />
     <MESSAGE value="MYBUDGETBACKEND-57: fix deploy, change ip address" />
     <MESSAGE value="MYBUDGETBACKEND-58: add local run, fix db, fix application config, fix deploy" />
@@ -650,7 +646,8 @@
     <MESSAGE value="MYBUDGETBACKEND-71: fix formatting" />
     <MESSAGE value="MYBUDGETBACKEND-71: fix secrets check" />
     <MESSAGE value="MYBUDGETBACKEND-72: fix hikari and replicas" />
-    <option name="LAST_COMMIT_MESSAGE" value="MYBUDGETBACKEND-72: fix hikari and replicas" />
+    <MESSAGE value="MYBUDGETBACKEND-73: fix deploy" />
+    <option name="LAST_COMMIT_MESSAGE" value="MYBUDGETBACKEND-73: fix deploy" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
