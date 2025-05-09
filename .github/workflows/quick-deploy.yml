@@ -435,27 +435,31 @@ jobs:
                 secrets:
                   - backend_app_secret
                 labels:
+                  # Enable Traefik
                   - "traefik.enable=true"
+                  # Router configuration
                   - "traefik.http.routers.backend.rule=Host('51.250.65.154')"
                   - "traefik.http.routers.backend.entrypoints=web"
+                  - "traefik.http.routers.backend.priority=100"
+                  - "traefik.http.routers.backend.service=backend@docker"
+                  - "traefik.http.routers.backend.middlewares=cors"
+                  # Service configuration
                   - "traefik.http.services.backend.loadbalancer.server.port=8082"
+                  - "traefik.http.services.backend.loadbalancer.server.scheme=http"
+                  - "traefik.http.services.backend.loadbalancer.passHostHeader=true"
+                  # Health check configuration
+                  - "traefik.http.services.backend.loadbalancer.healthcheck.path=/ping"
+                  - "traefik.http.services.backend.loadbalancer.healthcheck.interval=10s"
+                  - "traefik.http.services.backend.loadbalancer.healthcheck.timeout=5s"
+                  # CORS configuration
                   - "traefik.http.middlewares.cors.headers.accessControlAllowMethods=GET,POST,PUT,DELETE,OPTIONS"
                   - "traefik.http.middlewares.cors.headers.accessControlAllowOriginList=*"
                   - "traefik.http.middlewares.cors.headers.accessControlAllowHeaders=*"
                   - "traefik.http.middlewares.cors.headers.accessControlAllowCredentials=true"
                   - "traefik.http.middlewares.cors.headers.accessControlMaxAge=100"
-                  - "traefik.http.routers.backend.middlewares=cors"
-                  - "traefik.http.services.backend.loadbalancer.passHostHeader=true"
-                  - "traefik.http.routers.backend.service=backend"
-                  - "traefik.http.services.backend.loadbalancer.healthcheck.path=/ping"
-                  - "traefik.http.services.backend.loadbalancer.healthcheck.interval=10s"
-                  - "traefik.http.services.backend.loadbalancer.healthcheck.timeout=5s"
+                  # Docker configuration
                   - "traefik.docker.network=backend_backend"
                   - "traefik.docker.lbswarm=true"
-                  - "traefik.http.routers.backend.priority=100"
-                  - "traefik.http.services.backend.loadbalancer.server.scheme=http"
-                  - "traefik.http.services.backend.loadbalancer.server.port=8082"
-                  - "traefik.http.routers.backend.service=backend@docker"
                 healthcheck:
                   test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8082/ping || exit 1"]
                   interval: 30s
