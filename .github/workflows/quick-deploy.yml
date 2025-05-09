@@ -453,7 +453,7 @@ jobs:
                   labels:
                     - "traefik.enable=true"
                     - "traefik.docker.network=backend_backend"
-                    - "traefik.http.routers.backend.rule=Host('51.250.65.154')"
+                    - "traefik.http.routers.backend.rule=Host(`51.250.65.154`)"
                     - "traefik.http.routers.backend.entrypoints=web"
                     - "traefik.http.services.backend.loadbalancer.server.port=8082"
                     # CORS middleware
