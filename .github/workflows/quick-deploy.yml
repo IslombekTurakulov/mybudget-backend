@@ -190,65 +190,71 @@ jobs:
             echo "Creating temporary compose files..."
             
             # Database service compose file
-            echo "secrets:" > docker-compose.database.yml
-            echo "  backend_pg_password:" >> docker-compose.database.yml
-            echo "    external: true" >> docker-compose.database.yml
-            echo "  backend_pg_user:" >> docker-compose.database.yml
-            echo "    external: true" >> docker-compose.database.yml
-            echo "  backend_pg_database:" >> docker-compose.database.yml
-            echo "    external: true" >> docker-compose.database.yml
-            echo "" >> docker-compose.database.yml
-            echo "networks:" >> docker-compose.database.yml
-            echo "  backend:" >> docker-compose.database.yml
-            echo "    name: backend" >> docker-compose.database.yml
-            echo "    external: true" >> docker-compose.database.yml
-            echo "    driver: overlay" >> docker-compose.database.yml
-            echo "    driver_opts:" >> docker-compose.database.yml
-            echo "      com.docker.network.driver.mtu: \"1400\"" >> docker-compose.database.yml
-            echo "" >> docker-compose.database.yml
-            echo "volumes:" >> docker-compose.database.yml
-            echo "  pg_data:" >> docker-compose.database.yml
-            echo "    name: backend_pg_data" >> docker-compose.database.yml
-            echo "" >> docker-compose.database.yml
-            echo "services:" >> docker-compose.database.yml
-            echo "  database:" >> docker-compose.database.yml
-            echo "    image: postgres:17-alpine" >> docker-compose.database.yml
-            echo "    networks:" >> docker-compose.database.yml
-            echo "      backend:" >> docker-compose.database.yml
-            echo "        ipv4_address: 10.0.1.2" >> docker-compose.database.yml
-            echo "    volumes:" >> docker-compose.database.yml
-            echo "      - pg_data:/var/lib/postgresql/data" >> docker-compose.database.yml
-            echo "    environment:" >> docker-compose.database.yml
-            echo "      POSTGRES_USER: $PG_USER" >> docker-compose.database.yml
-            echo "      POSTGRES_DB: $PG_DATABASE" >> docker-compose.database.yml
-            echo "      POSTGRES_PASSWORD: $PG_PASSWORD" >> docker-compose.database.yml
-            echo "      PGDATA: /var/lib/postgresql/data/pgdata" >> docker-compose.database.yml
-            echo "    user: postgres" >> docker-compose.database.yml
-            echo "    ports:" >> docker-compose.database.yml
-            echo "      - target: 5432" >> docker-compose.database.yml
-            echo "        published: 5432" >> docker-compose.database.yml
-            echo "        protocol: tcp" >> docker-compose.database.yml
-            echo "        mode: host" >> docker-compose.database.yml
-            echo "    secrets:" >> docker-compose.database.yml
-            echo "      - backend_pg_user" >> docker-compose.database.yml
-            echo "      - backend_pg_database" >> docker-compose.database.yml
-            echo "      - backend_pg_password" >> docker-compose.database.yml
-            echo "    healthcheck:" >> docker-compose.database.yml
-            echo "      test: [\"CMD-SHELL\", \"pg_isready -U postgres\"]" >> docker-compose.database.yml
-            echo "      interval: 10s" >> docker-compose.database.yml
-            echo "      timeout: 5s" >> docker-compose.database.yml
-            echo "      retries: 5" >> docker-compose.database.yml
-            echo "      start_period: 30s" >> docker-compose.database.yml
-            echo "    deploy:" >> docker-compose.database.yml
-            echo "      replicas: 1" >> docker-compose.database.yml
-            echo "      restart_policy:" >> docker-compose.database.yml
-            echo "        condition: on-failure" >> docker-compose.database.yml
-            echo "        max_attempts: 3" >> docker-compose.database.yml
-            echo "        window: 120s" >> docker-compose.database.yml
-            echo "      resources:" >> docker-compose.database.yml
-            echo "        limits:" >> docker-compose.database.yml
-            echo "          cpus: '0.5'" >> docker-compose.database.yml
-            echo "          memory: 1G" >> docker-compose.database.yml
+            {
+              echo "secrets:"
+              echo "  backend_pg_password:"
+              echo "    external: true"
+              echo "  backend_pg_user:"
+              echo "    external: true"
+              echo "  backend_pg_database:"
+              echo "    external: true"
+              echo ""
+              echo "networks:"
+              echo "  backend:"
+              echo "    name: backend"
+              echo "    external: true"
+              echo "    driver: overlay"
+              echo "    driver_opts:"
+              echo "      com.docker.network.driver.mtu: \"1400\""
+              echo ""
+              echo "volumes:"
+              echo "  pg_data:"
+              echo "    name: backend_pg_data"
+              echo ""
+              echo "services:"
+              echo "  database:"
+              echo "    image: postgres:17-alpine"
+              echo "    networks:"
+              echo "      backend:"
+              echo "        ipv4_address: 10.0.1.2"
+              echo "    volumes:"
+              echo "      - pg_data:/var/lib/postgresql/data"
+              echo "    environment:"
+              echo "      POSTGRES_USER: \"$PG_USER\""
+              echo "      POSTGRES_DB: \"$PG_DATABASE\""
+              echo "      POSTGRES_PASSWORD: \"$PG_PASSWORD\""
+              echo "      PGDATA: /var/lib/postgresql/data/pgdata"
+              echo "    user: postgres"
+              echo "    ports:"
+              echo "      - target: 5432"
+              echo "        published: 5432"
+              echo "        protocol: tcp"
+              echo "        mode: host"
+              echo "    secrets:"
+              echo "      - backend_pg_user"
+              echo "      - backend_pg_database"
+              echo "      - backend_pg_password"
+              echo "    healthcheck:"
+              echo "      test: [\"CMD-SHELL\", \"pg_isready -U postgres\"]"
+              echo "      interval: 10s"
+              echo "      timeout: 5s"
+              echo "      retries: 5"
+              echo "      start_period: 30s"
+              echo "    deploy:"
+              echo "      replicas: 1"
+              echo "      restart_policy:"
+              echo "        condition: on-failure"
+              echo "        max_attempts: 3"
+              echo "        window: 120s"
+              echo "      resources:"
+              echo "        limits:"
+              echo "          cpus: '0.5'"
+              echo "          memory: 1G"
+            } > docker-compose.database.yml
+
+            # Verify the database compose file
+            echo "Verifying database compose file..."
+            cat docker-compose.database.yml
 
             # Traefik service compose file
             echo "secrets:" > docker-compose.traefik.yml
@@ -335,6 +341,7 @@ jobs:
             echo "      SPRING_SECURITY_CORS_ALLOWED_ORIGINS: \"*\"" >> docker-compose.backend.yml
             echo "      SPRING_SECURITY_CORS_ALLOWED_METHODS: \"GET,POST,PUT,DELETE,OPTIONS\"" >> docker-compose.backend.yml
             echo "      SPRING_SECURITY_CORS_ALLOWED_HEADERS: \"*\"" >> docker-compose.backend.yml
+            echo "      SPRING_SECURITY_CORS_ALLOW_CREDENTIALS: \"true\"" >> docker-compose.backend.yml
             echo "      SPRING_SECURITY_CORS_ALLOW_CREDENTIALS: \"true\"" >> docker-compose.backend.yml
             echo "    ports:" >> docker-compose.backend.yml
             echo "      - target: 8082" >> docker-compose.backend.yml
