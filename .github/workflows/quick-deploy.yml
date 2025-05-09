@@ -381,7 +381,6 @@ jobs:
                     parallelism: 1
                     delay: 15s
                     order: start-first
-                    failure_action: rollback
                   rollback_config:
                     parallelism: 1
                     delay: 15s
@@ -402,16 +401,37 @@ jobs:
 
             # Deploy services one by one
             echo "Deploying database service..."
-            docker stack deploy -c docker-compose.database.yml backend --with-registry-auth --prune
+            docker stack deploy -c docker-compose.database.yml backend --with-registry-auth
             sleep 30
+
+            # Verify database service is running
+            echo "Verifying database service..."
+            if ! docker service ls | grep -q "backend_database"; then
+              echo "Error: Database service failed to deploy"
+              exit 1
+            fi
 
             echo "Deploying traefik service..."
-            docker stack deploy -c docker-compose.traefik.yml backend --with-registry-auth --prune
+            docker stack deploy -c docker-compose.traefik.yml backend --with-registry-auth
             sleep 20
 
+            # Verify traefik service is running
+            echo "Verifying traefik service..."
+            if ! docker service ls | grep -q "backend_traefik"; then
+              echo "Error: Traefik service failed to deploy"
+              exit 1
+            fi
+
             echo "Deploying backend service..."
-            docker stack deploy -c docker-compose.backend.yml backend --with-registry-auth --prune
+            docker stack deploy -c docker-compose.backend.yml backend --with-registry-auth
             sleep 30
+
+            # Verify backend service is running
+            echo "Verifying backend service..."
+            if ! docker service ls | grep -q "backend_backend"; then
+              echo "Error: Backend service failed to deploy"
+              exit 1
+            fi
 
             # Clean up temporary files
             rm docker-compose.database.yml docker-compose.traefik.yml docker-compose.backend.yml
@@ -433,6 +453,11 @@ jobs:
               echo "Waiting for database service... Attempt $retry_count of $max_retries"
               sleep 10
             done
+
+            if [ $retry_count -eq $max_retries ]; then
+              echo "Error: Database service failed to start within the timeout period"
+              exit 1
+            fi
 
             # Check service status
             for service in backend_database backend_traefik backend_backend; do

@@ -217,22 +217,6 @@
       <option name="presentableId" value="Default" />
       <updated>1737229814397</updated>
     </task>
-    <task id="LOCAL-00077" summary="MYBUDGETBACKEND-54: fix pg volumes">
-      <option name="closed" value="true" />
-      <created>1746604157195</created>
-      <option name="number" value="00077" />
-      <option name="presentableId" value="LOCAL-00077" />
-      <option name="project" value="LOCAL" />
-      <updated>1746604157195</updated>
-    </task>
-    <task id="LOCAL-00078" summary="MYBUDGETBACKEND-54: fix pg volumes">
-      <option name="closed" value="true" />
-      <created>1746604353486</created>
-      <option name="number" value="00078" />
-      <option name="presentableId" value="LOCAL-00078" />
-      <option name="project" value="LOCAL" />
-      <updated>1746604353486</updated>
-    </task>
     <task id="LOCAL-00079" summary="MYBUDGETBACKEND-54: fix pg volumes">
       <option name="closed" value="true" />
       <created>1746604482492</created>
@@ -609,7 +593,23 @@
       <option name="project" value="LOCAL" />
       <updated>1746749491457</updated>
     </task>
-    <option name="localTasksCounter" value="126" />
+    <task id="LOCAL-00126" summary="MYBUDGETBACKEND-68: fix deploy to start database docker">
+      <option name="closed" value="true" />
+      <created>1746749678644</created>
+      <option name="number" value="00126" />
+      <option name="presentableId" value="LOCAL-00126" />
+      <option name="project" value="LOCAL" />
+      <updated>1746749678644</updated>
+    </task>
+    <task id="LOCAL-00127" summary="MYBUDGETBACKEND-68: fix deploy to start database docker">
+      <option name="closed" value="true" />
+      <created>1746749782370</created>
+      <option name="number" value="00127" />
+      <option name="presentableId" value="LOCAL-00127" />
+      <option name="project" value="LOCAL" />
+      <updated>1746749782370</updated>
+    </task>
+    <option name="localTasksCounter" value="128" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
