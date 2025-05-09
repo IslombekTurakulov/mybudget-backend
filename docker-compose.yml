@@ -14,9 +14,15 @@ networks:
   backend:
     name: backend
     external: true
+    driver: overlay
+    driver_opts:
+      com.docker.network.driver.mtu: "1400"
   public:
     name: public
     external: true
+    driver: overlay
+    driver_opts:
+      com.docker.network.driver.mtu: "1400"
 
 volumes:
   pg_data:
@@ -28,7 +34,8 @@ services:
   database:
     image: postgres:17-alpine
     networks:
-      - backend
+      backend:
+        ipv4_address: 10.0.1.2
     volumes:
       - pg_data:/var/lib/postgresql/data
     environment:
@@ -86,7 +93,8 @@ services:
       - "80:80"
       - "8080:8080"
     networks:
-      - public
+      public:
+        ipv4_address: 10.0.2.2
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     deploy:
@@ -108,8 +116,10 @@ services:
   backend:
     image: ghcr.io/islombekturakulov/mybudget-backend:${TAG}
     networks:
-      - backend
-      - public
+      backend:
+        ipv4_address: 10.0.1.3
+      public:
+        ipv4_address: 10.0.2.3
     depends_on:
       database:
         condition: service_healthy

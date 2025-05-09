@@ -126,12 +126,28 @@ jobs:
             echo "Verifying secrets..."
             docker secret ls
 
+            # Set variables from GitHub Actions context
+            GITHUB_OWNER="${{ github.repository_owner }}"
+            GITHUB_OWNER_LC=$(echo "$GITHUB_OWNER" | tr '[:upper:]' '[:lower:]')
+            TAG="${{ github.event.inputs.image_tag }}"
+            
+            # Validate and format image tag
+            if [ -z "$TAG" ]; then
+              TAG="latest"
+            fi
+            # Remove any invalid characters from tag
+            TAG=$(echo "$TAG" | tr -cd '[:alnum:]._-')
+            
+            echo "GITHUB_OWNER=$GITHUB_OWNER"
+            echo "GITHUB_OWNER_LC=$GITHUB_OWNER_LC"
+            echo "TAG=$TAG"
+
             # Export environment variables
             export PG_USER="${{ secrets.PG_USER }}"
             export PG_PASSWORD="${{ secrets.PG_PASSWORD }}"
             export PG_DATABASE="${{ secrets.PG_DATABASE }}"
             export JWT_SECRET="${{ secrets.JWT_SECRET }}"
-            export TAG="${{ github.event.inputs.image_tag }}"
+            export TAG="$TAG"
 
             # Verify environment variables
             echo "Verifying environment variables..."
@@ -158,6 +174,18 @@ jobs:
             
             # Create docker-compose.yml with correct configuration
             cat > docker-compose.yml << EOL
+            version: '3.8'
+            
+            secrets:
+              backend_pg_password:
+                external: true
+              backend_app_secret:
+                external: true
+              backend_pg_user:
+                external: true
+              backend_pg_database:
+                external: true
+            
             networks:
               backend:
                 name: backend
@@ -165,54 +193,12 @@ jobs:
               public:
                 name: public
                 external: true
-
-            secrets:
-              backend_pg_user:
-                external: true
-              backend_pg_password:
-                external: true
-              backend_pg_database:
-                external: true
-              backend_app_secret:
-                external: true
-
+            
             volumes:
               pg_data:
-              letsencrypt:
-              traefik_logs:
-
+                name: backend_pg_data
+            
             services:
-              traefik:
-                image: traefik:v2.10
-                command:
-                  - "--api.insecure=true"
-                  - "--providers.docker=true"
-                  - "--providers.docker.swarmMode=true"
-                  - "--providers.docker.exposedbydefault=false"
-                  - "--entrypoints.web.address=:80"
-                ports:
-                  - "80:80"
-                  - "8080:8080"
-                networks:
-                  - public
-                volumes:
-                  - /var/run/docker.sock:/var/run/docker.sock:ro
-                deploy:
-                  placement:
-                    constraints:
-                      - node.role == manager
-                  restart_policy:
-                    condition: on-failure
-                  resources:
-                    limits:
-                      cpus: '0.5'
-                      memory: 512M
-                logging:
-                  driver: json-file
-                  options:
-                    max-size: "10m"
-                    max-file: "3"
-
               database:
                 image: postgres:17-alpine
                 networks:
@@ -225,8 +211,8 @@ jobs:
                   POSTGRES_PASSWORD_FILE: /run/secrets/backend_pg_password
                   PGDATA: /var/lib/postgresql/data/pgdata
                 user: postgres
-                expose:
-                  - "5432"
+                ports:
+                  - "5432:5432"
                 secrets:
                   - backend_pg_user
                   - backend_pg_database
@@ -260,14 +246,47 @@ jobs:
                   options:
                     max-size: "10m"
                     max-file: "3"
-
+                command: ["postgres", "-c", "log_statement=all", "-c", "log_connections=on", "-c", "log_disconnections=on"]
+            
+              traefik:
+                image: traefik:v2.10
+                command:
+                  - "--api.insecure=true"
+                  - "--providers.docker=true"
+                  - "--providers.docker.swarmMode=true"
+                  - "--providers.docker.exposedbydefault=false"
+                  - "--entrypoints.web.address=:80"
+                ports:
+                  - "80:80"
+                  - "8080:8080"
+                networks:
+                  - public
+                volumes:
+                  - /var/run/docker.sock:/var/run/docker.sock:ro
+                deploy:
+                  placement:
+                    constraints:
+                      - node.role == manager
+                  restart_policy:
+                    condition: on-failure
+                  resources:
+                    limits:
+                      cpus: '0.5'
+                      memory: 512M
+                logging:
+                  driver: json-file
+                  options:
+                    max-size: "10m"
+                    max-file: "3"
+            
               backend:
                 image: ghcr.io/\${GITHUB_OWNER_LC}/mybudget-backend:\${TAG}
                 networks:
                   - backend
                   - public
                 depends_on:
-                  - database
+                  database:
+                    condition: service_healthy
                 environment:
                   PG_USER: \${PG_USER}
                   PG_PASSWORD: \${PG_PASSWORD}
@@ -280,8 +299,8 @@ jobs:
                   SPRING_SECURITY_CORS_ALLOWED_METHODS: "GET,POST,PUT,DELETE,OPTIONS"
                   SPRING_SECURITY_CORS_ALLOWED_HEADERS: "*"
                   SPRING_SECURITY_CORS_ALLOW_CREDENTIALS: "true"
-                expose:
-                  - "8082"
+                ports:
+                  - "8082:8082"
                 secrets:
                   - backend_app_secret
                 labels:
