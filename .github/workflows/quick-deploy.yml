@@ -208,7 +208,7 @@ jobs:
             fi
 
             # Create .env file
-            cat > .env << EOL
+            cat > .env << 'EOL'
             PG_USER=$PG_USER
             PG_PASSWORD=$PG_PASSWORD
             PG_DATABASE=$PG_DATABASE
@@ -238,6 +238,8 @@ jobs:
             
             # Create database compose file
             cat > docker-compose.database.yml << 'EOL'
+            version: '3.8'
+
             secrets:
               backend_pg_password:
                 external: true
@@ -321,11 +323,7 @@ jobs:
                 command: ["postgres", "-c", "log_statement=all", "-c", "log_connections=on", "-c", "log_disconnections=on"]
             EOL
 
-            # Verify the database compose file
-            echo "Verifying database compose file..."
-            cat docker-compose.database.yml
-
-            # Traefik service compose file
+            # Create traefik compose file
             cat > docker-compose.traefik.yml << 'EOL'
             version: '3.8'
 
@@ -411,8 +409,8 @@ jobs:
                     max-file: "5"
             EOL
 
-            # Backend service compose file
-            cat > docker-compose.backend.yml << EOL
+            # Create backend compose file
+            cat > docker-compose.backend.yml << 'EOL'
             version: '3.8'
 
             secrets:
