@@ -267,9 +267,9 @@ jobs:
               echo "    volumes:"
               echo "      - pg_data:/var/lib/postgresql/data"
               echo "    environment:"
-              echo "      POSTGRES_USER: \"$PG_USER\""
-              echo "      POSTGRES_DB: \"$PG_DATABASE\""
-              echo "      POSTGRES_PASSWORD: \"$PG_PASSWORD\""
+              echo "      POSTGRES_USER_FILE: /run/secrets/backend_pg_user"
+              echo "      POSTGRES_DB_FILE: /run/secrets/backend_pg_database"
+              echo "      POSTGRES_PASSWORD_FILE: /run/secrets/backend_pg_password"
               echo "      PGDATA: /var/lib/postgresql/data/pgdata"
               echo "    user: postgres"
               echo "    ports:"
@@ -297,6 +297,20 @@ jobs:
               echo "        limits:"
               echo "          cpus: '0.5'"
               echo "          memory: 1G"
+              echo "      update_config:"
+              echo "        parallelism: 1"
+              echo "        delay: 10s"
+              echo "        order: start-first"
+              echo "      rollback_config:"
+              echo "        parallelism: 1"
+              echo "        delay: 10s"
+              echo "        order: start-first"
+              echo "    logging:"
+              echo "      driver: json-file"
+              echo "      options:"
+              echo "        max-size: \"10m\""
+              echo "        max-file: \"3\""
+              echo "    command: [\"postgres\", \"-c\", \"log_statement=all\", \"-c\", \"log_connections=on\", \"-c\", \"log_disconnections=on\"]"
             } > docker-compose.database.yml
 
             # Verify the database compose file
@@ -384,7 +398,7 @@ jobs:
               echo "      PG_USER: \"$PG_USER\""
               echo "      PG_PASSWORD: \"$PG_PASSWORD\""
               echo "      PG_DATABASE: \"$PG_DATABASE\""
-              echo "      DATABASE_URL: \"jdbc:postgresql://database:5432/$PG_DATABASE?reconnect=true&connectTimeout=30\""
+              echo "      DATABASE_URL: \"jdbc:postgresql://database:5432/$PG_DATABASE?reconnect=true&connectTimeout=30&socketTimeout=30&tcpKeepAlive=true\""
               echo "      JWT_SECRET: \"$JWT_SECRET\""
               echo "      SPRING_PROFILES_ACTIVE: prod"
               echo "      SERVER_PORT: 8082"
@@ -397,6 +411,8 @@ jobs:
               echo "      SPRING_DATASOURCE_HIKARI_MINIMUM_IDLE: 1"
               echo "      SPRING_DATASOURCE_HIKARI_IDLE_TIMEOUT: 300000"
               echo "      SPRING_DATASOURCE_HIKARI_MAX_LIFETIME: 1200000"
+              echo "      SPRING_DATASOURCE_HIKARI_VALIDATION_TIMEOUT: 5000"
+              echo "      SPRING_DATASOURCE_HIKARI_LEAK_DETECTION_THRESHOLD: 60000"
               echo "    ports:"
               echo "      - target: 8082"
               echo "        published: 8082"
@@ -437,10 +453,16 @@ jobs:
               echo "        parallelism: 1"
               echo "        delay: 15s"
               echo "        order: start-first"
+              echo "        failure_action: rollback"
               echo "      rollback_config:"
               echo "        parallelism: 1"
               echo "        delay: 15s"
               echo "        order: start-first"
+              echo "    logging:"
+              echo "      driver: json-file"
+              echo "      options:"
+              echo "        max-size: \"10m\""
+              echo "        max-file: \"3\""
             } > docker-compose.backend.yml
 
             # Проверка свободного места на диске
@@ -544,8 +566,14 @@ jobs:
             retry_count=0
             while [ $retry_count -lt $max_retries ]; do
               if docker service ps backend_database --format '{{.CurrentState}}' | grep -q "Running"; then
-                echo "Database service is running"
-                break
+                echo "Database service is running, checking connectivity..."
+                DB_CONTAINER=$(docker ps -q -f name=backend_database)
+                if [ -n "$DB_CONTAINER" ]; then
+                  if docker exec $DB_CONTAINER pg_isready -U postgres; then
+                    echo "Database is ready to accept connections"
+                    break
+                  fi
+                fi
               fi
               retry_count=$((retry_count + 1))
               echo "Waiting for database service... Attempt $retry_count of $max_retries"
@@ -554,6 +582,28 @@ jobs:
 
             if [ $retry_count -eq $max_retries ]; then
               echo "Error: Database service failed to start within the timeout period"
+              echo "Checking database logs..."
+              docker service logs backend_database --tail 50
+              echo "Checking database container status..."
+              docker ps -a | grep backend_database
+              exit 1
+            fi
+
+            # Additional database checks
+            echo "Performing additional database checks..."
+            DB_CONTAINER=$(docker ps -q -f name=backend_database)
+            if [ -n "$DB_CONTAINER" ]; then
+              echo "Database container found: $DB_CONTAINER"
+              echo "Checking database environment..."
+              docker exec $DB_CONTAINER env | grep POSTGRES
+              echo "Checking database process list..."
+              docker exec $DB_CONTAINER ps aux
+              echo "Checking database logs..."
+              docker logs $DB_CONTAINER
+              echo "Testing database connection..."
+              docker exec $DB_CONTAINER psql -U postgres -c "\l"
+            else
+              echo "Database container not found"
               exit 1
             fi
 
