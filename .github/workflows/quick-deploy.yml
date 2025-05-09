@@ -362,12 +362,17 @@ jobs:
             echo "Verifying docker-compose.yml..."
             docker compose config
 
-            # Deploy stack with debug output
-            echo "Deploying stack..."
-            docker stack deploy -c docker-compose.yml backend --with-registry-auth --prune
+            # Deploy services one by one
+            echo "Deploying database service..."
+            docker stack deploy -c <(cat docker-compose.yml | sed '/^  traefik:/,$d') backend --with-registry-auth --prune
+            sleep 30
 
-            # Wait for services to start
-            echo "Waiting for services to start..."
+            echo "Deploying traefik service..."
+            docker stack deploy -c <(cat docker-compose.yml | sed '/^  database:/,/^  traefik:/d' | sed '/^  backend:/,$d') backend --with-registry-auth --prune
+            sleep 20
+
+            echo "Deploying backend service..."
+            docker stack deploy -c <(cat docker-compose.yml | sed '/^  database:/,/^  backend:/d') backend --with-registry-auth --prune
             sleep 30
 
             # Check service status with more detail
