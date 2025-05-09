@@ -85,6 +85,438 @@ jobs:
             sudo chown -R $USER:$USER /opt/mybudget/backend
             cd /opt/mybudget/backend
 
+            # Create monitoring directory
+            mkdir -p monitoring/grafana/provisioning/dashboards
+            mkdir -p monitoring/grafana/dashboards
+
+            # Copy monitoring files
+            cat > monitoring/prometheus.yml << 'EOL'
+            global:
+              scrape_interval: 15s
+              evaluation_interval: 15s
+
+            scrape_configs:
+              - job_name: 'prometheus'
+                static_configs:
+                  - targets: ['localhost:9090']
+
+              - job_name: 'backend'
+                static_configs:
+                  - targets: ['backend:8080']
+                metrics_path: '/actuator/prometheus'
+
+              - job_name: 'postgres'
+                static_configs:
+                  - targets: ['postgres:9187']
+                metrics_path: '/metrics'
+
+              - job_name: 'traefik'
+                static_configs:
+                  - targets: ['traefik:8080']
+                metrics_path: '/metrics'
+            EOL
+
+            cat > monitoring/grafana/provisioning/dashboards/dashboards.yml << 'EOL'
+            apiVersion: 1
+
+            providers:
+              - name: 'Default'
+                orgId: 1
+                folder: ''
+                type: file
+                disableDeletion: false
+                editable: true
+                options:
+                  path: /var/lib/grafana/dashboards
+            EOL
+
+            cat > monitoring/grafana/dashboards/backend.json << 'EOL'
+            {
+              "annotations": {
+                "list": []
+              },
+              "editable": true,
+              "fiscalYearStartMonth": 0,
+              "graphTooltip": 0,
+              "links": [],
+              "liveNow": false,
+              "panels": [
+                {
+                  "datasource": {
+                    "type": "prometheus",
+                    "uid": "prometheus"
+                  },
+                  "fieldConfig": {
+                    "defaults": {
+                      "color": {
+                        "mode": "palette-classic"
+                      },
+                      "custom": {
+                        "axisCenteredZero": false,
+                        "axisColorMode": "text",
+                        "axisLabel": "",
+                        "axisPlacement": "auto",
+                        "barAlignment": 0,
+                        "drawStyle": "line",
+                        "fillOpacity": 10,
+                        "gradientMode": "none",
+                        "hideFrom": {
+                          "legend": false,
+                          "tooltip": false,
+                          "viz": false
+                        },
+                        "lineInterpolation": "linear",
+                        "lineWidth": 1,
+                        "pointSize": 5,
+                        "scaleDistribution": {
+                          "type": "linear"
+                        },
+                        "showPoints": "never",
+                        "spanNulls": false,
+                        "stacking": {
+                          "group": "A",
+                          "mode": "none"
+                        },
+                        "thresholdsStyle": {
+                          "mode": "off"
+                        }
+                      },
+                      "mappings": [],
+                      "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                          {
+                            "color": "green",
+                            "value": null
+                          }
+                        ]
+                      },
+                      "unit": "short"
+                    },
+                    "overrides": []
+                  },
+                  "gridPos": {
+                    "h": 8,
+                    "w": 12,
+                    "x": 0,
+                    "y": 0
+                  },
+                  "id": 1,
+                  "options": {
+                    "legend": {
+                      "calcs": [],
+                      "displayMode": "list",
+                      "placement": "bottom",
+                      "showLegend": true
+                    },
+                    "tooltip": {
+                      "mode": "single",
+                      "sort": "none"
+                    }
+                  },
+                  "targets": [
+                    {
+                      "datasource": {
+                        "type": "prometheus",
+                        "uid": "prometheus"
+                      },
+                      "expr": "rate(http_server_requests_seconds_count{job=\"backend\"}[5m])",
+                      "refId": "A"
+                    }
+                  ],
+                  "title": "HTTP Request Rate",
+                  "type": "timeseries"
+                },
+                {
+                  "datasource": {
+                    "type": "prometheus",
+                    "uid": "prometheus"
+                  },
+                  "fieldConfig": {
+                    "defaults": {
+                      "color": {
+                        "mode": "palette-classic"
+                      },
+                      "custom": {
+                        "axisCenteredZero": false,
+                        "axisColorMode": "text",
+                        "axisLabel": "",
+                        "axisPlacement": "auto",
+                        "barAlignment": 0,
+                        "drawStyle": "line",
+                        "fillOpacity": 10,
+                        "gradientMode": "none",
+                        "hideFrom": {
+                          "legend": false,
+                          "tooltip": false,
+                          "viz": false
+                        },
+                        "lineInterpolation": "linear",
+                        "lineWidth": 1,
+                        "pointSize": 5,
+                        "scaleDistribution": {
+                          "type": "linear"
+                        },
+                        "showPoints": "never",
+                        "spanNulls": false,
+                        "stacking": {
+                          "group": "A",
+                          "mode": "none"
+                        },
+                        "thresholdsStyle": {
+                          "mode": "off"
+                        }
+                      },
+                      "mappings": [],
+                      "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                          {
+                            "color": "green",
+                            "value": null
+                          }
+                        ]
+                      },
+                      "unit": "s"
+                    },
+                    "overrides": []
+                  },
+                  "gridPos": {
+                    "h": 8,
+                    "w": 12,
+                    "x": 12,
+                    "y": 0
+                  },
+                  "id": 2,
+                  "options": {
+                    "legend": {
+                      "calcs": [],
+                      "displayMode": "list",
+                      "placement": "bottom",
+                      "showLegend": true
+                    },
+                    "tooltip": {
+                      "mode": "single",
+                      "sort": "none"
+                    }
+                  },
+                  "targets": [
+                    {
+                      "datasource": {
+                        "type": "prometheus",
+                        "uid": "prometheus"
+                      },
+                      "expr": "rate(http_server_requests_seconds_sum{job=\"backend\"}[5m]) / rate(http_server_requests_seconds_count{job=\"backend\"}[5m])",
+                      "refId": "A"
+                    }
+                  ],
+                  "title": "Average Response Time",
+                  "type": "timeseries"
+                }
+              ],
+              "refresh": "5s",
+              "schemaVersion": 38,
+              "style": "dark",
+              "tags": [],
+              "templating": {
+                "list": []
+              },
+              "time": {
+                "from": "now-6h",
+                "to": "now"
+              },
+              "timepicker": {},
+              "timezone": "",
+              "title": "Backend Monitoring",
+              "uid": "backend",
+              "version": 1,
+              "weekStart": ""
+            }
+            EOL
+
+            cat > monitoring/docker-compose.monitoring.yml << 'EOL'
+            version: '3.8'
+
+            networks:
+              backend_backend:
+                name: backend_backend
+                external: true
+                driver: overlay
+                driver_opts:
+                  com.docker.network.driver.mtu: "1400"
+              backend_public:
+                name: backend_public
+                external: true
+                driver: overlay
+                driver_opts:
+                  com.docker.network.driver.mtu: "1400"
+
+            volumes:
+              prometheus_data:
+                name: backend_prometheus_data
+              grafana_data:
+                name: backend_grafana_data
+
+            services:
+              prometheus:
+                image: prom/prometheus:v2.45.0
+                networks:
+                  backend_backend:
+                    ipv4_address: 10.0.1.10
+                  backend_public:
+                    ipv4_address: 10.0.2.10
+                volumes:
+                  - prometheus_data:/prometheus
+                  - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+                command:
+                  - '--config.file=/etc/prometheus/prometheus.yml'
+                  - '--storage.tsdb.path=/prometheus'
+                  - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+                  - '--web.console.templates=/usr/share/prometheus/consoles'
+                  - '--web.enable-lifecycle'
+                ports:
+                  - target: 9090
+                    published: 9090
+                    protocol: tcp
+                    mode: host
+                deploy:
+                  labels:
+                    - "traefik.enable=true"
+                    - "traefik.docker.network=backend_backend"
+                    - "traefik.http.routers.prometheus.rule=Host(`51.250.65.154`) && PathPrefix(`/prometheus`)"
+                    - "traefik.http.routers.prometheus.entrypoints=web"
+                    - "traefik.http.services.prometheus.loadbalancer.server.port=9090"
+                  placement:
+                    constraints:
+                      - node.role == manager
+                  restart_policy:
+                    condition: on-failure
+                    max_attempts: 3
+                    window: 120s
+                  resources:
+                    limits:
+                      cpus: '1.0'
+                      memory: 1G
+                    reservations:
+                      cpus: '0.5'
+                      memory: 512M
+                  update_config:
+                    parallelism: 1
+                    delay: 10s
+                    order: start-first
+                  rollback_config:
+                    parallelism: 1
+                    delay: 10s
+                    order: start-first
+                logging:
+                  driver: json-file
+                  options:
+                    max-size: "100m"
+                    max-file: "5"
+
+              grafana:
+                image: grafana/grafana:10.2.0
+                networks:
+                  backend_backend:
+                    ipv4_address: 10.0.1.11
+                  backend_public:
+                    ipv4_address: 10.0.2.11
+                volumes:
+                  - grafana_data:/var/lib/grafana
+                  - ./grafana/provisioning:/etc/grafana/provisioning
+                  - ./grafana/dashboards:/var/lib/grafana/dashboards
+                environment:
+                  - GF_SECURITY_ADMIN_USER=admin
+                  - GF_SECURITY_ADMIN_PASSWORD=admin
+                  - GF_USERS_ALLOW_SIGN_UP=false
+                  - GF_INSTALL_PLUGINS=grafana-piechart-panel,grafana-worldmap-panel
+                ports:
+                  - target: 3000
+                    published: 3000
+                    protocol: tcp
+                    mode: host
+                deploy:
+                  labels:
+                    - "traefik.enable=true"
+                    - "traefik.docker.network=backend_backend"
+                    - "traefik.http.routers.grafana.rule=Host(`51.250.65.154`) && PathPrefix(`/grafana`)"
+                    - "traefik.http.routers.grafana.entrypoints=web"
+                    - "traefik.http.services.grafana.loadbalancer.server.port=3000"
+                  placement:
+                    constraints:
+                      - node.role == manager
+                  restart_policy:
+                    condition: on-failure
+                    max_attempts: 3
+                    window: 120s
+                  resources:
+                    limits:
+                      cpus: '1.0'
+                      memory: 1G
+                    reservations:
+                      cpus: '0.5'
+                      memory: 512M
+                  update_config:
+                    parallelism: 1
+                    delay: 10s
+                    order: start-first
+                  rollback_config:
+                    parallelism: 1
+                    delay: 10s
+                    order: start-first
+                logging:
+                  driver: json-file
+                  options:
+                    max-size: "100m"
+                    max-file: "5"
+            EOL
+
+            # Deploy monitoring stack
+            echo "Deploying monitoring stack..."
+            cd monitoring
+            docker stack deploy -c docker-compose.monitoring.yml monitoring
+
+            # Wait for monitoring services to be ready
+            echo "Waiting for monitoring services to be ready..."
+            for service in monitoring_prometheus monitoring_grafana; do
+              max_retries=30
+              retry_count=0
+              while [ $retry_count -lt $max_retries ]; do
+                if docker service ps $service --format '{{.CurrentState}}' | grep -q "Running"; then
+                  echo "Service $service is running"
+                  break
+                fi
+                retry_count=$((retry_count + 1))
+                echo "Waiting for $service... Attempt $retry_count of $max_retries"
+                sleep 10
+              done
+
+              if [ $retry_count -eq $max_retries ]; then
+                echo "Error: Service $service failed to start within the timeout period"
+                echo "Checking service status..."
+                docker service ls
+                echo "Checking stack status..."
+                docker stack ps monitoring --no-trunc
+                echo "Checking service logs..."
+                docker service logs $service --tail 50
+                exit 1
+              fi
+            done
+
+            # Save monitoring logs
+            echo "Saving monitoring logs..."
+            docker service logs monitoring_prometheus --tail 50 > prometheus.log || true
+            docker service logs monitoring_grafana --tail 50 > grafana.log || true
+
+            # Display monitoring logs
+            echo "========== PROMETHEUS LOGS =========="
+            cat prometheus.log || echo "No prometheus logs available"
+            echo "========== GRAFANA LOGS =========="
+            cat grafana.log || echo "No grafana logs available"
+
+            # Return to backend directory
+            cd ..
+
             # Initialize Docker Swarm if needed
             echo "Checking Docker Swarm status..."
             if ! docker info | grep -q "Swarm: active"; then
@@ -613,11 +1045,3 @@ jobs:
           # Upload logs as artifact
           echo "Uploading logs as artifact..."
           tar -czf deployment_logs.tar.gz logs/
-          
-      - name: Upload logs artifact
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: deployment-logs-${{ github.run_number }}
-          path: deployment_logs.tar.gz
-          retention-days: 7
