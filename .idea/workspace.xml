@@ -4,8 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4bbd917-8929-44b4-afda-19b441d6e48e" name="Changes" comment="MYBUDGETBACKEND-82: fix formatting">
+    <list default="true" id="c4bbd917-8929-44b4-afda-19b441d6e48e" name="Changes" comment="MYBUDGETBACKEND-83: fix syntax host check">
       <change beforePath="$PROJECT_DIR$/.github/workflows/quick-deploy.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/quick-deploy.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -218,22 +220,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1737229814397</updated>
-    </task>
-    <task id="LOCAL-00117" summary="MYBUDGETBACKEND-67: fix deploy to start database docker">
-      <option name="closed" value="true" />
-      <created>1746747367939</created>
-      <option name="number" value="00117" />
-      <option name="presentableId" value="LOCAL-00117" />
-      <option name="project" value="LOCAL" />
-      <updated>1746747367939</updated>
-    </task>
-    <task id="LOCAL-00118" summary="MYBUDGETBACKEND-67: fix deploy to start database docker">
-      <option name="closed" value="true" />
-      <created>1746747847071</created>
-      <option name="number" value="00118" />
-      <option name="presentableId" value="LOCAL-00118" />
-      <option name="project" value="LOCAL" />
-      <updated>1746747847071</updated>
     </task>
     <task id="LOCAL-00119" summary="MYBUDGETBACKEND-68: fix deploy to start database docker">
       <option name="closed" value="true" />
@@ -611,7 +597,23 @@
       <option name="project" value="LOCAL" />
       <updated>1746766324921</updated>
     </task>
-    <option name="localTasksCounter" value="166" />
+    <task id="LOCAL-00166" summary="MYBUDGETBACKEND-82: fix formatting">
+      <option name="closed" value="true" />
+      <created>1746766641938</created>
+      <option name="number" value="00166" />
+      <option name="presentableId" value="LOCAL-00166" />
+      <option name="project" value="LOCAL" />
+      <updated>1746766641938</updated>
+    </task>
+    <task id="LOCAL-00167" summary="MYBUDGETBACKEND-83: fix syntax host check">
+      <option name="closed" value="true" />
+      <created>1746766858026</created>
+      <option name="number" value="00167" />
+      <option name="presentableId" value="LOCAL-00167" />
+      <option name="project" value="LOCAL" />
+      <updated>1746766858026</updated>
+    </task>
+    <option name="localTasksCounter" value="168" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -649,7 +651,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="MYBUDGETBACKEND-64: fix deploy to start database docker" />
     <MESSAGE value="MYBUDGETBACKEND-65: fix deploy to start database docker" />
     <MESSAGE value="MYBUDGETBACKEND-66: fix deploy to start database docker" />
     <MESSAGE value="MYBUDGETBACKEND-67: fix deploy to start database docker" />
@@ -674,7 +675,8 @@
     <MESSAGE value="MYBUDGETBACKEND-81: fix traefik for mobile routing" />
     <MESSAGE value="MYBUDGETBACKEND-81: fix formatting" />
     <MESSAGE value="MYBUDGETBACKEND-82: fix formatting" />
-    <option name="LAST_COMMIT_MESSAGE" value="MYBUDGETBACKEND-82: fix formatting" />
+    <MESSAGE value="MYBUDGETBACKEND-83: fix syntax host check" />
+    <option name="LAST_COMMIT_MESSAGE" value="MYBUDGETBACKEND-83: fix syntax host check" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

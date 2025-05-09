@@ -1,458 +1,174 @@
-# MyBudget Backend (Мой бюджет)
+# MyBudget (Мой бюджет)
 
-Backend service for the MyBudget application, built with Kotlin and Ktor. This service provides an API for managing finances.
+Комплексное решение для управления личными финансами, состоящее из бэкенд-сервиса и мобильного приложения. Система позволяет пользователям отслеживать расходы, управлять бюджетами и получать аналитику по своим финансам.
 
-## Table of Contents
+## Быстрый старт
 
-- [Features](#-features)
-- [Tech Stack](#-tech-stack)
-- [Project Structure](#-project-structure)
-- [Prerequisites](#-prerequisites)
-- [Installation](#-installation)
-- [Development](#-development)
-- [Deployment](#-deployment)
-- [Server Management](#-server-management)
-- [API Documentation](#-api-documentation)
-- [Contributing](#-contributing)
+### Бэкенд
 
-## 🚀 Features
+1. Клонируйте репозиторий:
+```bash
+git clone https://github.com/IslombekTurakulov/MyBudget-backend.git
+cd MyBudget-backend
+```
 
-### Core Features
-- **User Management**
-  - Secure registration and login
-  - JWT-based authentication
-  - Firebase integration
+2. Запустите приложение:
+```bash
+chmod +x run-local-backend.sh
+./run-local-backend.sh
+```
 
-- **Transaction Management**
-  - Create, read, update, and delete transactions
-  - Categorize transactions
-  - Filter and search transactions
+Скрипт автоматически настроит окружение и запустит приложение.
 
-- **Analytics**
-  - Project analytics
-  - Overview analytics 
+### Мобильное приложение
 
-- **Firebase cloud messaging notification with ru/en localization**
+1. Клонируйте репозиторий:
+```bash
+git clone https://github.com/IslombekTurakulov/MyBudget-android.git
+cd MyBudget-android
+```
 
+2. Откройте проект в Android Studio и запустите приложение
 
-### Technical Features
-- RESTful API design
-- Swagger UI documentation
-- Health check endpoints
-- Docker containerization
-- CI/CD pipeline with GitHub Actions
+## 🛠 Технологический стек
 
-## Tech Stack
-
-### Backend
-- **Language**: Kotlin 1.9.22
-- **Framework**: Ktor 2.3.7
-- **Database**: PostgreSQL 17
-- **Authentication**: JWT + Firebase
-- **Container**: Docker
+### Бэкенд
+- **Язык**: Kotlin
+- **Фреймворк**: Ktor
+- **База данных**: PostgreSQL 17
+- **Контейнеризация**: Docker & Docker Swarm
+- **Прокси**: Traefik
 - **CI/CD**: GitHub Actions
-- **Reverse Proxy**: Traefik v2.11
 
-## Project Structure
+## Требования
 
-```
-src/main/kotlin/ru/iuturakulov/mybudgetbackend/
-├── Application.kt           # Application entry point
-├── config/                 # Configuration files
-├── controller/            # API controllers
-├── database/             # Database configuration
-├── di/                   # Dependency injection
-├── entities/            # Database entities
-├── extensions/         # Kotlin extensions
-├── models/            # Data models
-├── plugins/          # Ktor plugins
-├── repositories/    # Data repositories
-├── routing/        # API routes
-├── services/      # Business logic
-└── utils/        # Utility functions
-```
+### Бэкенд
+- Docker и Docker Swarm
+- PostgreSQL 17
+- JDK 17+
+- Gradle 8.0+
 
-## Prerequisites
+### Мобильное приложение
+- Android Studio
+- Android SDK 34+
+- Kotlin 1.9+
+- Firebase CLI
 
-Before you begin, ensure you have the following installed:
+## 🔧 Настройка окружения
 
-### Required Software
-- **JDK 17**
-  ```bash
-  # Ubuntu/Debian
-  sudo apt install openjdk-17-jdk
-  
-  # macOS
-  brew install openjdk@17
-  ```
+### Бэкенд
 
-- **Docker & Docker Compose**
-  ```bash
-  # Ubuntu/Debian
-  sudo apt install docker.io docker-compose
-  
-  # macOS
-  brew install docker docker-compose
-  ```
-
-### Required Accounts
-- GitHub account (for repository access)
-- Firebase project (for authentication)
-
-## 🔧 Installation
-
-### 1. Clone the Repository
-```bash
-git clone https://github.com/IslombekTurakulov/mybudget-backend.git
-cd mybudget-backend
-```
-
-### 2. Set Up Environment Variables
-Create a `.env` file in the project root:
+1. Создайте файл `.env`:
 ```env
-# Database Configuration
 PG_USER=your_db_user
-PG_DATABASE=your_db_name
 PG_PASSWORD=your_db_password
-
-# JWT Configuration
+PG_DATABASE=your_db_name
 JWT_SECRET=your_jwt_secret
-
-# Let's Encrypt Configuration
-LETSENCRYPT_EMAIL=your_email@example.com
+FIREBASE_CREDENTIALS=path_to_firebase_credentials.json
 ```
 
-### 3. Build the Project
+2. Запустите приложение:
 ```bash
-./gradlew build
+./run-local-backend.sh
 ```
 
-## Development
+Скрипт автоматически:
+- Проверяет наличие Docker и Docker Compose
+- Создает необходимые Docker сети
+- Запускает PostgreSQL в контейнере
+- Запускает приложение с помощью Gradle
+- Отображает логи в реальном времени
 
-### Running Locally
-1. Start the database:
+## Развертывание
+
+### Бэкенд
+
+1. Соберите Docker образ:
 ```bash
-docker-compose up -d database
+docker build -t mybudget-backend .
 ```
 
-2. Run the application:
+2. Разверните с помощью Docker Swarm:
 ```bash
-./gradlew run
-```
-
-### Running Tests
-```bash
-# Run all tests
-./gradlew test
-```
-
-## 🐳 Deployment
-
-### Docker Deployment
-1. Build the image:
-```bash
-docker build -t ghcr.io/islombekturakulov/mybudget-backend:latest .
-```
-
-2. Run with Docker Compose:
-```bash
-docker-compose up -d
-```
-
-### Production Deployment
-The project uses GitHub Actions for automated deployment:
-
-1. **Manual Deployment**
-   - Go to GitHub Actions tab
-   - Select "Backend CI/CD" workflow
-   - Click "Run workflow"
-   - Select "Deploy to server" option
-
-2. **Automatic Deployment**
-   - Create a new version tag:
-   ```bash
-   git tag v0.0.1
-   git push origin v0.0.1
-   ```
-
-## 📊 Deployment Status
-
-### Latest Release
-[![Latest Release](https://img.shields.io/github/v/release/IslombekTurakulov/mybudget-backend?include_prereleases&sort=semver)](https://github.com/IslombekTurakulov/mybudget-backend/releases/latest)
-
-## 📚 API Documentation
-
-API documentation is available at `/swagger-ui` when the application is running.
-
-## 🛠 Server Management
-
-### Basic Commands
-
-#### Service Status
-```bash
-# List all services
-docker service ls
-
-# Check specific service status
-docker service ps backend_backend
-docker service ps backend_database
-docker service ps backend_traefik
-```
-
-#### Logs
-```bash
-# View backend logs
-docker service logs backend_backend
-
-# View database logs
-docker service logs backend_database
-
-# View Traefik logs
-docker service logs backend_traefik
-
-# Follow logs in real-time
-docker service logs -f backend_backend
-```
-
-#### Networks
-```bash
-# List all networks
-docker network ls
-
-# Inspect specific network
-docker network inspect backend_backend
-docker network inspect backend_public
-```
-
-#### Volumes
-```bash
-# List all volumes
-docker volume ls
-
-# Inspect specific volume
-docker volume inspect backend_pg_data
-docker volume inspect backend_letsencrypt
-```
-
-#### Containers
-```bash
-# List running containers
-docker ps
-
-# List all containers (including stopped)
-docker ps -a
-```
-
-### Health Checks
-
-#### Application Health
-```bash
-# Check application health
-curl http://localhost:8080/ping
-
-# Check Traefik dashboard
-curl http://localhost:8080/dashboard/
-```
-
-#### Port Status
-```bash
-# Check open ports
-netstat -tulpn | grep -E '80|443|8080'
-```
-
-### Service Management
-
-#### Restart Services
-```bash
-# Restart backend
-docker service update --force backend_backend
-
-# Restart database
-docker service update --force backend_database
-
-# Restart Traefik
-docker service update --force backend_traefik
-```
-
-#### Scale Services
-```bash
-# Scale backend to 3 replicas
-docker service scale backend_backend=3
-
-# Scale backend to 1 replica
-docker service scale backend_backend=1
-```
-
-#### Full Stack Update
-```bash
-# Remove stack
-docker stack rm backend
-
-# Wait for cleanup
-sleep 10
-
-# Deploy stack
 docker stack deploy -c docker-compose.yml backend
 ```
 
-### Resource Monitoring
+## API
 
-#### System Resources
-```bash
-# Monitor resource usage
-docker stats
-
-# System information
-docker info
+### Базовый URL
+```
+http://51.250.65.154
 ```
 
-### Troubleshooting
-
-#### Common Issues
-
-1. **Service Not Starting**
-   ```bash
-   # Check service logs
-   docker service logs backend_backend
-   
-   # Check service status
-   docker service ps backend_backend
-   
-   # Check container logs
-   docker ps
-   docker logs <container_id>
-   ```
-
-2. **Database Issues**
-   ```bash
-   # Check database logs
-   docker service logs backend_database
-   
-   # Check database connection
-   docker exec -it $(docker ps -q -f name=backend_database) psql -U $PG_USER -d $PG_DATABASE
-   ```
-
-3. **Network Issues**
-   ```bash
-   # Check network connectivity
-   docker network inspect backend_backend
-   
-   # Check Traefik configuration
-   docker service logs backend_traefik | grep "configuration"
-   ```
-
-4. **Port Conflicts**
-   ```bash
-   # Check port usage
-   netstat -tulpn | grep -E '80|443|8080'
-   
-   # Check Traefik logs
-   docker service logs backend_traefik
-   ```
-
-#### Recovery Steps
-
-1. **Service Recovery**
-   ```bash
-   # Force update service
-   docker service update --force backend_backend
-   
-   # Check service status
-   docker service ps backend_backend
-   ```
-
-2. **Stack Recovery**
-   ```bash
-   # Remove stack
-   docker stack rm backend
-   
-   # Clean up resources
-   docker container prune -f
-   docker network prune -f
-   docker volume prune -f
-   
-   # Redeploy stack
-   docker stack deploy -c docker-compose.yml backend
-   ```
-
-3. **Database Recovery**
-   ```bash
-   # Backup database
-   docker exec -it $(docker ps -q -f name=backend_database) pg_dump -U $PG_USER $PG_DATABASE > backup.sql
-   
-   # Restore database
-   docker exec -i $(docker ps -q -f name=backend_database) psql -U $PG_USER -d $PG_DATABASE < backup.sql
-   ```
-
-### Security
-
-#### Update Secrets
-```bash
-# Update JWT secret
-echo "new_jwt_secret" > secrets/app_jwt_secret.txt
-chmod 600 secrets/app_jwt_secret.txt
-docker service update --secret-rm app_secret --secret-add source=app_secret,target=/run/secrets/app_secret backend_backend
-
-# Update database password
-echo "new_db_password" > secrets/pg_password.txt
-chmod 600 secrets/pg_password.txt
-docker service update --secret-rm pg_password --secret-add source=pg_password,target=/run/secrets/pg_password backend_database
+### Аутентификация
+Все эндпоинты, кроме `/ping`, требуют JWT токен:
+```
+Authorization: Bearer <token>
 ```
 
-#### SSL/TLS
-```bash
-# Check SSL certificate status
-docker service logs backend_traefik | grep "certificate"
+### Основные эндпоинты
 
-# Force certificate renewal
-docker service update --force backend_traefik
-```
+#### Аутентификация
+- `POST /auth/register` - Регистрация
+- `POST /auth/login` - Вход
+- `POST /auth/verify-email` - Подтверждение email
+- `POST /auth/reset-password` - Сброс пароля
 
-## Быстрый локальный запуск backend с Postgres
+#### Проекты
+- `POST /projects` - Создание
+- `GET /projects` - Список
+- `GET /projects/{id}` - Детали
+- `PUT /projects/{id}` - Обновление
+- `DELETE /projects/{id}` - Удаление
 
-### 1. Через Docker
+#### Транзакции
+- `POST /transactions` - Создание
+- `GET /transactions` - Список
+- `GET /transactions/{id}` - Детали
+- `PUT /transactions/{id}` - Обновление
+- `DELETE /transactions/{id}` - Удаление
 
-1. Убедитесь, что Docker установлен и запущен.
-2. Запустите скрипт:
-   ```sh
-   ./run-local-backend.sh
-   ```
-3. После запуска скрипта, в этом же терминале выполните:
-   ```sh
-   ./gradlew run
-   ```
-   или
-   ```sh
-   java -jar build/libs/MyBudget-backend-1.0.0.jar
-   ```
+#### Аналитика
+- `GET /analytics/overview` - Общая
+- `GET /analytics/transactions` - По транзакциям
+- `GET /analytics/categories` - По категориям
 
-### 2. Через Podman (Mac/Windows/Linux)
+#### Уведомления
+- `GET /notifications` - Список
+- `POST /notifications/read` - Отметить прочитанными
+- `POST /notifications/settings` - Настройки
 
-1. Убедитесь, что Podman установлен.
-2. **На Mac/Windows обязательно запустите Podman Machine:**
-   ```sh
-   podman machine init   # только при первом запуске
-   podman machine start
-   ```
-3. Проверьте, что Podman работает:
-   ```sh
-   podman info
-   ```
-4. Запустите скрипт:
-   ```sh
-   ./run-local-backend.sh
-   ```
-5. После запуска скрипта, в этом же терминале выполните:
-   ```sh
-   ./gradlew run
-   ```
-   или
-   ```sh
-   java -jar build/libs/MyBudget-backend-1.0.0.jar
-   ```
+#### Настройки
+- `GET /settings` - Получить
+- `PUT /settings` - Обновить
 
-**Важно:**
-- Скрипт автоматически определяет, что использовать — podman или docker.
-- Для Podman на Mac/Windows всегда должна быть запущена Podman Machine, иначе будет ошибка подключения.
-- Если хотите использовать только Docker, убедитесь, что podman не установлен или временно уберите его из PATH.
+#### Устройства
+- `POST /device-tokens` - Регистрация
+- `DELETE /device-tokens/{token}` - Удаление
+
+## Мониторинг
+
+### Бэкенд
+- Health checks через Traefik
+- Логирование через Docker
+- Метрики производительности
+
+### Мобильное приложение
+- Firebase Analytics
+- Firebase Crashlytics
+- Firebase Performance Monitoring
+
+## Безопасность
+
+### Бэкенд
+- JWT аутентификация
+- Шифрование паролей
+- Rate limiting
+
+### Мобильное приложение
+- Firebase Authentication
+- Безопасное хранение данных
+- Шифрование локальных данных
+- Защита от реверс-инжиниринга
+
 

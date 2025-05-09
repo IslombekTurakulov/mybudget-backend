@@ -592,14 +592,32 @@ jobs:
             echo "========== TRAEFIK LOGS =========="
             cat backend_traefik.log || echo "No traefik logs available"
 
-      - name: Download logs from server
+      - name: Collect and upload logs
         if: always()
         run: |
-          scp -i ${{ secrets.SERVER_SSH_KEY }} -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/opt/mybudget/backend/*.log .
-
-      - name: Upload logs
+          # Create logs directory
+          mkdir -p logs
+          
+          # Get service logs directly
+          echo "Collecting service logs..."
+          ssh -i ${{ secrets.SERVER_SSH_KEY }} -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "docker service logs backend_backend --tail 100" > logs/backend.log || true
+          ssh -i ${{ secrets.SERVER_SSH_KEY }} -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "docker service logs backend_database --tail 100" > logs/database.log || true
+          ssh -i ${{ secrets.SERVER_SSH_KEY }} -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "docker service logs backend_traefik --tail 100" > logs/traefik.log || true
+          
+          # Add deployment info to logs
+          echo "=== Deployment Info ===" > logs/deployment_info.log
+          echo "Deployment Time: $(date)" >> logs/deployment_info.log
+          echo "GitHub Run Number: ${{ github.run_number }}" >> logs/deployment_info.log
+          echo "Image Tag: ${{ github.event.inputs.image_tag }}" >> logs/deployment_info.log
+          
+          # Upload logs as artifact
+          echo "Uploading logs as artifact..."
+          tar -czf deployment_logs.tar.gz logs/
+          
+      - name: Upload logs artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: deployment-logs
-          path: "*.log"
+          name: deployment-logs-${{ github.run_number }}
+          path: deployment_logs.tar.gz
+          retention-days: 7
