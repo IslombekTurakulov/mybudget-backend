@@ -111,10 +111,15 @@ fun Route.userRoute(userController: UserController) {
                     HttpStatusCode.Conflict,
                     "Email уже используется"
                 )
+            } catch (e: AppException.InvalidProperty.EmailNotExist){
+                call.respond(
+                    HttpStatusCode.InternalServerError,
+                    e.message ?: "Ошибка подтверждения email"
+                )
             } catch (e: Exception) {
                 call.respond(
                     HttpStatusCode.InternalServerError,
-                    "Ошибка подтверждения email: ${e.localizedMessage}",
+                    "Ошибка подтверждения email: ${e.localizedMessage.orEmpty()}",
                 )
             }
         }

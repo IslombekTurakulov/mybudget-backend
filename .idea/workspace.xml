@@ -4,11 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4bbd917-8929-44b4-afda-19b441d6e48e" name="Changes" comment="Revert &quot;MYBUDGETBACKEND-85: add grafana monitorings&quot;&#10;&#10;This reverts commit 42a573ed">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+    <list default="true" id="c4bbd917-8929-44b4-afda-19b441d6e48e" name="Changes" comment="MYBUDGETBACKEND-89: Remove env variables">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/setup-server.sh" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/setup-server.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/setup-yc-vm.sh" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/setup-yc-vm.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/routing/UserRoute.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/routing/UserRoute.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -52,7 +50,6 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
-    <option name="UPDATE_TYPE" value="REBASE" />
   </component>
   <component name="GitHubPullRequestSearchHistory">{
   &quot;lastFilter&quot;: {
@@ -221,30 +218,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1737229814397</updated>
-    </task>
-    <task id="LOCAL-00123" summary="MYBUDGETBACKEND-68: fix deploy to start database docker">
-      <option name="closed" value="true" />
-      <created>1746749157196</created>
-      <option name="number" value="00123" />
-      <option name="presentableId" value="LOCAL-00123" />
-      <option name="project" value="LOCAL" />
-      <updated>1746749157196</updated>
-    </task>
-    <task id="LOCAL-00124" summary="MYBUDGETBACKEND-68: fix deploy to start database docker">
-      <option name="closed" value="true" />
-      <created>1746749340491</created>
-      <option name="number" value="00124" />
-      <option name="presentableId" value="LOCAL-00124" />
-      <option name="project" value="LOCAL" />
-      <updated>1746749340491</updated>
-    </task>
-    <task id="LOCAL-00125" summary="MYBUDGETBACKEND-68: fix deploy to start database docker">
-      <option name="closed" value="true" />
-      <created>1746749491457</created>
-      <option name="number" value="00125" />
-      <option name="presentableId" value="LOCAL-00125" />
-      <option name="project" value="LOCAL" />
-      <updated>1746749491457</updated>
     </task>
     <task id="LOCAL-00126" summary="MYBUDGETBACKEND-68: fix deploy to start database docker">
       <option name="closed" value="true" />
@@ -614,7 +587,31 @@
       <option name="project" value="LOCAL" />
       <updated>1746826618730</updated>
     </task>
-    <option name="localTasksCounter" value="172" />
+    <task id="LOCAL-00172" summary="MYBUDGETBACKEND-87: Remove yandex cloud scripts">
+      <option name="closed" value="true" />
+      <created>1746826886074</created>
+      <option name="number" value="00172" />
+      <option name="presentableId" value="LOCAL-00172" />
+      <option name="project" value="LOCAL" />
+      <updated>1746826886074</updated>
+    </task>
+    <task id="LOCAL-00173" summary="MYBUDGETBACKEND-88: Remove unused sandbox CI from quick-deploy.yml">
+      <option name="closed" value="true" />
+      <created>1746826985648</created>
+      <option name="number" value="00173" />
+      <option name="presentableId" value="LOCAL-00173" />
+      <option name="project" value="LOCAL" />
+      <updated>1746826985648</updated>
+    </task>
+    <task id="LOCAL-00174" summary="MYBUDGETBACKEND-89: Remove env variables">
+      <option name="closed" value="true" />
+      <created>1746827180201</created>
+      <option name="number" value="00174" />
+      <option name="presentableId" value="LOCAL-00174" />
+      <option name="project" value="LOCAL" />
+      <updated>1746827180201</updated>
+    </task>
+    <option name="localTasksCounter" value="175" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -652,9 +649,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="MYBUDGETBACKEND-69: fix deploy to start database docker" />
-    <MESSAGE value="MYBUDGETBACKEND-70: fix deploy" />
-    <MESSAGE value="MYBUDGETBACKEND-71: fix formatting" />
     <MESSAGE value="MYBUDGETBACKEND-71: fix secrets check" />
     <MESSAGE value="MYBUDGETBACKEND-72: fix hikari and replicas" />
     <MESSAGE value="MYBUDGETBACKEND-73: fix deploy" />
@@ -677,7 +671,10 @@
     <MESSAGE value="MYBUDGETBACKEND-85: add grafana monitorings" />
     <MESSAGE value="Revert &quot;MYBUDGETBACKEND-85: add grafana monitorings&quot;&#10;&#10;This reverts commit bea81487" />
     <MESSAGE value="Revert &quot;MYBUDGETBACKEND-85: add grafana monitorings&quot;&#10;&#10;This reverts commit 42a573ed" />
-    <option name="LAST_COMMIT_MESSAGE" value="Revert &quot;MYBUDGETBACKEND-85: add grafana monitorings&quot;&#10;&#10;This reverts commit 42a573ed" />
+    <MESSAGE value="MYBUDGETBACKEND-87: Remove yandex cloud scripts" />
+    <MESSAGE value="MYBUDGETBACKEND-88: Remove unused sandbox CI from quick-deploy.yml" />
+    <MESSAGE value="MYBUDGETBACKEND-89: Remove env variables" />
+    <option name="LAST_COMMIT_MESSAGE" value="MYBUDGETBACKEND-89: Remove env variables" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -994,12 +991,12 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="kotlin-line">
           <url>file://$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/routing/UserRoute.kt</url>
-          <line>129</line>
+          <line>134</line>
           <option name="timeStamp" value="161" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="kotlin-line">
           <url>file://$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/routing/UserRoute.kt</url>
-          <line>131</line>
+          <line>136</line>
           <option name="timeStamp" value="162" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="kotlin-line">
