@@ -9,7 +9,7 @@ import ru.iuturakulov.mybudgetbackend.plugins.*
 
 fun main() {
     val config = HoconApplicationConfig(ConfigFactory.load("application.conf"))
-    val port = config.property("ktor.deployment.port").getString().toInt()
+    val port = System.getenv("SERVER_PORT")?.toInt() ?: 8080
     val host = config.property("ktor.deployment.host").getString()
 
     embeddedServer(Netty, port = port, host = host) {

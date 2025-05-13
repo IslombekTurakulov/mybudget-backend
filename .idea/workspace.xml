@@ -4,9 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4bbd917-8929-44b4-afda-19b441d6e48e" name="Changes" comment="MYBUDGETBACKEND-89: Remove env variables">
+    <list default="true" id="c4bbd917-8929-44b4-afda-19b441d6e48e" name="Changes" comment="MYBUDGETBACKEND-90: Fix try catch error">
+      <change afterPath="$PROJECT_DIR$/.idea/detekt.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/routing/UserRoute.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/routing/UserRoute.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/run-local-backend.sh" beforeDir="false" afterPath="$PROJECT_DIR$/run-local-backend.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/Application.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/Application.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/messages_ru.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/messages_ru.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -94,7 +98,7 @@
     &quot;git-widget-placeholder&quot;: &quot;main&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
     &quot;last_opened_file_path&quot;: &quot;/Users/iuturakulov/IdeaProjects/MyBudget-backend&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Facets&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Project&quot;,
     &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
     &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
     &quot;run.code.analysis.last.selected.profile&quot;: &quot;pProject Default&quot;,
@@ -125,15 +129,8 @@
   </component>
   <component name="RunManager" selected="Kotlin.ApplicationKt">
     <configuration name="ApplicationKt" type="JetRunConfigurationType" temporary="true" nameIsGenerated="true">
-      <envs>
-        <env name="DATABASE_URL" value="jdbc:postgresql://localhost:5433/postgres" />
-        <env name="PG_DATABASE" value="postgres" />
-        <env name="PG_HOST" value="localhost" />
-        <env name="PG_PASSWORD" value="p123" />
-        <env name="PG_PORT" value="5433" />
-        <env name="PG_USER" value="iuturakulov" />
-        <env name="SERVER_PORT" value="8080" />
-      </envs>
+      <option name="ALTERNATIVE_JRE_PATH" value="corretto-21" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
       <option name="MAIN_CLASS_NAME" value="ru.iuturakulov.mybudgetbackend.ApplicationKt" />
       <module name="MyBudget-backend.main" />
       <shortenClasspath name="NONE" />
@@ -145,21 +142,6 @@
       <option name="SCRIPT_TEXT" value="" />
       <option name="INDEPENDENT_SCRIPT_PATH" value="true" />
       <option name="SCRIPT_PATH" value="$PROJECT_DIR$/run-local-backend.sh" />
-      <option name="SCRIPT_OPTIONS" value="" />
-      <option name="INDEPENDENT_SCRIPT_WORKING_DIRECTORY" value="true" />
-      <option name="SCRIPT_WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="INDEPENDENT_INTERPRETER_PATH" value="true" />
-      <option name="INTERPRETER_PATH" value="/bin/bash" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="EXECUTE_IN_TERMINAL" value="true" />
-      <option name="EXECUTE_SCRIPT_FILE" value="true" />
-      <envs />
-      <method v="2" />
-    </configuration>
-    <configuration name="start-local.sh" type="ShConfigurationType" temporary="true">
-      <option name="SCRIPT_TEXT" value="" />
-      <option name="INDEPENDENT_SCRIPT_PATH" value="true" />
-      <option name="SCRIPT_PATH" value="$PROJECT_DIR$/start-local.sh" />
       <option name="SCRIPT_OPTIONS" value="" />
       <option name="INDEPENDENT_SCRIPT_WORKING_DIRECTORY" value="true" />
       <option name="SCRIPT_WORKING_DIRECTORY" value="$PROJECT_DIR$" />
@@ -198,14 +180,12 @@
       <item itemvalue="Docker.docker-compose.yml: Compose Deployment" />
       <item itemvalue="Kotlin.ApplicationKt" />
       <item itemvalue="Shell Script.run-local-backend.sh" />
-      <item itemvalue="Shell Script.start-local.sh" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Docker.Dockerfile" />
         <item itemvalue="Kotlin.ApplicationKt" />
         <item itemvalue="Shell Script.run-local-backend.sh" />
-        <item itemvalue="Shell Script.start-local.sh" />
+        <item itemvalue="Docker.Dockerfile" />
         <item itemvalue="Docker.docker-compose.yml: Compose Deployment" />
       </list>
     </recent_temporary>
@@ -218,14 +198,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1737229814397</updated>
-    </task>
-    <task id="LOCAL-00126" summary="MYBUDGETBACKEND-68: fix deploy to start database docker">
-      <option name="closed" value="true" />
-      <created>1746749678644</created>
-      <option name="number" value="00126" />
-      <option name="presentableId" value="LOCAL-00126" />
-      <option name="project" value="LOCAL" />
-      <updated>1746749678644</updated>
     </task>
     <task id="LOCAL-00127" summary="MYBUDGETBACKEND-68: fix deploy to start database docker">
       <option name="closed" value="true" />
@@ -611,7 +583,15 @@
       <option name="project" value="LOCAL" />
       <updated>1746827180201</updated>
     </task>
-    <option name="localTasksCounter" value="175" />
+    <task id="LOCAL-00175" summary="MYBUDGETBACKEND-90: Fix try catch error">
+      <option name="closed" value="true" />
+      <created>1746843936824</created>
+      <option name="number" value="00175" />
+      <option name="presentableId" value="LOCAL-00175" />
+      <option name="project" value="LOCAL" />
+      <updated>1746843936824</updated>
+    </task>
+    <option name="localTasksCounter" value="176" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -649,7 +629,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="MYBUDGETBACKEND-71: fix secrets check" />
     <MESSAGE value="MYBUDGETBACKEND-72: fix hikari and replicas" />
     <MESSAGE value="MYBUDGETBACKEND-73: fix deploy" />
     <MESSAGE value="MYBUDGETBACKEND-74: fix env" />
@@ -674,7 +653,8 @@
     <MESSAGE value="MYBUDGETBACKEND-87: Remove yandex cloud scripts" />
     <MESSAGE value="MYBUDGETBACKEND-88: Remove unused sandbox CI from quick-deploy.yml" />
     <MESSAGE value="MYBUDGETBACKEND-89: Remove env variables" />
-    <option name="LAST_COMMIT_MESSAGE" value="MYBUDGETBACKEND-89: Remove env variables" />
+    <MESSAGE value="MYBUDGETBACKEND-90: Fix try catch error" />
+    <option name="LAST_COMMIT_MESSAGE" value="MYBUDGETBACKEND-90: Fix try catch error" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
