@@ -4,13 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4bbd917-8929-44b4-afda-19b441d6e48e" name="Changes" comment="MYBUDGETBACKEND-90: Fix try catch error">
+    <list default="true" id="c4bbd917-8929-44b4-afda-19b441d6e48e" name="Changes" comment="MYBUDGETBACKEND-92: add LICENSE">
       <change afterPath="$PROJECT_DIR$/.idea/detekt.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/run-local-backend.sh" beforeDir="false" afterPath="$PROJECT_DIR$/run-local-backend.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/Application.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/Application.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/messages_ru.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/messages_ru.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/database/ConfigureDataBase.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/database/ConfigureDataBase.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -127,13 +125,10 @@
       <recent name="ru.iuturakulov.mybudgetbackend.models.fcm" />
     </key>
   </component>
-  <component name="RunManager" selected="Kotlin.ApplicationKt">
+  <component name="RunManager" selected="Shell Script.run-local-backend.sh">
     <configuration name="ApplicationKt" type="JetRunConfigurationType" temporary="true" nameIsGenerated="true">
-      <option name="ALTERNATIVE_JRE_PATH" value="corretto-21" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
       <option name="MAIN_CLASS_NAME" value="ru.iuturakulov.mybudgetbackend.ApplicationKt" />
-      <module name="MyBudget-backend.main" />
-      <shortenClasspath name="NONE" />
+      <module name="ru.iuturakulov.mybudgetbackend.MyBudget-backend.main" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -183,8 +178,8 @@
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Kotlin.ApplicationKt" />
         <item itemvalue="Shell Script.run-local-backend.sh" />
+        <item itemvalue="Kotlin.ApplicationKt" />
         <item itemvalue="Docker.Dockerfile" />
         <item itemvalue="Docker.docker-compose.yml: Compose Deployment" />
       </list>
@@ -198,22 +193,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1737229814397</updated>
-    </task>
-    <task id="LOCAL-00127" summary="MYBUDGETBACKEND-68: fix deploy to start database docker">
-      <option name="closed" value="true" />
-      <created>1746749782370</created>
-      <option name="number" value="00127" />
-      <option name="presentableId" value="LOCAL-00127" />
-      <option name="project" value="LOCAL" />
-      <updated>1746749782370</updated>
-    </task>
-    <task id="LOCAL-00128" summary="MYBUDGETBACKEND-68: fix deploy to start database docker">
-      <option name="closed" value="true" />
-      <created>1746749953845</created>
-      <option name="number" value="00128" />
-      <option name="presentableId" value="LOCAL-00128" />
-      <option name="project" value="LOCAL" />
-      <updated>1746749953845</updated>
     </task>
     <task id="LOCAL-00129" summary="MYBUDGETBACKEND-68: fix deploy to start database docker">
       <option name="closed" value="true" />
@@ -591,7 +570,23 @@
       <option name="project" value="LOCAL" />
       <updated>1746843936824</updated>
     </task>
-    <option name="localTasksCounter" value="176" />
+    <task id="LOCAL-00176" summary="MYBUDGETBACKEND-91: fix local backend run">
+      <option name="closed" value="true" />
+      <created>1747102462584</created>
+      <option name="number" value="00176" />
+      <option name="presentableId" value="LOCAL-00176" />
+      <option name="project" value="LOCAL" />
+      <updated>1747102462584</updated>
+    </task>
+    <task id="LOCAL-00177" summary="MYBUDGETBACKEND-92: add LICENSE">
+      <option name="closed" value="true" />
+      <created>1747102475844</created>
+      <option name="number" value="00177" />
+      <option name="presentableId" value="LOCAL-00177" />
+      <option name="project" value="LOCAL" />
+      <updated>1747102475844</updated>
+    </task>
+    <option name="localTasksCounter" value="178" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -629,8 +624,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="MYBUDGETBACKEND-72: fix hikari and replicas" />
-    <MESSAGE value="MYBUDGETBACKEND-73: fix deploy" />
     <MESSAGE value="MYBUDGETBACKEND-74: fix env" />
     <MESSAGE value="MYBUDGETBACKEND-74: fix file" />
     <MESSAGE value="MYBUDGETBACKEND-74: fix migration file" />
@@ -654,7 +647,9 @@
     <MESSAGE value="MYBUDGETBACKEND-88: Remove unused sandbox CI from quick-deploy.yml" />
     <MESSAGE value="MYBUDGETBACKEND-89: Remove env variables" />
     <MESSAGE value="MYBUDGETBACKEND-90: Fix try catch error" />
-    <option name="LAST_COMMIT_MESSAGE" value="MYBUDGETBACKEND-90: Fix try catch error" />
+    <MESSAGE value="MYBUDGETBACKEND-91: fix local backend run" />
+    <MESSAGE value="MYBUDGETBACKEND-92: add LICENSE" />
+    <option name="LAST_COMMIT_MESSAGE" value="MYBUDGETBACKEND-92: add LICENSE" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -981,7 +976,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="kotlin-line">
           <url>file://$PROJECT_DIR$/src/main/kotlin/ru/iuturakulov/mybudgetbackend/database/ConfigureDataBase.kt</url>
-          <line>44</line>
+          <line>57</line>
           <option name="timeStamp" value="168" />
         </line-breakpoint>
       </breakpoints>
