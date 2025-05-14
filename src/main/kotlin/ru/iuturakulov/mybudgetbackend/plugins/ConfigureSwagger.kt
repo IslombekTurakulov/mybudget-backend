@@ -38,7 +38,7 @@ fun Application.configureSwagger() {
             description = "Dev"
         }
         server {
-            url = ".."
+            url = "http://51.250.65.154/"
             description = "Prod"
         }
         schemas {
